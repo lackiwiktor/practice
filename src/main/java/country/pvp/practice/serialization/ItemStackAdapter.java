@@ -476,7 +476,8 @@ public class ItemStackAdapter {
 
     final JsonObject toReturn = new JsonObject();
 
-    enchantLevelMap.forEach((key, value) -> toReturn.addProperty("" + key.getId(), value));
+    enchantLevelMap.forEach(
+        (key, value) -> toReturn.addProperty(String.valueOf(key.getId()), value));
 
     return toReturn;
   }

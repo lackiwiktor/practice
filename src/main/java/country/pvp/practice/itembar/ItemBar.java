@@ -37,6 +37,6 @@ public enum ItemBar {
   }
 
   public ItemStack[] bar() {
-    return Arrays.stream(items).map(ItemBarItem::item).toArray(ItemStack[]::new);
+    return Arrays.stream(items).map(ItemBarItem::getItem).toArray(ItemStack[]::new);
   }
 }

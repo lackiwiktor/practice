@@ -1,2 +1,6 @@
-package country.pvp.practice.data;public class Callback {
+package country.pvp.practice.data;
+
+public interface Callback<V> {
+
+  void call();
 }
