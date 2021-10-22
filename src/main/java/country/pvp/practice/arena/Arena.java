@@ -1,7 +1,2 @@
-package country.pvp.practice.arena;
-
-public class Arena {
-
-  //  private final String name;
-
+package country.pvp.practice.arena;public class Arena {
 }

@@ -4,11 +4,7 @@ import org.bson.Document;
 
 public interface DataObject {
 
-  Document toDocument();
+  void save();
 
   void load(Document document);
-
-  String getCollection();
-
-  String getId();
 }

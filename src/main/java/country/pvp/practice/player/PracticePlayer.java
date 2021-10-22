@@ -13,7 +13,7 @@ import java.util.*;
 
 public class PracticePlayer implements DataObject, Recipient {
 
-  private static final Map<UUID, PracticePlayer> PLAYERS = Maps.newHashMap();
+  private static final Map<UUID, PracticePlayer> players = Maps.newHashMap();
 
   private final UUID id;
   private String name;
@@ -29,38 +29,25 @@ public class PracticePlayer implements DataObject, Recipient {
   }
 
   public static PracticePlayer get(Player player) {
-    return PLAYERS.get(player.getUniqueId());
+    return players.get(player.getUniqueId());
   }
 
   public static PracticePlayer remove(Player player) {
-    return PLAYERS.remove(player.getUniqueId());
+    return players.remove(player.getUniqueId());
   }
 
   public static Set<PracticePlayer> players() {
-    return Collections.unmodifiableSet(new HashSet<>(PLAYERS.values()));
+    return Collections.unmodifiableSet(new HashSet<>(players.values()));
   }
 
   @Override
-  public Document toDocument() {
-    Document document = new Document("_id", getId());
-    document.put("name", name);
-
-    return document;
+  public void save() {
+    // TODO: save data
   }
 
   @Override
   public void load(Document document) {
-    if (name == null) name = document.getString("name");
-  }
-
-  @Override
-  public String getCollection() {
-    return "players";
-  }
-
-  @Override
-  public String getId() {
-    return id.toString();
+    // TODO: load data from a document
   }
 
   @Override
@@ -71,7 +58,7 @@ public class PracticePlayer implements DataObject, Recipient {
   }
 
   public void cache() {
-    PLAYERS.put(id, this);
+    players.put(id, this);
   }
 
   public void show(PracticePlayer practicePlayer) {

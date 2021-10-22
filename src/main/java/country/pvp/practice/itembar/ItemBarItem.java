@@ -15,7 +15,7 @@ public class ItemBarItem {
     click.accept(player, interact);
   }
 
-  public ItemStack getItem() {
+  public ItemStack item() {
     return item.clone();
   }
 
