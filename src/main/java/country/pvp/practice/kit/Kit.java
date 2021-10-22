@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Data
 public class Kit implements DataObject {
 
-  private static final Map<String, Kit> kits = Maps.newHashMap();
+  private static final Map<String, Kit> KITS = Maps.newHashMap();
 
   private final String name;
   private String displayName;
@@ -25,15 +25,15 @@ public class Kit implements DataObject {
   private boolean ranked;
 
   public static Kit get(String name) {
-    return kits.get(name.toUpperCase(Locale.ROOT));
+    return KITS.get(name.toUpperCase(Locale.ROOT));
   }
 
   public static void remove(String name) {
-    kits.remove(name.toUpperCase(Locale.ROOT));
+    KITS.remove(name.toUpperCase(Locale.ROOT));
   }
 
   public static Set<Kit> kits() {
-    return Collections.unmodifiableSet(new HashSet<>(kits.values()));
+    return Collections.unmodifiableSet(new HashSet<>(KITS.values()));
   }
 
   public static void load() {
@@ -48,8 +48,8 @@ public class Kit implements DataObject {
   }
 
   @Override
-  public void save() {
-    Document document = new Document("_id", name);
+  public Document toDocument() {
+    Document document = new Document("_id", getId());
     document.put("displayName", displayName);
     document.put("icon", ItemStackAdapter.toJson(icon));
     document.put(
@@ -57,6 +57,8 @@ public class Kit implements DataObject {
         Arrays.stream(inventory).map(ItemStackAdapter::toJson).collect(Collectors.toList()));
     document.put(
         "armor", Arrays.stream(armor).map(ItemStackAdapter::toJson).collect(Collectors.toList()));
+
+    return document;
   }
 
   @Override
@@ -73,15 +75,25 @@ public class Kit implements DataObject {
             .toArray(ItemStack[]::new);
   }
 
+  @Override
+  public String getCollection() {
+    return "kits";
+  }
+
+  @Override
+  public String getId() {
+    return name;
+  }
+
   public void cache() {
-    kits.put(name.toUpperCase(Locale.ROOT), this);
+    KITS.put(name.toUpperCase(Locale.ROOT), this);
   }
 
   public boolean isSetup() {
     return displayName != null && icon != null && inventory != null && armor != null;
   }
 
-  public ItemStack icon() {
+  public ItemStack getIcon() {
     return new ItemBuilder(icon).name(displayName).build();
   }
 }
