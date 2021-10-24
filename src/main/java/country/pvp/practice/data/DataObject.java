@@ -3,12 +3,11 @@ package country.pvp.practice.data;
 import org.bson.Document;
 
 public interface DataObject {
+    Document get();
 
-  Document toDocument();
+    void apply(Document document);
 
-  void load(Document document);
+    String getCollection();
 
-  String getCollection();
-
-  String getId();
+    String getId();
 }

@@ -1,4 +1,4 @@
-package country.pvp.practice;
+package country.pvp.practice.concurrent;
 
 import lombok.experimental.UtilityClass;
 
