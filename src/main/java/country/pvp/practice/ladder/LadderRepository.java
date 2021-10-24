@@ -17,7 +17,7 @@ public class LadderRepository extends MongoRepository<Ladder> {
     public Set<Ladder> loadAll() {
         Set<Ladder> ladders = Sets.newHashSet();
 
-        database.getCollection("kit").find().forEach(it -> {
+        database.getCollection("ladders").find().forEach(it -> {
             Ladder ladder = new Ladder(it.getString("name"));
             ladder.applyDocument(it);
             ladders.add(ladder);

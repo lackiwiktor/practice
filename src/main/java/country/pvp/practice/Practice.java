@@ -6,10 +6,14 @@ import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarListener;
+import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderRepository;
 import country.pvp.practice.lobby.LobbyPlayerListener;
+import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.PreparePlayerListener;
+import country.pvp.practice.queue.QueueManager;
+import country.pvp.practice.queue.QueueTask;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -30,7 +34,9 @@ public class Practice extends JavaPlugin {
         register(PreparePlayerListener.class);
         register(PracticeBoard.class);
         register(LobbyPlayerListener.class);
+        register(MenuListener.class);
         schedule(BoardTask.class, 1L, TimeUnit.SECONDS, true);
+        schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
         loadAll();
     }
 
@@ -46,15 +52,26 @@ public class Practice extends JavaPlugin {
 
     @SneakyThrows
     public void loadAll() {
-        CompletableFuture<Boolean> kitsLoaded = new CompletableFuture<>();
-        TaskDispatcher.async(() -> loadKits(kitsLoaded));
+        CompletableFuture<Boolean> laddersLoaded = new CompletableFuture<>();
+        TaskDispatcher.async(() -> loadLadders(laddersLoaded));
 
-        if (kitsLoaded.get()) {
-            log.info("Loaded kits!");
+        if (laddersLoaded.get()) {
+            log.info("Loaded ladders!");
+            initPlayerQueues();
+            log.info("Initialized queues!");
         }
     }
 
-    private void loadKits(CompletableFuture<Boolean> future) {
+    public void initPlayerQueues() {
+        LadderManager manager = injector.getInstance(LadderManager.class);
+        QueueManager queueManager = injector.getInstance(QueueManager.class);
+
+        for (Ladder ladder : manager.get()) {
+            queueManager.initPlayerQueue(ladder, ladder.isRanked());
+        }
+    }
+
+    private void loadLadders(CompletableFuture<Boolean> future) {
         try {
             LadderRepository repository = injector.getInstance(LadderRepository.class);
             LadderManager manager = injector.getInstance(LadderManager.class);

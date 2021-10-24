@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-
 public class PlayerManager {
 
     private final Map<UUID, PracticePlayer> players = Maps.newHashMap();

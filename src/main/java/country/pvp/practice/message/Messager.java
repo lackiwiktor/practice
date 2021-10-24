@@ -1,6 +1,7 @@
 package country.pvp.practice.message;
 
 import lombok.experimental.UtilityClass;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 @UtilityClass
@@ -27,11 +28,19 @@ public class Messager {
     }
 
     public static void messageError(Recipient recipient, String error) {
-        message(recipient, "Error: ".concat(error));
+        message(recipient, ChatColor.RED + "Error: ".concat(error));
     }
 
     public static void messageError(Player recipient, String error) {
-        message(recipient, "Error: ".concat(error));
+        message(recipient, ChatColor.RED + "Error: ".concat(error));
+    }
+
+    public static void messageSuccess(Recipient recipient, String message) {
+        message(recipient, ChatColor.GREEN.toString().concat(message));
+    }
+
+    public static void messageSuccess(Player recipient, String message) {
+        message(recipient, ChatColor.GREEN.toString().concat(message));
     }
 
     public static void message(Recipient recipient, Messages message) {

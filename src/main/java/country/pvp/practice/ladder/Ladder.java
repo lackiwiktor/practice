@@ -23,13 +23,12 @@ public class Ladder implements DataObject {
         document.put("displayName", displayName);
         document.put("icon", ItemStackAdapter.toJson(icon));
         document.put("kit", kit.getDocument());
-
         return document;
     }
 
     @Override
     public String getCollection() {
-        return "kits";
+        return "ladders";
     }
 
     @Override
@@ -43,6 +42,14 @@ public class Ladder implements DataObject {
 
     public ItemStack getIcon() {
         return new ItemBuilder(icon).name(displayName).build();
+    }
+
+    public void setInventory(ItemStack[] inventory) {
+        this.kit.setInventory(inventory);
+    }
+
+    public void setArmor(ItemStack[] armor) {
+        this.kit.setArmor(armor);
     }
 
     @Override

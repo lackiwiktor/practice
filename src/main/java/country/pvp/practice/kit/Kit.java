@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 @Data
 public class Kit implements SerializableObject {
 
-    private ItemStack[] inventory;
-    private ItemStack[] armor;
+    private ItemStack[] inventory = new ItemStack[36];
+    private ItemStack[] armor = new ItemStack[4];
 
     @Override
     public Document getDocument() {
@@ -31,4 +31,5 @@ public class Kit implements SerializableObject {
         inventory = document.getList("inventory", String.class).stream().map(ItemStackAdapter::fromJson).toArray(ItemStack[]::new);
         armor = document.getList("armor", String.class).stream().map(ItemStackAdapter::fromJson).toArray(ItemStack[]::new);
     }
+
 }
