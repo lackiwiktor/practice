@@ -50,32 +50,24 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     @Override
-    public void receive(String message) {
-        Player player = getPlayer();
-        Preconditions.checkNotNull(player, "Player must be online in order to send him a message");
-        player.sendMessage(message);
-    }
-
-    public void show(PracticePlayer practicePlayer) {
-        Player observer = getPlayer();
-        Player observable = practicePlayer.getPlayer();
-        Preconditions.checkNotNull(observer, "Player must be online in order to hide other players.");
-        Preconditions.checkNotNull(observable, "Player must be online in order to be hidden.");
-
-        observer.showPlayer(observable);
-    }
-
-    public void hide(PracticePlayer practicePlayer) {
-        Player observer = getPlayer();
-        Player observable = practicePlayer.getPlayer();
-        Preconditions.checkNotNull(observer, "Player must be online in order to hide other players.");
-        Preconditions.checkNotNull(observable, "Player must be online in order to be hidden.");
-
-        observer.hidePlayer(observable);
+    public String getCollection() {
+        return "players";
     }
 
     @Override
-    public Document get() {
+    public String getId() {
+        return uuid.toString();
+    }
+
+    public boolean hasPermission(String permission) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "Player must be online in order to check his permissions");
+
+        return player.hasPermission(permission);
+    }
+
+    @Override
+    public Document getDocument() {
         org.bson.Document document = new org.bson.Document("_id", getId());
         document.put("name", name);
         document.put("nameLowerCase", name.toLowerCase(Locale.ROOT));
@@ -84,17 +76,14 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     @Override
-    public void apply(Document document) {
+    public void receive(String message) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "Player must be online in order to send him a message");
+        player.sendMessage(message);
+    }
+
+    @Override
+    public void applyDocument(Document document) {
         if (name == null) name = document.getString("name");
-    }
-
-    @Override
-    public String getCollection() {
-        return "players";
-    }
-
-    @Override
-    public String getId() {
-        return uuid.toString();
     }
 }

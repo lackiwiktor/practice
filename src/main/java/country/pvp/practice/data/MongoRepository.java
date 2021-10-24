@@ -12,13 +12,13 @@ public class MongoRepository<V extends DataObject> implements Repository<V> {
 
     @Override
     public void save(V entity) {
-        database.getCollection(entity.getCollection()).replaceOne(Filters.eq("_id", entity.getId()), entity.get());
+        database.getCollection(entity.getCollection()).replaceOne(Filters.eq("_id", entity.getId()), entity.getDocument());
     }
 
     @Override
     public void load(V entity) {
         org.bson.Document document = database.getCollection(entity.getCollection()).find(Filters.eq("_id", entity.getId())).first();
         if (document == null) return;
-        entity.apply(document);
+        entity.applyDocument(document);
     }
 }

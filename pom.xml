@@ -37,6 +37,12 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.google.common</pattern>
+                                    <shadedPattern>shaded.com.google.common</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
@@ -79,15 +85,27 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.vaperion</groupId>
-            <artifactId>blade</artifactId>
-            <version>1.2.10</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.0.1-jre</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.mrmicky</groupId>
+            <artifactId>fastboard</artifactId>
+            <version>1.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.0-alpha5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.vaperion</groupId>
+            <artifactId>blade</artifactId>
+            <version>1.2.10</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

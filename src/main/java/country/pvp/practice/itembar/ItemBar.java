@@ -13,7 +13,7 @@ public enum ItemBar {
   LOBBY(
       new ItemBarItem[] {
         new ItemBarItem(
-            new ItemBuilder(Material.IRON_SWORD).name("Unranked").build(),
+            new ItemBuilder(Material.IRON_SWORD).name("Unranked").unbreakable().build(),
             ((player, interact) -> Messager.message(player, "Clicked!")))
       });
 

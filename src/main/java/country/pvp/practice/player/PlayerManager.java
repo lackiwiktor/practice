@@ -10,7 +10,7 @@ public class PlayerManager {
 
     private final Map<UUID, PracticePlayer> players = Maps.newHashMap();
 
-    public PracticePlayer getAll(Player player) {
+    public PracticePlayer get(Player player) {
         return players.get(player.getUniqueId());
     }
 

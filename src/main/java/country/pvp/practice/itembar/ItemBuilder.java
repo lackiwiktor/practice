@@ -55,6 +55,14 @@ public class ItemBuilder {
     return this;
   }
 
+  public ItemBuilder unbreakable() {
+    ItemMeta meta = is.getItemMeta();
+    meta.spigot().setUnbreakable(true);
+    is.setItemMeta(meta);
+
+    return this;
+  }
+
   public ItemBuilder lore(String... lore) {
     ItemMeta meta = is.getItemMeta();
     List<String> toSet = meta.getLore();

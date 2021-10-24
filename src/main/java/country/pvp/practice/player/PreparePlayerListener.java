@@ -1,35 +1,39 @@
 package country.pvp.practice.player;
 
 import com.google.inject.Inject;
-import country.pvp.practice.itembar.ItemBar;
-import country.pvp.practice.visibility.VisibilityUpdater;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class PreparePlayerListener implements Listener {
+@Slf4j
+public class PreparePlayerListener extends PlayerListener {
 
-    private final PlayerManager playerManager;
     private final PlayerRepository playerRepository;
-    private final VisibilityUpdater visibilityUpdater;
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @Inject
+    public PreparePlayerListener(PlayerManager playerManager, PlayerRepository playerRepository) {
+        super(playerManager);
+        this.playerRepository = playerRepository;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void joinEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PracticePlayer practicePlayer = new PracticePlayer(player);
 
-        playerManager.add(practicePlayer);
-        playerRepository.loadAsync(practicePlayer);
-
-        ItemBar.LOBBY.apply(practicePlayer);
-        visibilityUpdater.update(practicePlayer);
+        try {
+            playerRepository.loadAsync(practicePlayer);
+            playerManager.add(practicePlayer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Player not initialized successfully, player= {}", player.getName());
+            player.kickPlayer("&cError");
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

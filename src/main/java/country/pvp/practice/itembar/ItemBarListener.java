@@ -15,22 +15,21 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ItemBarListener implements Listener {
 
-  private final PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
-  @EventHandler(priority = EventPriority.MONITOR)
-  public void clickEvent(PlayerInteractEvent event) {
-    Player player = event.getPlayer();
-    PracticePlayer practicePlayer = playerManager.getAll(player);
-    ItemStack item = event.getItem();
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void clickEvent(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        PracticePlayer practicePlayer = playerManager.get(player);
+        ItemStack item = event.getItem();
 
-    if (item == null) return;
+        if (item == null) return;
 
-    Action action = event.getAction();
+        Action action = event.getAction();
 
-    if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
-    if (!practicePlayer.isFighting()) {
-      event.setCancelled(ItemBar.click(practicePlayer, item, BarInteract.LEFT_CLICK));
+        if (!practicePlayer.isFighting())
+            event.setCancelled(ItemBar.click(practicePlayer, item, BarInteract.LEFT_CLICK));
     }
-  }
 }
