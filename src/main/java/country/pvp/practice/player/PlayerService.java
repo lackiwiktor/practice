@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
 import country.pvp.practice.data.MongoRepository;
 
-public class PlayerRepository extends MongoRepository<PracticePlayer> {
+public class PlayerService extends MongoRepository<PracticePlayer> {
 
     @Inject
-    public PlayerRepository(MongoDatabase database) {
+    public PlayerService(MongoDatabase database) {
         super(database);
     }
 }

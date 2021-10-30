@@ -30,6 +30,6 @@ public class ItemBarListener implements Listener {
         if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
         if (!practicePlayer.isFighting())
-            event.setCancelled(ItemBar.click(practicePlayer, item, BarInteract.LEFT_CLICK));
+            event.setCancelled(ItemBar.click(practicePlayer, item, BarInteract.RIGHT_CLICK));
     }
 }

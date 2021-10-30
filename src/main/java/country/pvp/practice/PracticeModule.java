@@ -7,7 +7,7 @@ import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderRepository;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PlayerRepository;
+import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
@@ -20,7 +20,7 @@ public class PracticeModule extends AbstractModule {
                         .getDatabase("practice"));
         bind(PlayerManager.class).asEagerSingleton();
         bind(LadderManager.class).asEagerSingleton();
-        bind(PlayerRepository.class).asEagerSingleton();
+        bind(PlayerService.class).asEagerSingleton();
         bind(LadderRepository.class).asEagerSingleton();
         bind(VisibilityProvider.class).asEagerSingleton();
         bind(VisibilityUpdater.class).asEagerSingleton();

@@ -3,23 +3,32 @@ package country.pvp.practice.queue;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.team.PlayerTeam;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueueManager {
 
-    private final Table<Ladder, Boolean, Queue<PlayerTeam>> playerQueues = HashBasedTable.create();
+    private final Table<Ladder, MatchType, SoloQueue> soloQueues = HashBasedTable.create();
 
-    public void initPlayerQueue(Ladder ladder, boolean ranked) {
-        if (ranked)
-            playerQueues.put(ladder, true, new Queue<>(ladder, true));
-        playerQueues.put(ladder, false, new Queue<>(ladder, false));
+    public void initSoloQueue(Ladder ladder, MatchType... types) {
+        for (MatchType type : types) {
+            soloQueues.put(ladder, type, new SoloQueue(ladder, type));
+        }
     }
 
-    public Queue<PlayerTeam> getPlayerQueue(Ladder ladder, boolean ranked) {
-        return playerQueues.get(ladder, ranked);
+    public SoloQueue getSoloQueue(Ladder ladder, MatchType type) {
+        return soloQueues.get(ladder, type);
+    }
+
+    public List<SoloQueue> getSoloQueues(MatchType type) {
+        return soloQueues.cellSet()
+                .stream()
+                .filter(it -> it.getColumnKey() == type)
+                .map(Table.Cell::getValue).collect(Collectors.toList());
     }
 
     public void tick() {
-        playerQueues.cellSet().forEach(cell -> cell.getValue().tick());
+        soloQueues.cellSet().forEach(cell -> cell.getValue().tick());
     }
 }

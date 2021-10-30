@@ -2,19 +2,26 @@ package country.pvp.practice.queue;
 
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.team.Team;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-@RequiredArgsConstructor
+@Data
 public class Queue<V extends Team> {
 
     private final Ladder ladder;
-    private final boolean ranked;
+    private final MatchType type;
     private final PriorityQueue<QueueData<V>> queueData = new PriorityQueue<>(Comparator.naturalOrder());
 
-    public void add(V team) {
+    public QueueData<V> add(V team) {
+        QueueData<V> data = new QueueData<>(team);
+        queueData.add(data);
+        return data;
+    }
+
+    public int size() {
+        return queueData.size();
     }
 
     public void tick() {

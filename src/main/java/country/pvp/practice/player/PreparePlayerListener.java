@@ -13,12 +13,12 @@ import java.util.Optional;
 @Slf4j
 public class PreparePlayerListener extends PlayerListener {
 
-    private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
 
     @Inject
-    public PreparePlayerListener(PlayerManager playerManager, PlayerRepository playerRepository) {
+    public PreparePlayerListener(PlayerManager playerManager, PlayerService playerService) {
         super(playerManager);
-        this.playerRepository = playerRepository;
+        this.playerService = playerService;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -27,7 +27,7 @@ public class PreparePlayerListener extends PlayerListener {
         PracticePlayer practicePlayer = new PracticePlayer(player);
 
         try {
-            playerRepository.loadAsync(practicePlayer);
+            playerService.loadAsync(practicePlayer);
             playerManager.add(practicePlayer);
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,6 +40,6 @@ public class PreparePlayerListener extends PlayerListener {
     public void quitEvent(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Optional.ofNullable(playerManager.remove(player))
-                .ifPresent(playerRepository::saveAsync);
+                .ifPresent(playerService::saveAsync);
     }
 }

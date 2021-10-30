@@ -2,8 +2,8 @@ package country.pvp.practice;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.board.BoardTask;
+import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarListener;
 import country.pvp.practice.ladder.Ladder;
@@ -12,6 +12,7 @@ import country.pvp.practice.ladder.LadderRepository;
 import country.pvp.practice.lobby.LobbyPlayerListener;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.PreparePlayerListener;
+import country.pvp.practice.queue.MatchType;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.QueueTask;
 import lombok.SneakyThrows;
@@ -67,7 +68,7 @@ public class Practice extends JavaPlugin {
         QueueManager queueManager = injector.getInstance(QueueManager.class);
 
         for (Ladder ladder : manager.get()) {
-            queueManager.initPlayerQueue(ladder, ladder.isRanked());
+            queueManager.initSoloQueue(ladder, MatchType.UNRANKED, ladder.isRanked() ? MatchType.RANKED : MatchType.UNRANKED);
         }
     }
 

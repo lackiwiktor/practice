@@ -1,6 +1,7 @@
 package country.pvp.practice.queue;
 
 import country.pvp.practice.team.Team;
+import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,5 +14,9 @@ public class QueueData<V extends Team> implements Comparable<QueueData> {
     @Override
     public int compareTo(@NotNull QueueData playerQueueData) {
         return (int) (this.joinTimeStamp - playerQueueData.joinTimeStamp);
+    }
+
+    public int getEloRangeFactor() {
+        return (int) (TimeUtil.elapsed(joinTimeStamp) / 1000L) * 5;
     }
 }
