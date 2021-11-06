@@ -21,4 +21,9 @@ public class MongoRepository<V extends DataObject> implements Repository<V> {
         if (document == null) return;
         entity.applyDocument(document);
     }
+
+    @Override
+    public void delete(V entity) {
+        database.getCollection(entity.getCollection()).deleteOne(Filters.eq("_id", entity.getId()));
+    }
 }

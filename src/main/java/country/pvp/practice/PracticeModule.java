@@ -8,6 +8,8 @@ import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderRepository;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.queue.QueueManager;
+import country.pvp.practice.queue.QueueMenuProvider;
 import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
@@ -25,5 +27,8 @@ public class PracticeModule extends AbstractModule {
         bind(VisibilityProvider.class).asEagerSingleton();
         bind(VisibilityUpdater.class).asEagerSingleton();
         bind(PracticeBoard.class).asEagerSingleton();
+        bind(LadderManager.class).asEagerSingleton();
+        bind(QueueManager.class).asEagerSingleton();
+        bind(QueueMenuProvider.class).asEagerSingleton();
     }
 }

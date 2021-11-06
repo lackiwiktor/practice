@@ -8,6 +8,8 @@ public interface Repository<V> {
 
     void load(V entity);
 
+    void delete(V entity);
+
     default void saveAsync(V entity) {
         TaskDispatcher.async(() -> save(entity));
     }
@@ -15,5 +17,10 @@ public interface Repository<V> {
     default void loadAsync(V entity) {
         TaskDispatcher.async(() -> load(entity));
     }
+
+    default void deleteAsync(V entity) {
+        TaskDispatcher.async(() -> delete(entity));
+    }
+
 
 }

@@ -59,6 +59,10 @@
 
     <repositories>
         <repository>
+            <id>IntellectualSites Releases</id>
+            <url>https://mvn.intellectualsites.com/content/repositories/releases/</url>
+        </repository>
+        <repository>
             <id>maven-central</id>
             <url>https://repo1.maven.org/maven2</url>
         </repository>
@@ -81,6 +85,7 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+
     </repositories>
 
     <dependencies>

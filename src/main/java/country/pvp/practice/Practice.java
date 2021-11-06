@@ -1,6 +1,7 @@
 package country.pvp.practice;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
@@ -15,6 +16,7 @@ import country.pvp.practice.player.PreparePlayerListener;
 import country.pvp.practice.queue.MatchType;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.QueueTask;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -25,9 +27,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class Practice extends JavaPlugin {
 
     private final Injector injector = Guice.createInjector(new PracticeModule());
+    private final LadderManager ladderManager;
+    private final QueueManager queueManager;
 
     @Override
     public void onEnable() {
@@ -64,10 +69,7 @@ public class Practice extends JavaPlugin {
     }
 
     public void initPlayerQueues() {
-        LadderManager manager = injector.getInstance(LadderManager.class);
-        QueueManager queueManager = injector.getInstance(QueueManager.class);
-
-        for (Ladder ladder : manager.get()) {
+        for (Ladder ladder : ladderManager.getAll()) {
             queueManager.initSoloQueue(ladder, MatchType.UNRANKED, ladder.isRanked() ? MatchType.RANKED : MatchType.UNRANKED);
         }
     }

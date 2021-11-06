@@ -8,8 +8,8 @@ public class LadderManager {
 
     private final Map<String, Ladder> ladders = Maps.newHashMap();
 
-    public void addAll(Set<Ladder> ladders) {
-        ladders.forEach(it -> this.ladders.put(it.getName().toUpperCase(Locale.ROOT), it));
+    public void add(Ladder ladder) {
+        this.ladders.put(ladder.getName().toUpperCase(Locale.ROOT), ladder);
     }
 
     public Ladder get(String name) {
@@ -20,7 +20,12 @@ public class LadderManager {
         ladders.remove(ladder.getName().toUpperCase(Locale.ROOT));
     }
 
-    public Set<Ladder> get() {
+    public void addAll(Set<Ladder> ladders) {
+        ladders.forEach(this::add);
+    }
+
+    public Set<Ladder> getAll() {
         return Collections.unmodifiableSet(new HashSet<>(ladders.values()));
     }
+
 }

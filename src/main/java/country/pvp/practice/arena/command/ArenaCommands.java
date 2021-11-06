@@ -1,4 +1,4 @@
-package country.pvp.practice.ladder.command;
+package country.pvp.practice.arena.command;
 
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class LadderCommands {
+public class ArenaCommands {
 
     private final LadderManager ladderManager;
     private final LadderRepository ladderRepository;
