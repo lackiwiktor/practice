@@ -1,5 +1,6 @@
 package country.pvp.practice.queue;
 
+import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.team.Team;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
@@ -18,5 +19,9 @@ public class QueueData<V extends Team> implements Comparable<QueueData> {
 
     public int getEloRangeFactor() {
         return (int) (TimeUtil.elapsed(joinTimeStamp) / 1000L) * 5;
+    }
+
+    public boolean hasPlayer(PracticePlayer player) {
+        return team.hasPlayer(player);
     }
 }

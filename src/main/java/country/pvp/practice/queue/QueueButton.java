@@ -3,7 +3,7 @@ package country.pvp.practice.queue;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.menu.Button;
-import country.pvp.practice.team.PlayerTeam;
+import country.pvp.practice.team.SoloTeam;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,9 +12,8 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor
 public class QueueButton extends Button {
 
-    private final PlayerTeam team;
-    private final SoloQueue queue;
-    private final QueueManager queueManager;
+    private final SoloTeam team;
+    private final Queue queue;
 
     @Override
     public ItemStack getButtonItem(Player player) {
@@ -28,6 +27,7 @@ public class QueueButton extends Button {
 
     @Override
     public void clicked(Player player, ClickType clickType) {
-        queue.addToQueue(team);
+        queue.add(team);
+        player.getOpenInventory().close();
     }
 }

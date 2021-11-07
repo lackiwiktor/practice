@@ -3,8 +3,6 @@ package country.pvp.practice.player;
 import com.google.common.base.Preconditions;
 import country.pvp.practice.data.DataObject;
 import country.pvp.practice.message.Recipient;
-import country.pvp.practice.queue.QueueData;
-import country.pvp.practice.team.Queueable;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -15,12 +13,11 @@ import java.util.Locale;
 import java.util.UUID;
 
 @Data
-public class PracticePlayer implements DataObject, Recipient, Queueable {
+public class PracticePlayer implements DataObject, Recipient {
 
     private final UUID uuid;
     private String name;
     private PlayerState state = PlayerState.IN_LOBBY;
-    private QueueData<?> currentQueue;
 
     public PracticePlayer(Player player) {
         this(player.getUniqueId());
@@ -50,16 +47,6 @@ public class PracticePlayer implements DataObject, Recipient, Queueable {
             ItemStack item = bar[i].clone();
             player.getInventory().setItem(i, item);
         }
-    }
-
-    @Override
-    public void startQueuing(QueueData<?> queueData) {
-        currentQueue = queueData;
-    }
-
-    @Override
-    public void stopQueueing() {
-        currentQueue = null;
     }
 
     @Override
@@ -98,9 +85,5 @@ public class PracticePlayer implements DataObject, Recipient, Queueable {
     @Override
     public void applyDocument(Document document) {
         if (name == null) name = document.getString("name");
-    }
-
-    public void removeFromQueue() {
-        currentQueue = null;
     }
 }

@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 public class ItemBarListener implements Listener {
 
     private final PlayerManager playerManager;
+    private final ItemBarManager itemBarManager;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void clickEvent(PlayerInteractEvent event) {
@@ -30,6 +31,6 @@ public class ItemBarListener implements Listener {
         if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
         if (!practicePlayer.isFighting())
-            event.setCancelled(ItemBar.click(practicePlayer, item, BarInteract.RIGHT_CLICK));
+            event.setCancelled(itemBarManager.click(practicePlayer, item, BarInteract.RIGHT_CLICK));
     }
 }

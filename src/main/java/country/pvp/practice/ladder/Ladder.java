@@ -23,6 +23,7 @@ public class Ladder implements DataObject {
         document.put("displayName", displayName);
         document.put("icon", ItemStackAdapter.toJson(icon));
         document.put("kit", kit.getDocument());
+        document.put("ranked", ranked);
         return document;
     }
 
@@ -42,7 +43,8 @@ public class Ladder implements DataObject {
 
     public ItemStack getIcon() {
         if(!isSetup()) return null;
-        return new ItemBuilder(icon).name(displayName).build();
+
+        return new ItemBuilder(icon.clone()).name(displayName).build();
     }
 
     public void setInventory(ItemStack[] inventory) {
@@ -58,5 +60,6 @@ public class Ladder implements DataObject {
         displayName = document.getString("displayName");
         icon = ItemStackAdapter.fromJson(document.getString("icon"));
         (kit = new Kit()).applyDocument(document.get("kit", Document.class));
+        ranked = document.getBoolean("ranked");
     }
 }

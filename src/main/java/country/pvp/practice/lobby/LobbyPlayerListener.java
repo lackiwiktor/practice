@@ -1,7 +1,8 @@
 package country.pvp.practice.lobby;
 
 import com.google.inject.Inject;
-import country.pvp.practice.itembar.ItemBar;
+import country.pvp.practice.itembar.ItemBarManager;
+import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
@@ -26,18 +27,20 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 public class LobbyPlayerListener extends PlayerListener {
 
     private final VisibilityUpdater visibilityUpdater;
+    private final ItemBarManager itemBarManager;
 
     @Inject
-    public LobbyPlayerListener(PlayerManager playerManager, VisibilityUpdater visibilityUpdater) {
+    public LobbyPlayerListener(PlayerManager playerManager, VisibilityUpdater visibilityUpdater, ItemBarManager itemBarManager) {
         super(playerManager);
         this.visibilityUpdater = visibilityUpdater;
+        this.itemBarManager = itemBarManager;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void joinEvent(PlayerJoinEvent event) {
         PracticePlayer practicePlayer = get(event);
 
-        ItemBar.LOBBY.apply(practicePlayer);
+        itemBarManager.apply(ItemBarType.LOBBY, practicePlayer);
         visibilityUpdater.update(practicePlayer);
     }
 

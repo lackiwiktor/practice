@@ -1,14 +1,13 @@
 package country.pvp.practice.team;
 
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.queue.QueueData;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class PlayerTeam extends QueueableTeam {
+public class SoloTeam implements Team {
 
     private final PracticePlayer player;
 
@@ -22,13 +21,4 @@ public class PlayerTeam extends QueueableTeam {
         return Collections.singleton(player);
     }
 
-    @Override
-    public void startQueuing(QueueData<?> queueData) {
-        player.startQueuing(queueData);
-    }
-
-    @Override
-    public void stopQueueing() {
-        player.removeFromQueue();
-    }
 }
