@@ -13,10 +13,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 
 /**
  * This class sets up and handles a player who is in the lobby
@@ -40,6 +42,11 @@ public class LobbyPlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void spawnEvent(EntitySpawnEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void breakEvent(BlockBreakEvent event) {
         cancelIfInLobby(event.getPlayer(), event, true);
     }
@@ -57,6 +64,11 @@ public class LobbyPlayerListener extends PlayerListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void dropEvent(PlayerDropItemEvent event) {
+        cancelIfInLobby(event.getPlayer(), event, false);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void dropEvent(PlayerPickupItemEvent event) {
         cancelIfInLobby(event.getPlayer(), event, false);
     }
 

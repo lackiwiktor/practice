@@ -3,6 +3,7 @@ package country.pvp.practice.data;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
@@ -12,7 +13,7 @@ public class MongoRepository<V extends DataObject> implements Repository<V> {
 
     @Override
     public void save(V entity) {
-        database.getCollection(entity.getCollection()).replaceOne(Filters.eq("_id", entity.getId()), entity.getDocument());
+        database.getCollection(entity.getCollection()).replaceOne(Filters.eq("_id", entity.getId()), entity.getDocument(), new ReplaceOptions().upsert(true));
     }
 
     @Override

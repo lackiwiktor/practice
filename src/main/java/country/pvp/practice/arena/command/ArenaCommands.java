@@ -1,9 +1,9 @@
 package country.pvp.practice.arena.command;
 
 import com.google.inject.Inject;
-import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.ladder.LadderManager;
-import country.pvp.practice.ladder.LadderRepository;
+import country.pvp.practice.arena.Arena;
+import country.pvp.practice.arena.ArenaManager;
+import country.pvp.practice.arena.ArenaService;
 import country.pvp.practice.message.Messager;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.command.annotation.Command;
@@ -17,42 +17,42 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ArenaCommands {
 
-    private final LadderManager ladderManager;
-    private final LadderRepository ladderRepository;
+    private final ArenaManager arenaManager;
+    private final ArenaService arenaService;
 
-    @Command("ladder create")
+    @Command("arena create")
     @Permission("practice.admin")
     public void create(@Sender Player sender, @Name("name") String name) {
-        if (ladderManager.get(name) != null) {
-            Messager.messageError(sender, "Ladder with this name already exists.");
+        if (arenaManager.get(name) != null) {
+            Messager.messageError(sender, "Arena with this name already exists.");
             return;
         }
 
-        Ladder ladder = new Ladder(name);
-        ladderManager.add(ladder);
-        ladderRepository.saveAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully created new ladder.");
+        Arena arena = new Arena(name);
+        arenaManager.add(arena);
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully created new arena.");
     }
 
-    @Command("ladder remove")
+    @Command("arena remove")
     @Permission("practice.admin")
-    public void remove(@Sender Player sender, @Name("ladder") Ladder ladder) {
-        ladderManager.remove(ladder);
-        ladderRepository.deleteAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully created new ladder.");
+    public void remove(@Sender Player sender, @Name("arena") Arena arena) {
+        arenaManager.remove(arena);
+        arenaService.deleteAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully removed arena.");
     }
 
-    @Command("ladder displayName")
+    @Command("arena displayName")
     @Permission("practice.admin")
-    public void displayName(@Sender Player sender, @Name("ladder") Ladder ladder, @Name("displayName") String name) {
-        ladder.setDisplayName(ladder.getDisplayName());
-        ladderRepository.saveAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's display name.");
+    public void displayName(@Sender Player sender, @Name("arena") Arena arena, @Name("displayName") String name) {
+        arena.setDisplayName(name);
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's display name.");
     }
 
-    @Command("ladder icon")
+    @Command("arena icon")
     @Permission("practice.admin")
-    public void icon(@Sender Player sender, @Name("ladder") Ladder ladder) {
+    public void icon(@Sender Player sender, @Name("arena") Arena arena) {
         ItemStack itemInHand = sender.getItemInHand();
 
         if (itemInHand == null) {
@@ -60,32 +60,40 @@ public class ArenaCommands {
             return;
         }
 
-        ladder.setIcon(itemInHand.clone());
-        ladderRepository.saveAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's icon.");
+        arena.setIcon(itemInHand.clone());
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's icon.");
     }
 
-    @Command("ladder ranked")
+    @Command("arena spawnLocation1")
     @Permission("practice.admin")
-    public void ranked(@Sender Player sender, @Name("ladder") Ladder ladder, @Name("ranked") boolean ranked) {
-        ladder.setRanked(ranked);
-        ladderRepository.saveAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's ranked status.");
+    public void spawnLocation1(@Sender Player sender, @Name("arena") Arena arena) {
+        arena.setSpawnLocation1(sender.getLocation().getBlock().getLocation());
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's first spawn location.");
     }
 
-    @Command("ladder inventory")
+    @Command("arena spawnLocation2")
     @Permission("practice.admin")
-    public void inventory(@Sender Player sender, @Name("ladder") Ladder ladder) {
-        ladder.setInventory(sender.getInventory().getContents());
-        ladderRepository.saveAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's inventory.");
+    public void spawnLocation2(@Sender Player sender, @Name("arena") Arena arena) {
+        arena.setSpawnLocation2(sender.getLocation().getBlock().getLocation());
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's second spawn location.");
     }
 
-    @Command("ladder armor")
+    @Command("arena center")
     @Permission("practice.admin")
-    public void armor(@Sender Player sender, @Name("ladder") Ladder ladder) {
-        ladder.setArmor(sender.getInventory().getArmorContents());
-        ladderRepository.saveAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's armor.");
+    public void center(@Sender Player sender, @Name("arena") Arena arena) {
+        arena.setCenter(sender.getLocation().getBlock().getLocation());
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's center location.");
+    }
+
+    @Command("arena spectatorLocation")
+    @Permission("practice.admin")
+    public void spectatorLocation(@Sender Player sender, @Name("arena") Arena arena) {
+        arena.setSpectatorLocation(sender.getLocation().getBlock().getLocation());
+        arenaService.saveAsync(arena);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's spectator location.");
     }
 }

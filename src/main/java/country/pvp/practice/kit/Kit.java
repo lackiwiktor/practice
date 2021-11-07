@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
@@ -28,8 +29,8 @@ public class Kit implements SerializableObject {
 
     @Override
     public void applyDocument(Document document) {
-        inventory = document.getList("inventory", String.class).stream().map(ItemStackAdapter::fromJson).toArray(ItemStack[]::new);
-        armor = document.getList("armor", String.class).stream().map(ItemStackAdapter::fromJson).toArray(ItemStack[]::new);
+        inventory = (ItemStack[]) document.get("inventory", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
+        armor = (ItemStack[]) document.get("armor", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
     }
 
 }

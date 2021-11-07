@@ -7,10 +7,10 @@ import country.pvp.practice.data.MongoRepository;
 
 import java.util.Set;
 
-public class LadderRepository extends MongoRepository<Ladder> {
+public class LadderService extends MongoRepository<Ladder> {
 
     @Inject
-    public LadderRepository(MongoDatabase database) {
+    public LadderService(MongoDatabase database) {
         super(database);
     }
 
@@ -18,7 +18,7 @@ public class LadderRepository extends MongoRepository<Ladder> {
         Set<Ladder> ladders = Sets.newHashSet();
 
         database.getCollection("ladders").find().forEach(it -> {
-            Ladder ladder = new Ladder(it.getString("name"));
+            Ladder ladder = new Ladder(it.getString("_id"));
             ladder.applyDocument(it);
             ladders.add(ladder);
         });

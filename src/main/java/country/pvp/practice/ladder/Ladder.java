@@ -41,6 +41,7 @@ public class Ladder implements DataObject {
     }
 
     public ItemStack getIcon() {
+        if(!isSetup()) return null;
         return new ItemBuilder(icon).name(displayName).build();
     }
 

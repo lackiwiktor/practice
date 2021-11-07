@@ -3,7 +3,7 @@ package country.pvp.practice.ladder.command;
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
-import country.pvp.practice.ladder.LadderRepository;
+import country.pvp.practice.ladder.LadderService;
 import country.pvp.practice.message.Messager;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.command.annotation.Command;
@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack;
 public class LadderCommands {
 
     private final LadderManager ladderManager;
-    private final LadderRepository ladderRepository;
+    private final LadderService ladderService;
 
     @Command("ladder create")
     @Permission("practice.admin")
@@ -30,7 +30,7 @@ public class LadderCommands {
 
         Ladder ladder = new Ladder(name);
         ladderManager.add(ladder);
-        ladderRepository.saveAsync(ladder);
+        ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully created new ladder.");
     }
 
@@ -38,15 +38,15 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void remove(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladderManager.remove(ladder);
-        ladderRepository.deleteAsync(ladder);
-        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully created new ladder.");
+        ladderService.deleteAsync(ladder);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully removed ladder.");
     }
 
     @Command("ladder displayName")
     @Permission("practice.admin")
     public void displayName(@Sender Player sender, @Name("ladder") Ladder ladder, @Name("displayName") String name) {
-        ladder.setDisplayName(ladder.getDisplayName());
-        ladderRepository.saveAsync(ladder);
+        ladder.setDisplayName(name);
+        ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's display name.");
     }
 
@@ -61,7 +61,7 @@ public class LadderCommands {
         }
 
         ladder.setIcon(itemInHand.clone());
-        ladderRepository.saveAsync(ladder);
+        ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's icon.");
     }
 
@@ -69,7 +69,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void ranked(@Sender Player sender, @Name("ladder") Ladder ladder, @Name("ranked") boolean ranked) {
         ladder.setRanked(ranked);
-        ladderRepository.saveAsync(ladder);
+        ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's ranked status.");
     }
 
@@ -77,7 +77,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void inventory(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setInventory(sender.getInventory().getContents());
-        ladderRepository.saveAsync(ladder);
+        ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's inventory.");
     }
 
@@ -85,7 +85,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void armor(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setArmor(sender.getInventory().getArmorContents());
-        ladderRepository.saveAsync(ladder);
+        ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's armor.");
     }
 }

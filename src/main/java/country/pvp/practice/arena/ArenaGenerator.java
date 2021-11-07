@@ -10,7 +10,7 @@ public class ArenaGenerator {
         Set<DuplicatedArena> duplicatedArenas = Sets.newHashSet();
 
         for (int index = 0; index < amount; index++) {
-            DuplicatedArena arena = DuplicatedArena.from(parent, offset);
+            DuplicatedArena arena = DuplicatedArena.from(parent, index * offset);
             duplicatedArenas.add(arena);
         }
 

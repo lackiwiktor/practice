@@ -1,6 +1,6 @@
 package country.pvp.practice.concurrent;
 
-import country.pvp.practice.Practice;
+import country.pvp.practice.PracticePlugin;
 import country.pvp.practice.time.TimeUtil;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
@@ -22,10 +22,10 @@ public class TaskDispatcher {
   }
 
   public static BukkitTask scheduleSync(Runnable runnable, long duration, TimeUnit unit) {
-    return Bukkit.getScheduler().runTaskTimer(Practice.getPlugin(Practice.class), runnable, 0L, TimeUtil.convertTimeToTicks(duration, unit));
+    return Bukkit.getScheduler().runTaskTimer(PracticePlugin.getPlugin(PracticePlugin.class), runnable, 0L, TimeUtil.convertTimeToTicks(duration, unit));
   }
 
   public static BukkitTask scheduleAsync(Runnable runnable, long duration, TimeUnit unit) {
-    return Bukkit.getScheduler().runTaskTimerAsynchronously(Practice.getPlugin(Practice.class), runnable, 0L, TimeUtil.convertTimeToTicks(duration, unit));
+    return Bukkit.getScheduler().runTaskTimerAsynchronously(PracticePlugin.getPlugin(PracticePlugin.class), runnable, 0L, TimeUtil.convertTimeToTicks(duration, unit));
   }
 }

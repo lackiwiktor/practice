@@ -1,6 +1,6 @@
 package country.pvp.practice.menu;
 
-import country.pvp.practice.Practice;
+import country.pvp.practice.PracticePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -60,7 +60,7 @@ public class MenuListener implements Listener {
                 }
 
                 if (event.isCancelled()) {
-                    Bukkit.getScheduler().runTaskLater(Practice.getPlugin(Practice.class), player::updateInventory, 1L);
+                    Bukkit.getScheduler().runTaskLater(PracticePlugin.getPlugin(PracticePlugin.class), player::updateInventory, 1L);
                 }
             } else {
                 if (event.getCurrentItem() != null) {

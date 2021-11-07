@@ -1,9 +1,10 @@
 package country.pvp.practice.queue;
 
+import com.google.inject.Inject;
 import country.pvp.practice.team.PlayerTeam;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class QueueMenuProvider {
 
     private final QueueManager queueManager;
