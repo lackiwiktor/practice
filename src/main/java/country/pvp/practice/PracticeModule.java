@@ -12,7 +12,6 @@ import country.pvp.practice.ladder.LadderService;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.queue.QueueManager;
-import country.pvp.practice.queue.QueueMenuProvider;
 import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
@@ -23,6 +22,7 @@ public class PracticeModule extends AbstractModule {
         bind(MongoDatabase.class).toInstance(
                 MongoClients.create("mongodb+srv://ponktacology:yHzd9Qcg7u1f3Q3H@cluster0.zch1g.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
                         .getDatabase("practice"));
+        bind(ItemBarManager.class).asEagerSingleton();
         bind(PlayerManager.class).asEagerSingleton();
         bind(PlayerService.class).asEagerSingleton();
         bind(VisibilityProvider.class).asEagerSingleton();
@@ -32,8 +32,8 @@ public class PracticeModule extends AbstractModule {
         bind(ArenaManager.class).asEagerSingleton();
         bind(ArenaService.class).asEagerSingleton();
         bind(QueueManager.class).asEagerSingleton();
-        bind(QueueMenuProvider.class).asEagerSingleton();
-        bind(ItemBarManager.class).asEagerSingleton();
+       // bind(QueueMenuProvider.class).asEagerSingleton();
+
         bind(PracticeBoard.class).asEagerSingleton();
     }
 }

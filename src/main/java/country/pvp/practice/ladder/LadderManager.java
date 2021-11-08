@@ -3,6 +3,7 @@ package country.pvp.practice.ladder;
 import com.google.common.collect.Maps;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LadderManager {
 
@@ -25,7 +26,7 @@ public class LadderManager {
     }
 
     public Set<Ladder> getAll() {
-        return Collections.unmodifiableSet(new HashSet<>(ladders.values()));
+        return Collections.unmodifiableSet(ladders.values().stream().filter(Ladder::isSetup).collect(Collectors.toSet()));
     }
 
 }

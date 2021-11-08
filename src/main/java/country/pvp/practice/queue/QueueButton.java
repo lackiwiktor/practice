@@ -3,7 +3,7 @@ package country.pvp.practice.queue;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.menu.Button;
-import country.pvp.practice.team.SoloTeam;
+import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,12 +12,13 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor
 public class QueueButton extends Button {
 
-    private final SoloTeam team;
+    private final PracticePlayer practicePlayer;
     private final Queue queue;
 
     @Override
     public ItemStack getButtonItem(Player player) {
         Ladder ladder = queue.getLadder();
+
         return new ItemBuilder(ladder.getIcon())
                 .name(ladder.getDisplayName())
                 .lore("", "In Fights: n/a",
@@ -27,7 +28,7 @@ public class QueueButton extends Button {
 
     @Override
     public void clicked(Player player, ClickType clickType) {
-        queue.add(team);
+        queue.addPlayer(practicePlayer);
         player.getOpenInventory().close();
     }
 }

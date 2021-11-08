@@ -1,7 +1,10 @@
-package country.pvp.practice.itembar;
+package country.pvp.practice.kit;
 
 import com.google.inject.Inject;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.MatchData;
 import country.pvp.practice.player.PlayerManager;
+import country.pvp.practice.player.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -13,10 +16,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class ItemBarListener implements Listener {
+public class PlayerKitListener implements Listener {
 
     private final PlayerManager playerManager;
-    private final ItemBarManager itemBarManager;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void clickEvent(PlayerInteractEvent event) {
@@ -29,7 +31,10 @@ public class ItemBarListener implements Listener {
         Player player = event.getPlayer();
         PracticePlayer practicePlayer = playerManager.get(player);
 
-        if (!practicePlayer.isFighting())
-            event.setCancelled(itemBarManager.click(practicePlayer, item, BarInteract.RIGHT_CLICK));
+        if (practicePlayer.isFighting()) {
+            MatchData matchData = practicePlayer.getStateData(PlayerState.IN_MATCH);
+            Match match = matchData.getMatch();
+            practicePlayer.getMatchingKit(match.getLadder(), item).apply(practicePlayer);
+        }
     }
 }

@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
 public class ItemBarItem {
+
   private final ItemStack item;
   private final BiConsumer<PracticePlayer, BarInteract> click;
 
