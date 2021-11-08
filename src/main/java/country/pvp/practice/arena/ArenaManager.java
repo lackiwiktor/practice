@@ -2,12 +2,16 @@ package country.pvp.practice.arena;
 
 import com.google.common.collect.Maps;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ArenaManager {
 
     private final Map<String, Arena> arenas = Maps.newHashMap();
-  //  private final Map<Arena, Set<DuplicatedArena>> duplicatedArenas = Maps.newHashMap();
+    //  private final Map<Arena, Set<DuplicatedArena>> duplicatedArenas = Maps.newHashMap();
 
     public void add(Arena arena) {
         arenas.put(arena.getName().toUpperCase(Locale.ROOT), arena);
@@ -15,7 +19,7 @@ public class ArenaManager {
 
     public void remove(Arena arena) {
         arenas.remove(arena.getName().toUpperCase(Locale.ROOT));
-     //   duplicatedArenas.remove(arena);
+        //   duplicatedArenas.remove(arena);
     }
 
     public Arena get(String name) {
@@ -35,7 +39,11 @@ public class ArenaManager {
     } */
 
     public Set<Arena> getAll() {
-        return Collections.unmodifiableSet(new HashSet<>(arenas.values()));
+        return Collections.unmodifiableSet(arenas.values().stream().filter(Arena::isSetup).collect(Collectors.toSet()));
+    }
+
+    public Arena getRandom() {
+        return getAll().toArray(new Arena[0])[(int) (arenas.size() * Math.random())];
     }
 
 }

@@ -1,50 +1,38 @@
 package country.pvp.practice.queue;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import country.pvp.practice.arena.ArenaManager;
+import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.team.Team;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class QueueManager {
 
-    private final Table<Ladder, MatchType, Queue> queues = HashBasedTable.create();
+    private final ItemBarManager itemBarManager;
+    private final ArenaManager arenaManager;
+    private final Map<Boolean, List<Queue>> queues = Maps.newHashMap();
 
-    public void initSoloQueue(Ladder ladder, MatchType... types) {
-        for (MatchType type : types) {
-            queues.put(ladder, type, new Queue(ladder, type));
-        }
+    public void initQueue(Ladder ladder) {
+        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(ladder, false, itemBarManager, arenaManager));
+        if (ladder.isRanked())
+            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(ladder, true, itemBarManager, arenaManager));
     }
 
-    public Queue getSoloQueue(Ladder ladder, MatchType type) {
-        return queues.get(ladder, type);
-    }
-
-    public void remove(PracticePlayer player) {
-        getQueue(player).remove(player);
-    }
-
-    public Queue getQueue(PracticePlayer player) {
-        return queues.values().stream().filter(it -> it.hasPlayer(player)).findFirst().orElse(null);
-    }
-
-    public QueueData<Team> getQueueData(PracticePlayer player) {
-        Queue queue = getQueue(player);
-
-        return queue.get(player);
-    }
-
-    public List<Queue> getSoloQueues(MatchType type) {
-        return queues.cellSet()
-                .stream()
-                .filter(it -> it.getColumnKey() == type)
-                .map(Table.Cell::getValue).collect(Collectors.toList());
+    public List<Queue> getQueues(boolean ranked) {
+        return queues.get(ranked);
     }
 
     public void tick() {
-        queues.cellSet().forEach(cell -> cell.getValue().tick());
+        for (List<Queue> queueList : queues.values()) {
+            for (Queue queue : queueList) {
+                queue.tick();
+            }
+        }
     }
 }

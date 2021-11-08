@@ -19,9 +19,10 @@ import country.pvp.practice.ladder.command.provider.LadderProvider;
 import country.pvp.practice.lobby.LobbyPlayerListener;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.PreparePlayerListener;
-import country.pvp.practice.queue.MatchType;
 import country.pvp.practice.queue.QueueManager;
+import country.pvp.practice.queue.QueueMenuProvider;
 import country.pvp.practice.queue.QueueTask;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +41,28 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class Practice {
 
+    @Getter
+    private static Practice instance;
+
     private final Injector injector;
     private final LadderManager ladderManager;
     private final LadderService ladderService;
     private final ArenaManager arenaManager;
     private final ArenaService arenaService;
     private final QueueManager queueManager;
+    private final QueueMenuProvider queueMenuProvider;
     private Blade blade;
 
+    public static QueueManager getQueueManager() {
+        return instance.queueManager;
+    }
+
+    public static QueueMenuProvider getQueueMenuProvider() {
+        return instance.queueMenuProvider;
+    }
+
     public void onEnable() {
+        instance = this;
         register(ItemBarListener.class);
         register(PreparePlayerListener.class);
         register(PracticeBoard.class);
@@ -106,7 +120,7 @@ public class Practice {
 
     private void initPlayerQueues() {
         for (Ladder ladder : ladderManager.getAll()) {
-            queueManager.initSoloQueue(ladder, MatchType.UNRANKED, ladder.isRanked() ? MatchType.RANKED : MatchType.UNRANKED);
+            queueManager.initQueue(ladder);
         }
     }
 

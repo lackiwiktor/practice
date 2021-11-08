@@ -1,10 +1,16 @@
 package country.pvp.practice.kit;
 
+import com.google.common.base.Preconditions;
 import country.pvp.practice.data.SerializableObject;
+import country.pvp.practice.itembar.ItemBuilder;
+import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.serialization.ItemStackAdapter;
 import lombok.Data;
 import org.bson.Document;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +37,28 @@ public class Kit implements SerializableObject {
     public void applyDocument(Document document) {
         inventory = (ItemStack[]) document.get("inventory", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
         armor = (ItemStack[]) document.get("armor", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
+    }
+
+    public void apply(PracticePlayer player) {
+        Player bukkitPlayer = player.getPlayer();
+        Preconditions.checkNotNull(bukkitPlayer, "player");
+        PlayerInventory playerInventory = bukkitPlayer.getInventory();
+        playerInventory.setArmorContents(getArmor());
+        playerInventory.setContents(getInventory());
+    }
+
+    public ItemStack[] getInventory() {
+        return (ItemStack[]) Arrays.stream(this.inventory).map(it -> it == null ? null : it.clone()).toArray();
+    }
+
+    public ItemStack[] getArmor() {
+        return (ItemStack[]) Arrays.stream(this.armor).map(it -> it == null ? null : it.clone()).toArray();
+    }
+
+    public ItemStack getIcon() {
+        return new ItemBuilder(Material.ENCHANTED_BOOK)
+                .name("Default Kit")
+                .build();
     }
 
 }

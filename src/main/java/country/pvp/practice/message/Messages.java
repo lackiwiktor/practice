@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Messages {
-    TEST("TEST", "Hello {player}");
+    TEST("TEST", "Hello {player}"),
+    PLAYER_JOINED_QUEUE("PLAYER_JOINED_QUEUE", "You have joined the {ranked} {queue} queue."),
+    PLAYER_LEFT_QUEUE("PLAYER_LEFT_QUEUE", "You have left the queue.");
 
     private final String name;
     private final String value;

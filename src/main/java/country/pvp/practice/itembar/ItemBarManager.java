@@ -1,12 +1,11 @@
 package country.pvp.practice.itembar;
 
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import country.pvp.practice.Practice;
+import country.pvp.practice.player.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.queue.MatchType;
-import country.pvp.practice.queue.QueueManager;
-import country.pvp.practice.queue.QueueMenuProvider;
-import country.pvp.practice.team.SoloTeam;
+import country.pvp.practice.queue.Queue;
+import country.pvp.practice.queue.QueueData;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,25 +14,23 @@ import java.util.Map;
 public class ItemBarManager {
 
     private final Map<ItemBarType, ItemBar> itemBars = Maps.newHashMap();
-    private final QueueMenuProvider queueMenuProvider;
-    private final QueueManager queueManager;
 
-    @Inject
-    public ItemBarManager(QueueMenuProvider queueMenuProvider, QueueManager queueManager) {
-        this.queueMenuProvider = queueMenuProvider;
-        this.queueManager = queueManager;
+    public ItemBarManager() {
         setupItemBars();
     }
 
     private void setupItemBars() {
         add(ItemBarType.LOBBY, new ItemBar(
                 new ItemBarItem(new ItemBuilder(Material.IRON_SWORD).name("Unranked").unbreakable().build(),
-                        ((player, interact) -> queueMenuProvider.provide(MatchType.UNRANKED, new SoloTeam(player)).openMenu(player.getPlayer())))));
+                        ((player, interact) -> {
+                            Practice.getQueueMenuProvider().provide(false, player).openMenu(player.getPlayer());
+                        }))));
         add(ItemBarType.QUEUE, new ItemBar(
                 new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("Leave Queue").unbreakable().build(),
                         ((player, interact) -> {
-                            queueManager.remove(player);
-                            apply(ItemBarType.LOBBY, player);
+                            QueueData queueData = player.getStateData(PlayerState.QUEUING);
+                            Queue queue = queueData.getQueue();
+                            queue.removePlayer(player, true);
                         }))));
     }
 
