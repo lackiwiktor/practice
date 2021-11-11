@@ -2,7 +2,7 @@ package country.pvp.practice.settings;
 
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
-import country.pvp.practice.data.MongoRepository;
+import country.pvp.practice.data.mongo.MongoRepository;
 
 public class PracticeSettingsService extends MongoRepository<PracticeSettings> {
 

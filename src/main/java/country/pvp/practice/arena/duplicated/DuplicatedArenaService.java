@@ -1,7 +1,7 @@
-package country.pvp.practice.arena;
+package country.pvp.practice.arena.duplicated;
 
 import com.mongodb.client.MongoDatabase;
-import country.pvp.practice.data.MongoRepository;
+import country.pvp.practice.data.mongo.MongoRepository;
 
 public class DuplicatedArenaService extends MongoRepository<DuplicatedArena> {
 

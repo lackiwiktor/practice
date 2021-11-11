@@ -2,7 +2,7 @@ package country.pvp.practice.itembar;
 
 import com.google.common.collect.Maps;
 import country.pvp.practice.Practice;
-import country.pvp.practice.player.PlayerState;
+import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.queue.Queue;

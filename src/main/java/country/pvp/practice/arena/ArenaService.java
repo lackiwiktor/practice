@@ -3,7 +3,7 @@ package country.pvp.practice.arena;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
-import country.pvp.practice.data.MongoRepository;
+import country.pvp.practice.data.mongo.MongoRepository;
 
 import java.util.Set;
 

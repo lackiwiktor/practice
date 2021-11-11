@@ -1,10 +1,13 @@
-package country.pvp.practice.queue;
+package country.pvp.practice.queue.menu;
 
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.ladder.Ladder;
+import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.menu.Button;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.queue.Queue;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor
 public class QueueButton extends Button {
 
+    private final MatchManager matchManager;
     private final PracticePlayer practicePlayer;
     private final Queue queue;
 
@@ -21,8 +25,9 @@ public class QueueButton extends Button {
 
         return new ItemBuilder(ladder.getIcon())
                 .name(ladder.getDisplayName())
-                .lore("", "In Fights: n/a",
-                        "In Queue: " + queue.size())
+                .lore("",
+                        ChatColor.GRAY + "In Fights: " + ChatColor.WHITE + matchManager.getPlayersInFightCount(queue.getLadder(), queue.isRanked()),
+                        ChatColor.GRAY + "In Queue: " + ChatColor.WHITE + queue.size())
                 .build();
     }
 

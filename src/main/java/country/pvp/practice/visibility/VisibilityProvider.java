@@ -2,7 +2,7 @@ package country.pvp.practice.visibility;
 
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchData;
-import country.pvp.practice.player.PlayerState;
+import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
 
 public class VisibilityProvider {
@@ -24,8 +24,15 @@ public class VisibilityProvider {
                 MatchData matchData = observer.getStateData(PlayerState.IN_MATCH);
                 Match match = matchData.getMatch();
 
-                if (match.isInMatch(observable)) return Visibility.SHOWN;
-                else return Visibility.HIDDEN;
+                if (match.isInMatch(observable)) {
+                    if (!match.isAlive(observable)) {
+                        return Visibility.HIDDEN;
+                    }
+
+                    return Visibility.SHOWN;
+                } else {
+                    return Visibility.HIDDEN;
+                }
             } else return Visibility.HIDDEN;
         }
 

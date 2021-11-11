@@ -18,6 +18,11 @@ public class SoloTeam extends Team {
     }
 
     @Override
+    public String getName() {
+        return player.getName();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

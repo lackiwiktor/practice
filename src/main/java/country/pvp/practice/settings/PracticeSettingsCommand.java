@@ -17,7 +17,7 @@ public class PracticeSettingsCommand {
     @Command(value = "setspawn", description = "Sets the spawn location")
     @Permission("practice.admin")
     public void setSpawn(@Sender Player sender) {
-        practiceSettings.setSpawnLocation(sender.getLocation().getBlock().getLocation());
+        practiceSettings.setSpawnLocation(sender.getLocation());
         practiceSettingsService.saveAsync(practiceSettings);
         Messager.messageSuccess(sender, "Successfully set the spawn location.");
     }

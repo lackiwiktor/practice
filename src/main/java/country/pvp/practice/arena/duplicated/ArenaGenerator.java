@@ -1,6 +1,7 @@
-package country.pvp.practice.arena;
+package country.pvp.practice.arena.duplicated;
 
 import com.google.common.collect.Sets;
+import country.pvp.practice.arena.Arena;
 
 import java.util.Set;
 

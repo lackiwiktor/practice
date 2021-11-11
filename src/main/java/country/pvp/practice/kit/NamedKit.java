@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 @AllArgsConstructor
 @Data
-public class PlayerKit extends Kit {
+public class NamedKit extends Kit {
 
     private String name;
 

@@ -1,9 +1,11 @@
-package country.pvp.practice.data;
+package country.pvp.practice.data.mongo;
 
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import country.pvp.practice.data.DataObject;
+import country.pvp.practice.data.Repository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))

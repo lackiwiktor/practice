@@ -1,4 +1,4 @@
-package country.pvp.practice.player;
+package country.pvp.practice.player.data;
 
 public enum PlayerState {
   IN_LOBBY,
