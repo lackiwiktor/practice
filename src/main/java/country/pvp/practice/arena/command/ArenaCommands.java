@@ -68,7 +68,7 @@ public class ArenaCommands {
     @Command("arena spawnLocation1")
     @Permission("practice.admin")
     public void spawnLocation1(@Sender Player sender, @Name("arena") Arena arena) {
-        arena.setSpawnLocation1(sender.getLocation().getBlock().getLocation());
+        arena.setSpawnLocation1(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's first spawn location.");
     }
@@ -76,7 +76,7 @@ public class ArenaCommands {
     @Command("arena spawnLocation2")
     @Permission("practice.admin")
     public void spawnLocation2(@Sender Player sender, @Name("arena") Arena arena) {
-        arena.setSpawnLocation2(sender.getLocation().getBlock().getLocation());
+        arena.setSpawnLocation2(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's second spawn location.");
     }
@@ -84,7 +84,7 @@ public class ArenaCommands {
     @Command("arena center")
     @Permission("practice.admin")
     public void center(@Sender Player sender, @Name("arena") Arena arena) {
-        arena.setCenter(sender.getLocation().getBlock().getLocation());
+        arena.setCenter(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's center location.");
     }
@@ -92,7 +92,7 @@ public class ArenaCommands {
     @Command("arena spectatorLocation")
     @Permission("practice.admin")
     public void spectatorLocation(@Sender Player sender, @Name("arena") Arena arena) {
-        arena.setSpectatorLocation(sender.getLocation().getBlock().getLocation());
+        arena.setSpectatorLocation(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's spectator location.");
     }

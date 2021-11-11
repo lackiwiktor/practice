@@ -1,13 +1,9 @@
 package country.pvp.practice.lobby;
 
 import com.google.inject.Inject;
-import country.pvp.practice.settings.PracticeSettings;
-import country.pvp.practice.itembar.ItemBarManager;
-import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.visibility.VisibilityUpdater;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -27,25 +23,19 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
  */
 public class LobbyPlayerListener extends PlayerListener {
 
-    private final VisibilityUpdater visibilityUpdater;
-    private final ItemBarManager itemBarManager;
-    private final PracticeSettings practiceSettings;
+    private final LobbyService lobbyService;
 
     @Inject
-    public LobbyPlayerListener(PlayerManager playerManager, VisibilityUpdater visibilityUpdater, ItemBarManager itemBarManager, PracticeSettings practiceSettings) {
+    public LobbyPlayerListener(PlayerManager playerManager, LobbyService lobbyService) {
         super(playerManager);
-        this.visibilityUpdater = visibilityUpdater;
-        this.itemBarManager = itemBarManager;
-        this.practiceSettings = practiceSettings;
+        this.lobbyService = lobbyService;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void joinEvent(PlayerJoinEvent event) {
+        event.setJoinMessage(null);
         PracticePlayer practicePlayer = get(event);
-
-        itemBarManager.apply(ItemBarType.LOBBY, practicePlayer);
-        visibilityUpdater.update(practicePlayer);
-        practicePlayer.teleport(practiceSettings.getSpawnLocation());
+        lobbyService.moveToLobby(practicePlayer);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

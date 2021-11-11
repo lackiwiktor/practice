@@ -57,7 +57,7 @@ public class Kit implements SerializableObject {
 
     public ItemStack getIcon() {
         return new ItemBuilder(Material.ENCHANTED_BOOK)
-                .name("Default Kit")
+                .name("&eDefault Kit")
                 .build();
     }
 

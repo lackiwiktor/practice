@@ -1,4 +1,4 @@
-package country.pvp.practice.player;
+package country.pvp.practice.player.data;
 
 import com.google.common.collect.Maps;
 import country.pvp.practice.data.SerializableObject;

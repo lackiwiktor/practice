@@ -3,9 +3,13 @@ package country.pvp.practice.player;
 import com.google.common.base.Preconditions;
 import country.pvp.practice.data.DataObject;
 import country.pvp.practice.kit.Kit;
-import country.pvp.practice.kit.PlayerKit;
+import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.message.Recipient;
+import country.pvp.practice.player.data.PlayerKits;
+import country.pvp.practice.player.data.PlayerState;
+import country.pvp.practice.player.data.PlayerStateData;
+import country.pvp.practice.player.data.PlayerStatistics;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -13,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -49,7 +54,7 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public boolean isInQueue() {
-        return state == PlayerState.QUEUING  && getStateData(PlayerState.QUEUING) != null;
+        return state == PlayerState.QUEUING && getStateData(PlayerState.QUEUING) != null;
     }
 
     public boolean isInLobby() {
@@ -81,6 +86,10 @@ public class PracticePlayer implements DataObject, Recipient {
         return stateData.hasStateData(state);
     }
 
+    public void clearPlayerData() {
+        stateData.clear();
+    }
+
     public int getRank(Ladder ladder) {
         return statistics.getRank(ladder);
     }
@@ -89,8 +98,22 @@ public class PracticePlayer implements DataObject, Recipient {
         return kits.hasKits(ladder);
     }
 
-    public List<PlayerKit> getKits(Ladder ladder) {
+    public List<NamedKit> getKits(Ladder ladder) {
         return kits.getKits(ladder);
+    }
+
+    public void enableFlying() {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.setAllowFlight(true);
+        player.setFlying(true);
+    }
+
+    public void disableFlying() {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.setFlying(false);
+        player.setAllowFlight(false);
     }
 
     @Override
@@ -115,7 +138,7 @@ public class PracticePlayer implements DataObject, Recipient {
         org.bson.Document document = new org.bson.Document("_id", getId());
         document.put("name", name);
         document.put("nameLowerCase", name.toLowerCase(Locale.ROOT));
-        document.put("ranks", statistics.getDocument());
+        document.put("statistics", statistics.getDocument());
 
         return document;
     }
@@ -130,7 +153,7 @@ public class PracticePlayer implements DataObject, Recipient {
     @Override
     public void applyDocument(Document document) {
         if (name == null) name = document.getString("name");
-        statistics.applyDocument(document.get("ranks", Document.class));
+        statistics.applyDocument(document.get("statistics", Document.class));
     }
 
     public void teleport(Location location) {
@@ -158,7 +181,7 @@ public class PracticePlayer implements DataObject, Recipient {
         playerInventory.addItem(ladder.getKit().getIcon());
 
         if (kits.hasKits(ladder)) {
-            for (PlayerKit kit : getKits(ladder)) {
+            for (NamedKit kit : getKits(ladder)) {
                 playerInventory.addItem(kit.getIcon());
             }
         }
@@ -175,5 +198,23 @@ public class PracticePlayer implements DataObject, Recipient {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
+    }
+
+    public void respawn() {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.spigot().respawn();
+    }
+
+    public void setVelocity(Vector vector) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.setVelocity(vector);
+    }
+
+    public Location getLocation() {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        return player.getLocation();
     }
 }

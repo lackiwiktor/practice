@@ -3,7 +3,7 @@ package country.pvp.practice.queue;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PlayerState;
+import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;

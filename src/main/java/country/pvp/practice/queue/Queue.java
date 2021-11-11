@@ -6,11 +6,12 @@ import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.ladder.Ladder;
+import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
-import country.pvp.practice.player.PlayerState;
+import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.team.SoloTeam;
 import lombok.Data;
@@ -61,14 +62,14 @@ public class Queue {
 
         Arena arena = arenaManager.getRandom();
 
-        createMatch(queueData1, queueData2, arena);
+        createMatch(queueData1, queueData2, arena).startMatch();
     }
 
     public int size() {
         return entries.size();
     }
 
-    private void createMatch(QueueData queueData1, QueueData queueData2, Arena arena) {
-        matchProvider.provide(ladder, arena, ranked, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
+    private Match createMatch(QueueData queueData1, QueueData queueData2, Arena arena) {
+        return matchProvider.provide(ladder, arena, ranked, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
 }

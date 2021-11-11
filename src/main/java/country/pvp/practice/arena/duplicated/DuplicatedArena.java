@@ -1,5 +1,6 @@
-package country.pvp.practice.arena;
+package country.pvp.practice.arena.duplicated;
 
+import country.pvp.practice.arena.Arena;
 import org.bson.Document;
 import org.bukkit.Location;
 

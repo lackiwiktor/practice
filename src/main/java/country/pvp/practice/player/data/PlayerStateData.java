@@ -1,4 +1,4 @@
-package country.pvp.practice.player;
+package country.pvp.practice.player.data;
 
 import com.google.common.collect.Maps;
 
@@ -22,5 +22,9 @@ public class PlayerStateData {
 
     public boolean hasStateData(PlayerState state) {
         return stateDataMap.containsKey(state);
+    }
+
+    public void clear() {
+        stateDataMap.clear();
     }
 }
