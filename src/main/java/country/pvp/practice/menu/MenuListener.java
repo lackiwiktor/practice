@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class MenuListener implements Listener {
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onButtonPress(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());

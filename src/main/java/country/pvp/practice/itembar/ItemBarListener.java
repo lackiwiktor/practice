@@ -29,7 +29,7 @@ public class ItemBarListener implements Listener {
         Player player = event.getPlayer();
         PracticePlayer practicePlayer = playerManager.get(player);
 
-        if (!practicePlayer.isFighting())
+        if (!practicePlayer.isInMatch())
             event.setCancelled(itemBarManager.click(practicePlayer, item, BarInteract.RIGHT_CLICK));
     }
 }

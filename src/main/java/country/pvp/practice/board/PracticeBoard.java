@@ -1,5 +1,6 @@
 package country.pvp.practice.board;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
@@ -12,13 +13,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class PracticeBoard extends PlayerListener {
 
     public static final String TITLE = ChatColor.YELLOW.toString() + ChatColor.BOLD + "Practice";
-    private final Map<PracticePlayer, FastBoard> boards = new HashMap<>();
+    private final Map<PracticePlayer, FastBoard> boards = Maps.newConcurrentMap();
     private final BoardProvider provider;
 
     @Inject

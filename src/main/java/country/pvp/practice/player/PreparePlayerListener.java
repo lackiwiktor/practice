@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
@@ -22,17 +22,16 @@ public class PreparePlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void joinEvent(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        PracticePlayer practicePlayer = new PracticePlayer(player);
+    public void joinEvent(AsyncPlayerPreLoginEvent event) {
+        PracticePlayer practicePlayer = new PracticePlayer(event.getUniqueId(), event.getName());
 
         try {
-            playerService.loadAsync(practicePlayer);
+            playerService.load(practicePlayer);
             playerManager.add(practicePlayer);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Player not initialized successfully, player= {}", player.getName());
-            player.kickPlayer("&cError");
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Error");
+            log.error("Player not initialized successfully, player= {}", event.getName());
         }
     }
 
