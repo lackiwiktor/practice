@@ -7,7 +7,7 @@ import java.util.*;
 
 public class PlayerManager {
 
-    private final Map<UUID, PracticePlayer> players = Maps.newHashMap();
+    private final Map<UUID, PracticePlayer> players = Maps.newConcurrentMap();
 
     public PracticePlayer get(Player player) {
         return players.get(player.getUniqueId());

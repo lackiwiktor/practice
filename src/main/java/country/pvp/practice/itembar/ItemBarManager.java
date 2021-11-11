@@ -3,6 +3,7 @@ package country.pvp.practice.itembar;
 import com.google.common.collect.Maps;
 import country.pvp.practice.Practice;
 import country.pvp.practice.player.PlayerState;
+import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.queue.Queue;
 import country.pvp.practice.queue.QueueData;
@@ -22,9 +23,7 @@ public class ItemBarManager {
     private void setupItemBars() {
         add(ItemBarType.LOBBY, new ItemBar(
                 new ItemBarItem(new ItemBuilder(Material.IRON_SWORD).name("Unranked").unbreakable().build(),
-                        ((player, interact) -> {
-                            Practice.getQueueMenuProvider().provide(false, player).openMenu(player.getPlayer());
-                        }))));
+                        ((player, interact) -> Practice.getQueueMenuProvider().provide(false, player).openMenu(player.getPlayer())))));
         add(ItemBarType.QUEUE, new ItemBar(
                 new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("Leave Queue").unbreakable().build(),
                         ((player, interact) -> {
@@ -56,6 +55,7 @@ public class ItemBarManager {
     }
 
     public void apply(ItemBarType type, PracticePlayer player) {
+        PlayerUtil.resetPlayer(player.getPlayer());
         get(type).apply(player);
     }
 }

@@ -11,6 +11,7 @@ import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarListener;
+import country.pvp.practice.kit.PlayerKitListener;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
@@ -18,10 +19,17 @@ import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
 import country.pvp.practice.lobby.LobbyPlayerListener;
 import country.pvp.practice.menu.MenuListener;
+import country.pvp.practice.player.PlayerManager;
+import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.PreparePlayerListener;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.QueueMenuProvider;
+import country.pvp.practice.queue.QueueRemovePlayerListener;
 import country.pvp.practice.queue.QueueTask;
+import country.pvp.practice.settings.PracticeSettings;
+import country.pvp.practice.settings.PracticeSettingsCommand;
+import country.pvp.practice.settings.PracticeSettingsService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -31,6 +39,7 @@ import me.vaperion.blade.command.bindings.impl.BukkitBindings;
 import me.vaperion.blade.command.container.impl.BukkitCommandContainer;
 import me.vaperion.blade.completer.impl.DefaultTabCompleter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,17 +54,17 @@ public class Practice {
     private static Practice instance;
 
     private final Injector injector;
+    private final PlayerManager playerManager;
+    private final PlayerService playerService;
     private final LadderManager ladderManager;
     private final LadderService ladderService;
     private final ArenaManager arenaManager;
     private final ArenaService arenaService;
     private final QueueManager queueManager;
     private final QueueMenuProvider queueMenuProvider;
+    private final PracticeSettings practiceSettings;
+    private final PracticeSettingsService practiceSettingsService;
     private Blade blade;
-
-    public static QueueManager getQueueManager() {
-        return instance.queueManager;
-    }
 
     public static QueueMenuProvider getQueueMenuProvider() {
         return instance.queueMenuProvider;
@@ -63,17 +72,34 @@ public class Practice {
 
     public void onEnable() {
         instance = this;
+
         register(ItemBarListener.class);
         register(PreparePlayerListener.class);
         register(PracticeBoard.class);
         register(LobbyPlayerListener.class);
         register(MenuListener.class);
+        register(PlayerKitListener.class);
+        register(QueueRemovePlayerListener.class);
+
         schedule(BoardTask.class, 1L, TimeUnit.SECONDS, true);
         schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
+
         loadAll();
+
         setupBlade();
         registerCommand(ArenaCommands.class);
         registerCommand(LadderCommands.class);
+        registerCommand(PracticeSettingsCommand.class);
+
+        loadOnlinePlayers();
+    }
+
+    public void loadOnlinePlayers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PracticePlayer practicePlayer = new PracticePlayer(player);
+            playerService.loadAsync(practicePlayer);
+            playerManager.add(practicePlayer);
+        }
     }
 
     private void register(Class<? extends Listener> listener) {
@@ -105,16 +131,26 @@ public class Practice {
 
     @SneakyThrows
     private void loadAll() {
+        CompletableFuture<Boolean> settingsLoaded = new CompletableFuture<>();
         CompletableFuture<Boolean> laddersLoaded = new CompletableFuture<>();
         CompletableFuture<Boolean> arenasLoaded = new CompletableFuture<>();
 
+        TaskDispatcher.async(() -> loadSettings(settingsLoaded));
         TaskDispatcher.async(() -> loadLadders(laddersLoaded));
         TaskDispatcher.async(() -> loadArenas(arenasLoaded));
 
-        if (laddersLoaded.get() && arenasLoaded.get()) {
+        if (settingsLoaded.get()) {
+            log.info("Loaded settings");
+        }
+
+        if (laddersLoaded.get()) {
             log.info("Loaded arenas and ladders!");
             initPlayerQueues();
             log.info("Initialized queues!");
+        }
+
+        if (arenasLoaded.get()) {
+            log.info("Loaded arenas!");
         }
     }
 
@@ -144,5 +180,13 @@ public class Practice {
         }
     }
 
-
+    public void loadSettings(CompletableFuture<Boolean> future) {
+        try {
+            practiceSettingsService.load(practiceSettings);
+            future.complete(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            future.complete(false);
+        }
+    }
 }

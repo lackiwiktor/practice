@@ -2,6 +2,7 @@ package country.pvp.practice.player;
 
 import com.google.common.base.Preconditions;
 import country.pvp.practice.data.DataObject;
+import country.pvp.practice.kit.Kit;
 import country.pvp.practice.kit.PlayerKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.message.Recipient;
@@ -11,11 +12,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class PracticePlayer implements DataObject, Recipient {
@@ -23,13 +22,18 @@ public class PracticePlayer implements DataObject, Recipient {
     private final UUID uuid;
     private final PlayerStateData stateData = new PlayerStateData();
     private final PlayerStatistics statistics = new PlayerStatistics();
-    private final PlayerKits kits = new PlayerKits(this);
+    private final PlayerKits kits = new PlayerKits();
     private String name;
     private PlayerState state = PlayerState.IN_LOBBY;
 
     public PracticePlayer(Player player) {
         this(player.getUniqueId());
         this.name = player.getName();
+    }
+
+    public PracticePlayer(UUID uuid, String name) {
+        this(uuid);
+        this.name = name;
     }
 
     public PracticePlayer(UUID uuid) {
@@ -40,8 +44,12 @@ public class PracticePlayer implements DataObject, Recipient {
         return Bukkit.getPlayer(uuid);
     }
 
-    public boolean isFighting() {
-        return state == PlayerState.IN_MATCH;
+    public boolean isInMatch() {
+        return state == PlayerState.IN_MATCH && getStateData(PlayerState.IN_MATCH) != null;
+    }
+
+    public boolean isInQueue() {
+        return state == PlayerState.QUEUING  && getStateData(PlayerState.QUEUING) != null;
     }
 
     public boolean isInLobby() {
@@ -131,8 +139,29 @@ public class PracticePlayer implements DataObject, Recipient {
         player.teleport(location);
     }
 
-    public PlayerKit getMatchingKit(Ladder ladder, ItemStack itemStack) {
-        return kits.getKits(ladder).stream().filter(it -> it.getIcon().isSimilar(itemStack)).findFirst().orElse(null);
+    public Optional<? extends Kit> getMatchingKit(Ladder ladder, ItemStack itemStack) {
+        Optional<? extends Kit> playerKit = kits.getKits(ladder).stream().filter(it -> it.getIcon().isSimilar(itemStack)).findFirst();
+
+        if (!playerKit.isPresent()) {
+            if (ladder.getKit().getIcon().isSimilar(itemStack)) {
+                return Optional.of(ladder.getKit()); //Give default kit
+            }
+        } else return playerKit; //Give custom player kit
+
+        return Optional.empty();
+    }
+
+    public void giveKits(Ladder ladder) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        PlayerInventory playerInventory = player.getInventory();
+        playerInventory.addItem(ladder.getKit().getIcon());
+
+        if (kits.hasKits(ladder)) {
+            for (PlayerKit kit : getKits(ladder)) {
+                playerInventory.addItem(kit.getIcon());
+            }
+        }
     }
 
     @Override

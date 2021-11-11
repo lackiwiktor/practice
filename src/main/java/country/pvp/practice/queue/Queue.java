@@ -6,11 +6,13 @@ import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.ladder.Ladder;
+import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.team.SoloTeam;
 import lombok.Data;
 
 import java.util.PriorityQueue;
@@ -18,11 +20,13 @@ import java.util.PriorityQueue;
 @Data
 public class Queue {
 
+    private final PriorityQueue<QueueData> entries = Queues.newPriorityQueue();
+
     private final Ladder ladder;
     private final boolean ranked;
-    private final PriorityQueue<QueueData> entries = Queues.newPriorityQueue();
     private final ItemBarManager itemBarManager;
     private final ArenaManager arenaManager;
+    private final MatchProvider matchProvider;
 
     public void addPlayer(PracticePlayer player) {
         QueueData entry = new QueueData(player, this);
@@ -31,7 +35,7 @@ public class Queue {
         player.setStateData(PlayerState.QUEUING, entry);
         itemBarManager.apply(ItemBarType.QUEUE, player);
         Messager.message(player, Messages.PLAYER_JOINED_QUEUE,
-                new MessagePattern("{player}", player.getName()),
+                new MessagePattern("{queue}", ladder.getDisplayName()),
                 new MessagePattern("{ranked}", ranked ? "ranked" : "unranked"));
     }
 
@@ -65,8 +69,6 @@ public class Queue {
     }
 
     private void createMatch(QueueData queueData1, QueueData queueData2, Arena arena) {
-
+        matchProvider.provide(ladder, arena, ranked, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
-
-
 }

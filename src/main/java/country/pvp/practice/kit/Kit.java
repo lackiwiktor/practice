@@ -48,11 +48,11 @@ public class Kit implements SerializableObject {
     }
 
     public ItemStack[] getInventory() {
-        return (ItemStack[]) Arrays.stream(this.inventory).map(it -> it == null ? null : it.clone()).toArray();
+        return Arrays.stream(this.inventory).map(it -> it == null ? null : it.clone()).toArray(ItemStack[]::new);
     }
 
     public ItemStack[] getArmor() {
-        return (ItemStack[]) Arrays.stream(this.armor).map(it -> it == null ? null : it.clone()).toArray();
+        return Arrays.stream(this.armor).map(it -> it == null ? null : it.clone()).toArray(ItemStack[]::new);
     }
 
     public ItemStack getIcon() {

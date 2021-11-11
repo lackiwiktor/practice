@@ -1,23 +1,21 @@
 package country.pvp.practice.player;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import country.pvp.practice.data.SerializableObject;
 import country.pvp.practice.kit.PlayerKit;
 import country.pvp.practice.ladder.Ladder;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
+import org.bson.Document;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class PlayerKits {
+public class PlayerKits implements SerializableObject {
 
     private final Map<String, List<PlayerKit>> kits = Maps.newHashMap();
-    private final PracticePlayer player;
 
     public List<PlayerKit> getKits(Ladder ladder) {
         return kits.getOrDefault(ladder.getName(), Collections.emptyList());
@@ -35,11 +33,13 @@ public class PlayerKits {
         kits.getOrDefault(ladder.getName(), Collections.emptyList()).remove(kit);
     }
 
-    public void prepareKits(Ladder ladder) {
-        Player bukkitPlayer = player.getPlayer();
-        Preconditions.checkNotNull(bukkitPlayer, "player");
+    @Override
+    public Document getDocument() {
+        return null;
+    }
 
-        PlayerInventory playerInventory = bukkitPlayer.getInventory();
-        playerInventory.setItem(0, ladder.getKit().getIcon());
+    @Override
+    public void applyDocument(Document document) {
+
     }
 }
