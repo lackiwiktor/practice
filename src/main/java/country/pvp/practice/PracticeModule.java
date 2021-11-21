@@ -9,6 +9,7 @@ import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
+import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerService;
@@ -39,5 +40,6 @@ public class PracticeModule extends AbstractModule {
         bind(PracticeSettingsService.class).asEagerSingleton();
         bind(MatchProvider.class).asEagerSingleton();
         bind(PracticeBoard.class).asEagerSingleton();
+        bind(MatchManager.class).asEagerSingleton();
     }
 }

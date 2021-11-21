@@ -23,7 +23,9 @@ public class ItemBarManager {
     private void setupItemBars() {
         add(ItemBarType.LOBBY, new ItemBar(
                 new ItemBarItem(new ItemBuilder(Material.IRON_SWORD).name("Unranked").unbreakable().build(),
-                        ((player, interact) -> Practice.getQueueMenuProvider().provide(false, player).openMenu(player.getPlayer())))));
+                        ((player, interact) -> Practice.getQueueMenuProvider().provide(false, player).openMenu(player.getPlayer()))),
+                new ItemBarItem(new ItemBuilder(Material.DIAMOND_SWORD).name("Ranked").unbreakable().build(),
+                        ((player, interact) -> Practice.getQueueMenuProvider().provide(true, player).openMenu(player.getPlayer())))));
         add(ItemBarType.QUEUE, new ItemBar(
                 new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("Leave Queue").unbreakable().build(),
                         ((player, interact) -> {

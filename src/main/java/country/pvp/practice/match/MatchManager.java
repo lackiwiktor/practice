@@ -7,10 +7,10 @@ import java.util.Set;
 
 public class MatchManager {
 
-    private final Set<Match> matches = Sets.newCopyOnWriteArraySet();
+    private final Set<Match> matches = Sets.newHashSet();
 
     public void add(Match match) {
-        matches.remove(match);
+        matches.add(match);
     }
 
     public void remove(Match match) {
@@ -18,11 +18,11 @@ public class MatchManager {
     }
 
     public int getPlayersInFightCount(Ladder ladder, boolean ranked) {
-        return matches.stream().filter(it -> it.getLadder().equals(ladder) && it.isRanked() == ranked).mapToInt(it -> it.getPlayersCount()).sum();
+        return matches.stream().filter(it -> it.getLadder().equals(ladder) && it.isRanked() == ranked).mapToInt(Match::getPlayersCount).sum();
     }
 
     public int getPlayersInFight() {
-        return matches.stream().mapToInt(it -> it.getPlayersCount()).sum();
+        return matches.stream().mapToInt(Match::getPlayersCount).sum();
     }
 
 }

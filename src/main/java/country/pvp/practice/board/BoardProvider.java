@@ -41,6 +41,19 @@ public class BoardProvider {
             MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
             Match match = matchData.getMatch();
             lines.add("State: " + match.getState());
+
+            switch (match.getState()) {
+                case COUNTDOWN:
+                    lines.add(ChatColor.GRAY + "Opponent: " + ChatColor.WHITE + match.getOpponent(player).getName());
+                    break;
+                case FIGHT:
+                    lines.add(ChatColor.GRAY + "Ping: " + ChatColor.WHITE + 0);
+                    break;
+                case END:
+                    lines.add(ChatColor.GRAY + "Winner: " + ChatColor.WHITE + (match.getWinner() == null ? "none" : match.getWinner().getName()));
+                    break;
+            }
+
         }
 
         lines.add(0, "");

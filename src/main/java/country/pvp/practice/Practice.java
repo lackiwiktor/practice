@@ -16,7 +16,7 @@ import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
 import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
-import country.pvp.practice.lobby.LobbyPlayerListener;
+import country.pvp.practice.player.PlayerProtectionListener;
 import country.pvp.practice.match.MatchKitListener;
 import country.pvp.practice.match.MatchPlayerListener;
 import country.pvp.practice.menu.MenuListener;
@@ -77,7 +77,7 @@ public class Practice {
         register(ItemBarListener.class);
         register(PreparePlayerListener.class);
         register(PracticeBoard.class);
-        register(LobbyPlayerListener.class);
+        register(PlayerProtectionListener.class);
         register(MenuListener.class);
         register(MatchKitListener.class);
         register(MatchPlayerListener.class);

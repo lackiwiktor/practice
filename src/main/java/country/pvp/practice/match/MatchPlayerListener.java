@@ -3,12 +3,13 @@ package country.pvp.practice.match;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -18,6 +19,21 @@ public class MatchPlayerListener extends PlayerListener {
     @Inject
     public MatchPlayerListener(PlayerManager playerManager) {
         super(playerManager);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void entityDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        PracticePlayer damagedPlayer = get((Player) event.getEntity());
+
+        if (!damagedPlayer.isInMatch()) return;
+
+        MatchData matchData = damagedPlayer.getStateData(PlayerState.IN_MATCH);
+        Match match = matchData.getMatch();
+
+        if (match.getState() != MatchState.FIGHT) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -43,7 +59,7 @@ public class MatchPlayerListener extends PlayerListener {
             return;
         }
 
-        matchData.setLastAttacker(damagedPlayer);
+        matchData.setLastAttacker(damagerPlayer);
     }
 
     @EventHandler

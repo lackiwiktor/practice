@@ -40,7 +40,7 @@ public class MatchKitListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void dropEvent(PlayerDropItemEvent event) {
+    public void dropItem(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
         PracticePlayer practicePlayer = get(event);
         if (!practicePlayer.isInMatch()) return;
@@ -51,7 +51,7 @@ public class MatchKitListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void dropEvent(InventoryClickEvent event) {
+    public void clickEvent(InventoryClickEvent event) {
         ItemStack item = event.getCurrentItem();
         if (item == null) return;
         PracticePlayer practicePlayer = get((Player) event.getWhoClicked());

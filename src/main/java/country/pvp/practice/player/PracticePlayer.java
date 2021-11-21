@@ -128,7 +128,7 @@ public class PracticePlayer implements DataObject, Recipient {
 
     public boolean hasPermission(String permission) {
         Player player = getPlayer();
-        Preconditions.checkNotNull(player, "Player must be online in order to check his permissions");
+        Preconditions.checkNotNull(player, "player");
 
         return player.hasPermission(permission);
     }
@@ -146,7 +146,7 @@ public class PracticePlayer implements DataObject, Recipient {
     @Override
     public void receive(String message) {
         Player player = getPlayer();
-        Preconditions.checkNotNull(player, "Player must be online in order to send him a message");
+        Preconditions.checkNotNull(player, "player");
         player.sendMessage(message);
     }
 
@@ -158,7 +158,7 @@ public class PracticePlayer implements DataObject, Recipient {
 
     public void teleport(Location location) {
         Player player = getPlayer();
-        Preconditions.checkNotNull(player, "Player must be online in order to teleport him");
+        Preconditions.checkNotNull(player, "player");
         player.teleport(location);
     }
 

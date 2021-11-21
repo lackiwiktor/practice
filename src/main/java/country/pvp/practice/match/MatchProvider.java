@@ -13,8 +13,9 @@ public class MatchProvider {
 
     private final VisibilityUpdater visibilityUpdater;
     private final LobbyService lobbyService;
+    private final MatchManager matchManager;
 
     public Match provide(Ladder ladder, Arena arena, boolean ranked, Team teamA, Team teamB) {
-        return new Match(visibilityUpdater, lobbyService, ladder, arena, teamA, teamB, ranked);
+        return new Match(visibilityUpdater, lobbyService, matchManager, ladder, arena, teamA, teamB, ranked);
     }
 }
