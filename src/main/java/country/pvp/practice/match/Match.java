@@ -5,13 +5,16 @@ import country.pvp.practice.arena.Arena;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
+import country.pvp.practice.message.MessagePattern;
+import country.pvp.practice.message.Messager;
+import country.pvp.practice.message.Messages;
 import country.pvp.practice.message.Recipient;
+import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.team.Team;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -27,6 +30,7 @@ public class Match implements Recipient {
 
     private final VisibilityUpdater visibilityUpdater;
     private final LobbyService lobbyService;
+    private final MatchManager matchManager;
 
     private final UUID id = UUID.randomUUID(); //match-id
     private final Ladder ladder;
@@ -35,10 +39,13 @@ public class Match implements Recipient {
     private final Team teamB;
     private final boolean ranked;
 
+    private Team winner;
+
     private MatchState state = MatchState.COUNTDOWN;
     private BukkitRunnable countDownRunnable;
 
-    public void startMatch() {
+    public void start() {
+        matchManager.add(this);
         prepareTeams();
     }
 
@@ -72,32 +79,46 @@ public class Match implements Recipient {
             @Override
             public void run() {
                 if (count.decrementAndGet() > 0) {
-                    //   broadcastMessage("Match will start in " + count.get() + " seconds.");
+                    broadcast(Messages.MATCH_COUNTDOWN.match("{time}", count.get()));
                 } else if (count.get() == 0) {
                     state = MatchState.FIGHT;
-                    //  broadcastMessage("Match has started!");
+                    broadcast(Messages.MATCH_START);
                     cancel();
                 }
             }
         }).runTaskTimer(PracticePlugin.getPlugin(PracticePlugin.class), 20L, 20L);
     }
 
-    void cancelCountDown() {
-        if (countDownRunnable == null) return;
-        if (Bukkit.getScheduler().isCurrentlyRunning(countDownRunnable.getTaskId())) {
-            countDownRunnable.cancel();
-        }
+    void broadcast(String message) {
+        Messager.message(this, message);
     }
 
-    Team getOpponent(Team team) {
+    void broadcast(Messages message) {
+        Messager.message(this, message);
+    }
+
+    void broadcast(Team team, Messages message) {
+        Messager.message(team, message);
+    }
+
+    void broadcast(Team team, String message) {
+        Messager.message(team, message);
+    }
+
+    void cancelCountDown() {
+        if (countDownRunnable == null) return;
+        countDownRunnable.cancel();
+    }
+
+    public Team getOpponent(Team team) {
         return team.equals(teamA) ? teamB : teamA;
     }
 
-    Team getOpponent(PracticePlayer player) {
+    public Team getOpponent(PracticePlayer player) {
         return teamA.hasPlayer(player) ? teamB : teamA;
     }
 
-    Team getTeam(PracticePlayer player) {
+    public Team getTeam(PracticePlayer player) {
         return teamA.hasPlayer(player) ? teamA : teamB;
     }
 
@@ -112,6 +133,26 @@ public class Match implements Recipient {
     public void handleDeath(PracticePlayer player) {
         MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
         matchData.setDead(true);
+
+
+        if (matchData.getLastAttacker() != null) {
+            PracticePlayer killer = matchData.getLastAttacker();
+
+            broadcast(teamA,
+                    Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
+                            new MessagePattern("{player}", getFormattedDisplayName(player, teamA)),
+                            new MessagePattern("{killer}", getFormattedDisplayName(killer, teamA))));
+            broadcast(teamB,
+                    Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
+                            new MessagePattern("{player}", getFormattedDisplayName(player, teamB)),
+                            new MessagePattern("{killer}", getFormattedDisplayName(killer, teamB))));
+        } else {
+            broadcast(teamA,
+                    Messages.MATCH_PLAYER_KILLED_BY_UNKNOWN.match("{player}", getFormattedDisplayName(player, teamA)));
+            broadcast(teamB,
+                    Messages.MATCH_PLAYER_KILLED_BY_UNKNOWN.match("{player}", getFormattedDisplayName(player, teamB)));
+        }
+
         updateVisibility();
         player.respawn();
         player.setVelocity(new Vector());
@@ -120,9 +161,10 @@ public class Match implements Recipient {
 
     public void handleRespawn(PracticePlayer player) {
         Team team = getTeam(player);
+        PlayerUtil.resetPlayer(player.getPlayer());
 
-        if (!team.isAnyPlayerAlive()) {
-            endMatch(getOpponent(team));
+        if (team.isDead()) {
+            end(getOpponent(team));
             return;
         }
 
@@ -130,6 +172,9 @@ public class Match implements Recipient {
     }
 
     public void handleDisconnect(PracticePlayer player) {
+        broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
+        broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
+
         MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
 
         matchData.setDead(true);
@@ -137,8 +182,8 @@ public class Match implements Recipient {
 
         Team team = getTeam(player);
 
-        if (!team.isAnyPlayerAlive()) {
-            endMatch(getOpponent(team));
+        if (team.isDead()) {
+            end(getOpponent(team));
         }
     }
 
@@ -146,7 +191,16 @@ public class Match implements Recipient {
         player.enableFlying();
     }
 
-    void endMatch(Team winner) {
+    void end(Team winner) {
+        state = MatchState.END;
+        this.winner = winner;
+        cancelCountDown();
+
+        if (winner != null) {
+            broadcast(winner, Messages.MATCH_WON);
+            broadcast(getOpponent(winner), Messages.MATCH_LOST);
+        }
+
         Runnable runnable = () -> {
             for (PracticePlayer player : teamA.getOnlinePlayers()) {
                 lobbyService.moveToLobby(player);
@@ -155,13 +209,24 @@ public class Match implements Recipient {
             for (PracticePlayer player : teamB.getOnlinePlayers()) {
                 lobbyService.moveToLobby(player);
             }
+
+            matchManager.remove(this);
         };
 
         TaskDispatcher.runLater(runnable, 3L, TimeUnit.SECONDS);
     }
 
+    public void cancel(String reason) {
+        broadcast(Messages.MATCH_CANCELLED.match("{reason}", reason));
+        end(null);
+    }
+
+    public String getFormattedDisplayName(PracticePlayer player, Team team) {
+        return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
+    }
+
     public String getFormattedDisplayName(PracticePlayer player, PracticePlayer other) {
-        return (getTeam(player).hasPlayer(other) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
+        return getFormattedDisplayName(player, getTeam(other));
     }
 
     @Override

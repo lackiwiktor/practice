@@ -21,4 +21,12 @@ public class PracticeSettingsCommand {
         practiceSettingsService.saveAsync(practiceSettings);
         Messager.messageSuccess(sender, "Successfully set the spawn location.");
     }
+
+    @Command(value = "seteditor", description = "Sets the editor location")
+    @Permission("practice.admin")
+    public void setEditor(@Sender Player sender) {
+        practiceSettings.setEditorLocation(sender.getLocation());
+        practiceSettingsService.saveAsync(practiceSettings);
+        Messager.messageSuccess(sender, "Successfully set the editor location.");
+    }
 }

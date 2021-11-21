@@ -11,23 +11,22 @@ import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarListener;
+import country.pvp.practice.kit.KitCommand;
+import country.pvp.practice.kit.editor.KitChooseProvider;
+import country.pvp.practice.kit.editor.KitEditorListener;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
 import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
-import country.pvp.practice.lobby.LobbyPlayerListener;
 import country.pvp.practice.match.MatchKitListener;
 import country.pvp.practice.match.MatchPlayerListener;
 import country.pvp.practice.menu.MenuListener;
-import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PlayerService;
-import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.PreparePlayerListener;
+import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
-import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.queue.QueueRemovePlayerListener;
 import country.pvp.practice.queue.QueueTask;
+import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
@@ -65,10 +64,15 @@ public class Practice {
     private final QueueMenuProvider queueMenuProvider;
     private final PracticeSettings practiceSettings;
     private final PracticeSettingsService practiceSettingsService;
+    private final KitChooseProvider kitChooseProvider;
     private Blade blade;
 
     public static QueueMenuProvider getQueueMenuProvider() {
         return instance.queueMenuProvider;
+    }
+
+    public static KitChooseProvider getKitChooseProvider() {
+        return instance.kitChooseProvider;
     }
 
     public void onEnable() {
@@ -77,11 +81,12 @@ public class Practice {
         register(ItemBarListener.class);
         register(PreparePlayerListener.class);
         register(PracticeBoard.class);
-        register(LobbyPlayerListener.class);
+        register(PlayerProtectionListener.class);
         register(MenuListener.class);
         register(MatchKitListener.class);
         register(MatchPlayerListener.class);
         register(QueueRemovePlayerListener.class);
+        register(KitEditorListener.class);
 
         schedule(BoardTask.class, 1L, TimeUnit.SECONDS, true);
         schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
@@ -92,6 +97,7 @@ public class Practice {
         registerCommand(ArenaCommands.class);
         registerCommand(LadderCommands.class);
         registerCommand(PracticeSettingsCommand.class);
+        registerCommand(KitCommand.class);
 
         loadOnlinePlayers();
     }

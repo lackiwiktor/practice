@@ -10,6 +10,7 @@ import org.bukkit.Location;
 public class PracticeSettings implements DataObject {
 
     private Location spawnLocation;
+    private Location editorLocation;
 
     @Override
     public String getCollection() {
@@ -24,12 +25,16 @@ public class PracticeSettings implements DataObject {
     @Override
     public Document getDocument() {
         Document document = new Document("_id", getId());
+
         document.put("spawnLocation", LocationAdapter.toJson(spawnLocation));
+        document.put("editorLocation", LocationAdapter.toJson(editorLocation));
+
         return document;
     }
 
     @Override
     public void applyDocument(Document document) {
         spawnLocation = LocationAdapter.fromJson(document.getString("spawnLocation"));
+        editorLocation = LocationAdapter.fromJson(document.getString("editorLocation"));
     }
 }

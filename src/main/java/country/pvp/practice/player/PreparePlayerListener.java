@@ -22,7 +22,7 @@ public class PreparePlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void joinEvent(AsyncPlayerPreLoginEvent event) {
+    public void loginEvent(AsyncPlayerPreLoginEvent event) {
         PracticePlayer practicePlayer = new PracticePlayer(event.getUniqueId(), event.getName());
 
         try {

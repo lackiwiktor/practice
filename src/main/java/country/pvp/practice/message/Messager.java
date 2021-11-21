@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 public class Messager {
 
     public static void message(Recipient recipient, String message) {
-        recipient.receive(message);
+        recipient.receive(MessageUtil.color(message));
     }
 
     public static void message(Player recipient, String message) {
-        recipient.sendMessage(message);
+        recipient.sendMessage(MessageUtil.color(message));
     }
 
     public static void message(Recipient recipient, String... messages) {

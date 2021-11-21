@@ -2,8 +2,8 @@ package country.pvp.practice.visibility;
 
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchData;
-import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.data.PlayerState;
 
 public class VisibilityProvider {
 
@@ -15,7 +15,7 @@ public class VisibilityProvider {
      * @return visibility
      */
     public Visibility provide(PracticePlayer observer, PracticePlayer observable) {
-        if (observer.isInLobby()) {
+        if (observer.isInLobby() || observer.isInQueue() || observer.isInEditor()) {
             return Visibility.HIDDEN;
         }
 

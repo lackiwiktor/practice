@@ -45,14 +45,15 @@ public class Kit implements SerializableObject {
         PlayerInventory playerInventory = bukkitPlayer.getInventory();
         playerInventory.setArmorContents(getArmor());
         playerInventory.setContents(getInventory());
+        bukkitPlayer.updateInventory();
     }
 
     public ItemStack[] getInventory() {
-        return Arrays.stream(this.inventory).map(it -> it == null ? null : it.clone()).toArray(ItemStack[]::new);
+        return Arrays.stream(inventory).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 
     public ItemStack[] getArmor() {
-        return Arrays.stream(this.armor).map(it -> it == null ? null : it.clone()).toArray(ItemStack[]::new);
+        return Arrays.stream(armor).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 
     public ItemStack getIcon() {

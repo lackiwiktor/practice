@@ -26,11 +26,7 @@ public class BoardProvider {
     public List<String> provide(PracticePlayer player) {
         List<String> lines = Lists.newArrayList();
 
-        if (player.isInLobby()) {
-            lines.add(ChatColor.GRAY + "Online: " + ChatColor.WHITE + Bukkit.getServer().getOnlinePlayers().size());
-            lines.add(ChatColor.GRAY + "Queuing: " + ChatColor.WHITE + queueManager.getPlayersInQueueCount());
-            lines.add(ChatColor.GRAY + "Fighting: " + ChatColor.WHITE + matchManager.getPlayersInFight());
-        } else if (player.isInQueue()) {
+        if (player.isInQueue()) {
             QueueData queueData = player.getStateData(PlayerState.QUEUING);
             lines.add("  Time: " + TimeUtil.formatTimeMillisToClock(TimeUtil.elapsed(queueData.getJoinTimeStamp())));
             if (queueData.isRanked()) {
@@ -41,6 +37,22 @@ public class BoardProvider {
             MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
             Match match = matchData.getMatch();
             lines.add("State: " + match.getState());
+
+            switch (match.getState()) {
+                case COUNTDOWN:
+                    lines.add(ChatColor.GRAY + "Opponent: " + ChatColor.WHITE + match.getOpponent(player).getName());
+                    break;
+                case FIGHT:
+                    lines.add(ChatColor.GRAY + "Ping: " + ChatColor.WHITE + 0);
+                    break;
+                case END:
+                    lines.add(ChatColor.GRAY + "Winner: " + ChatColor.WHITE + (match.getWinner() == null ? "none" : match.getWinner().getName()));
+                    break;
+            }
+        } else {
+            lines.add(ChatColor.GRAY + "Online: " + ChatColor.WHITE + Bukkit.getServer().getOnlinePlayers().size());
+            lines.add(ChatColor.GRAY + "Queuing: " + ChatColor.WHITE + queueManager.getPlayersInQueueCount());
+            lines.add(ChatColor.GRAY + "Fighting: " + ChatColor.WHITE + matchManager.getPlayersInFight());
         }
 
         lines.add(0, "");

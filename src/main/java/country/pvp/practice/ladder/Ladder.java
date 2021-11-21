@@ -6,7 +6,12 @@ import country.pvp.practice.kit.Kit;
 import country.pvp.practice.serialization.ItemStackAdapter;
 import lombok.Data;
 import org.bson.Document;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class Ladder implements DataObject {
@@ -15,6 +20,7 @@ public class Ladder implements DataObject {
     private String displayName;
     private ItemStack icon;
     private Kit kit = new Kit();
+    private ItemStack[] editorItems;
     private boolean ranked;
 
     @Override
@@ -24,7 +30,18 @@ public class Ladder implements DataObject {
         document.put("icon", ItemStackAdapter.toJson(icon));
         document.put("kit", kit.getDocument());
         document.put("ranked", ranked);
+        document.put("editorItems", Arrays.stream(editorItems).map(ItemStackAdapter::toJson).collect(Collectors.toList()));
         return document;
+    }
+
+
+    @Override
+    public void applyDocument(Document document) {
+        displayName = document.getString("displayName");
+        icon = ItemStackAdapter.fromJson(document.getString("icon"));
+        kit.applyDocument(document.get("kit", Document.class));
+        ranked = document.getBoolean("ranked");
+        editorItems = (ItemStack[]) document.get("editorItems", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
     }
 
     @Override
@@ -42,24 +59,24 @@ public class Ladder implements DataObject {
     }
 
     public ItemStack getIcon() {
-        if(!isSetup()) return null;
+        if (!isSetup()) return null;
 
         return new ItemBuilder(icon.clone()).name(displayName).build();
     }
 
     public void setInventory(ItemStack[] inventory) {
-        this.kit.setInventory(inventory);
+        kit.setInventory(inventory);
     }
 
     public void setArmor(ItemStack[] armor) {
-        this.kit.setArmor(armor);
+        kit.setArmor(armor);
     }
 
-    @Override
-    public void applyDocument(Document document) {
-        displayName = document.getString("displayName");
-        icon = ItemStackAdapter.fromJson(document.getString("icon"));
-        (kit = new Kit()).applyDocument(document.get("kit", Document.class));
-        ranked = document.getBoolean("ranked");
+    public ItemStack[] getEditorItems() {
+        return editorItems == null ? new ItemStack[0] : Arrays.stream(editorItems).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
+    }
+
+    public void setEditorItems(ItemStack[] items) {
+        editorItems = items;
     }
 }

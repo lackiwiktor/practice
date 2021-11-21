@@ -13,6 +13,8 @@ public class VisibilityUpdater {
 
     public void update(PracticePlayer player) {
         for (PracticePlayer other : playerManager.getAll()) {
+            if (!other.isOnline()) continue;
+
             update(player, other);
             update(other, player);
         }

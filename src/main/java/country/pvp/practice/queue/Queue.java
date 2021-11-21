@@ -1,6 +1,6 @@
 package country.pvp.practice.queue;
 
-import com.google.common.collect.Queues;
+import com.mongodb.assertions.Assertions;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.itembar.ItemBarManager;
@@ -11,17 +11,17 @@ import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
-import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.team.SoloTeam;
 import lombok.Data;
 
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 
 @Data
 public class Queue {
 
-    private final PriorityQueue<QueueData> entries = Queues.newPriorityQueue();
+    private final java.util.Queue<QueueData> entries = new LinkedList<>();
 
     private final Ladder ladder;
     private final boolean ranked;
@@ -35,16 +35,16 @@ public class Queue {
         player.setState(PlayerState.QUEUING);
         player.setStateData(PlayerState.QUEUING, entry);
         itemBarManager.apply(ItemBarType.QUEUE, player);
-        Messager.message(player, Messages.PLAYER_JOINED_QUEUE,
+        Messager.message(player, Messages.PLAYER_JOINED_QUEUE.match(
                 new MessagePattern("{queue}", ladder.getDisplayName()),
-                new MessagePattern("{ranked}", ranked ? "ranked" : "unranked"));
+                new MessagePattern("{ranked}", ranked ? "&branked" : "&dunranked")));
     }
 
     public void removePlayer(PracticePlayer player, boolean leftQueue) {
-        entries.removeIf(it -> it.getPlayer().equals(player));
         player.removeStateData(PlayerState.QUEUING);
 
         if (leftQueue) {
+            entries.removeIf(it -> it.getPlayer().equals(player));
             player.setState(PlayerState.IN_LOBBY);
             itemBarManager.apply(ItemBarType.LOBBY, player);
             Messager.message(player, Messages.PLAYER_LEFT_QUEUE);
@@ -60,9 +60,12 @@ public class Queue {
         removePlayer(queueData1.getPlayer(), false);
         removePlayer(queueData2.getPlayer(), false);
 
+        Assertions.assertFalse(entries.contains(queueData1));
+        Assertions.assertFalse(entries.contains(queueData2));
+
         Arena arena = arenaManager.getRandom();
 
-        createMatch(queueData1, queueData2, arena).startMatch();
+        createMatch(queueData1, queueData2, arena).start();
     }
 
     public int size() {

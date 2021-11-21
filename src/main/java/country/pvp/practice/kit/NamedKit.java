@@ -7,6 +7,8 @@ import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 @Data
 public class NamedKit extends Kit {
@@ -31,5 +33,18 @@ public class NamedKit extends Kit {
         return new ItemBuilder(Material.ENCHANTED_BOOK)
                 .name(name)
                 .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NamedKit namedKit = (NamedKit) o;
+        return Objects.equals(name, namedKit.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
