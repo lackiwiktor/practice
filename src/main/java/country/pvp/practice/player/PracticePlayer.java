@@ -50,11 +50,11 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public boolean isInMatch() {
-        return state == PlayerState.IN_MATCH && getStateData(PlayerState.IN_MATCH) != null;
+        return state == PlayerState.IN_MATCH && hasStateData(PlayerState.IN_MATCH);
     }
 
     public boolean isInQueue() {
-        return state == PlayerState.QUEUING && getStateData(PlayerState.QUEUING) != null;
+        return state == PlayerState.QUEUING && hasStateData(PlayerState.QUEUING);
     }
 
     public boolean isInLobby() {
@@ -94,11 +94,23 @@ public class PracticePlayer implements DataObject, Recipient {
         return statistics.getRank(ladder);
     }
 
-    public boolean hasKit(Ladder ladder) {
+    public void removeKit(Ladder ladder, int index) {
+        kits.removeKit(ladder, index);
+    }
+
+    public void setKit(Ladder ladder, NamedKit newKit, int index) {
+        kits.setKit(ladder, newKit, index);
+    }
+
+    public NamedKit getKit(Ladder ladder, int index) {
+        return kits.getKit(ladder, index);
+    }
+
+    public boolean hasKits(Ladder ladder) {
         return kits.hasKits(ladder);
     }
 
-    public List<NamedKit> getKits(Ladder ladder) {
+    public NamedKit[] getKits(Ladder ladder) {
         return kits.getKits(ladder);
     }
 
@@ -139,6 +151,7 @@ public class PracticePlayer implements DataObject, Recipient {
         document.put("name", name);
         document.put("nameLowerCase", name.toLowerCase(Locale.ROOT));
         document.put("statistics", statistics.getDocument());
+        document.put("kits", kits.getDocument());
 
         return document;
     }
@@ -154,6 +167,7 @@ public class PracticePlayer implements DataObject, Recipient {
     public void applyDocument(Document document) {
         if (name == null) name = document.getString("name");
         statistics.applyDocument(document.get("statistics", Document.class));
+        kits.applyDocument(document.get("kits", Document.class));
     }
 
     public void teleport(Location location) {
@@ -163,7 +177,7 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public Optional<? extends Kit> getMatchingKit(Ladder ladder, ItemStack itemStack) {
-        Optional<? extends Kit> playerKit = kits.getKits(ladder).stream().filter(it -> it.getIcon().isSimilar(itemStack)).findFirst();
+        Optional<? extends Kit> playerKit = Arrays.stream(kits.getKits(ladder)).filter(it -> it != null && it.getIcon().isSimilar(itemStack)).findFirst();
 
         if (!playerKit.isPresent()) {
             if (ladder.getKit().getIcon().isSimilar(itemStack)) {
@@ -181,9 +195,7 @@ public class PracticePlayer implements DataObject, Recipient {
         playerInventory.addItem(ladder.getKit().getIcon());
 
         if (kits.hasKits(ladder)) {
-            for (NamedKit kit : getKits(ladder)) {
-                playerInventory.addItem(kit.getIcon());
-            }
+            Arrays.stream(getKits(ladder)).filter(Objects::nonNull).forEach(it -> playerInventory.addItem(it.getIcon()));
         }
     }
 
@@ -216,5 +228,13 @@ public class PracticePlayer implements DataObject, Recipient {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         return player.getLocation();
+    }
+
+    public boolean isInEditor() {
+        return state == PlayerState.EDITING_KIT && hasStateData(PlayerState.EDITING_KIT);
+    }
+
+    public boolean isOnline() {
+        return getPlayer() != null;
     }
 }

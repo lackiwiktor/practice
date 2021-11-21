@@ -26,11 +26,7 @@ public class BoardProvider {
     public List<String> provide(PracticePlayer player) {
         List<String> lines = Lists.newArrayList();
 
-        if (player.isInLobby()) {
-            lines.add(ChatColor.GRAY + "Online: " + ChatColor.WHITE + Bukkit.getServer().getOnlinePlayers().size());
-            lines.add(ChatColor.GRAY + "Queuing: " + ChatColor.WHITE + queueManager.getPlayersInQueueCount());
-            lines.add(ChatColor.GRAY + "Fighting: " + ChatColor.WHITE + matchManager.getPlayersInFight());
-        } else if (player.isInQueue()) {
+        if (player.isInQueue()) {
             QueueData queueData = player.getStateData(PlayerState.QUEUING);
             lines.add("  Time: " + TimeUtil.formatTimeMillisToClock(TimeUtil.elapsed(queueData.getJoinTimeStamp())));
             if (queueData.isRanked()) {
@@ -53,7 +49,10 @@ public class BoardProvider {
                     lines.add(ChatColor.GRAY + "Winner: " + ChatColor.WHITE + (match.getWinner() == null ? "none" : match.getWinner().getName()));
                     break;
             }
-
+        } else {
+            lines.add(ChatColor.GRAY + "Online: " + ChatColor.WHITE + Bukkit.getServer().getOnlinePlayers().size());
+            lines.add(ChatColor.GRAY + "Queuing: " + ChatColor.WHITE + queueManager.getPlayersInQueueCount());
+            lines.add(ChatColor.GRAY + "Fighting: " + ChatColor.WHITE + matchManager.getPlayersInFight());
         }
 
         lines.add(0, "");

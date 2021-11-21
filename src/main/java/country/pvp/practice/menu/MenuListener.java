@@ -30,15 +30,7 @@ public class MenuListener implements Listener {
                 Button button = openMenu.getButtons().get(event.getSlot());
                 boolean cancel = button.shouldCancel(player, event.getClick());
 
-                if (!cancel && (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT)) {
-                    event.setCancelled(true);
-
-                    if (event.getCurrentItem() != null) {
-                        player.getInventory().addItem(event.getCurrentItem());
-                    }
-                } else {
-                    event.setCancelled(cancel);
-                }
+                event.setCancelled(cancel);
 
                 button.clicked(player, event.getClick());
                 button.clicked(player, event.getSlot(), event.getClick(), event.getHotbarButton());

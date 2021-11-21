@@ -88,4 +88,12 @@ public class LadderCommands {
         ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's armor.");
     }
+
+    @Command("ladder editoritems")
+    @Permission("practice.admin")
+    public void editorItems(@Sender Player sender, @Name("ladder") Ladder ladder) {
+        ladder.setEditorItems(sender.getInventory().getContents());
+        ladderService.saveAsync(ladder);
+        Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's editor items.");
+    }
 }

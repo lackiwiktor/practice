@@ -23,7 +23,7 @@ public class MatchKitListener extends PlayerListener {
         super(playerManager);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void clickEvent(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
