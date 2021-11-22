@@ -12,6 +12,6 @@ public class KitChooseProvider {
     private final KitEditorService kitEditorService;
 
     public KitChooseMenu provide(PracticePlayer player) {
-        return new KitChooseMenu(player, ladderManager, kitEditorService);
+        return new KitChooseMenu(ladderManager, kitEditorService, player);
     }
 }

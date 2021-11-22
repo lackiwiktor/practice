@@ -28,17 +28,7 @@ public class KitEditorChest extends Menu {
         ItemStack[] items = ladder.getEditorItems();
 
         for (ItemStack item : items) {
-            buttons.put(buttons.size(), new Button() {
-                @Override
-                public ItemStack getButtonItem(Player player) {
-                    return item;
-                }
-
-                @Override
-                public boolean shouldCancel(Player player, ClickType clickType) {
-                    return false;
-                }
-            });
+            buttons.put(buttons.size(), new KitEditorChestButton(item));
         }
 
         return buttons;
@@ -47,5 +37,21 @@ public class KitEditorChest extends Menu {
     @Override
     public int size(Map<Integer, Button> buttons) {
         return 36;
+    }
+
+    @RequiredArgsConstructor
+    public static class KitEditorChestButton extends Button {
+
+        private final ItemStack item;
+
+        @Override
+        public ItemStack getButtonItem(Player player) {
+            return item;
+        }
+
+        @Override
+        public boolean shouldCancel(Player player, ClickType clickType) {
+            return false;
+        }
     }
 }
