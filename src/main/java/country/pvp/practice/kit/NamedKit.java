@@ -31,7 +31,7 @@ public class NamedKit extends Kit {
     @Override
     public ItemStack getIcon() {
         return new ItemBuilder(Material.ENCHANTED_BOOK)
-                .name(name)
+                .name("&e".concat(name))
                 .build();
     }
 

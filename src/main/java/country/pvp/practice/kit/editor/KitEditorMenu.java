@@ -31,69 +31,11 @@ public class KitEditorMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (int i = 0; i < 7; i++) {
-            NamedKit kit = practicePlayer.getKit(ladder, i);
+            buttons.put(i + 1, new SaveKitButton(practicePlayer, ladder, i));
 
-            final int index = i;
-            final int slot = index + 1;
-            buttons.put(slot, new Button() {
-                @Override
-                public ItemStack getButtonItem(Player player) {
-                    return new ItemBuilder(Material.CHEST).name("Save kit " + ladder.getName() + " #" + slot).build();
-                }
-
-                @Override
-                public boolean shouldUpdate(Player player, ClickType clickType) {
-                    if (clickType.isLeftClick()) {
-                        NamedKit newKit = kit;
-
-                        if (newKit == null) {
-                            newKit = new NamedKit(ladder.getName() + " #" + slot);
-                            newKit.setArmor(ladder.getKit().getArmor());
-                            newKit.setInventory(ladder.getKit().getInventory());
-                            practicePlayer.setKit(ladder, newKit, index);
-                        }
-
-                        newKit.setArmor(player.getInventory().getArmorContents());
-                        newKit.setInventory(player.getInventory().getContents());
-                        return true;
-                    }
-
-                    return false;
-                }
-            });
-
-            if (kit != null) {
-                buttons.put(slot + 9, new Button() {
-                    @Override
-                    public ItemStack getButtonItem(Player player) {
-                        return new ItemBuilder(Material.BOOK).name("Load kit " + ladder.getName() + " #" + slot).build();
-                    }
-
-                    @Override
-                    public void clicked(Player player, ClickType clickType) {
-                        if (clickType.isLeftClick()) {
-                            kit.apply(practicePlayer);
-                            player.getOpenInventory().close();
-                        }
-                    }
-                });
-
-                buttons.put(slot + 18, new Button() {
-                    @Override
-                    public ItemStack getButtonItem(Player player) {
-                        return new ItemBuilder(Material.REDSTONE_BLOCK).name("Remove kit " + ladder.getName() + " #" + slot).build();
-                    }
-
-                    @Override
-                    public boolean shouldUpdate(Player player, ClickType clickType) {
-                        if (clickType.isLeftClick()) {
-                            practicePlayer.removeKit(ladder, index);
-                            return true;
-                        }
-
-                        return false;
-                    }
-                });
+            if (practicePlayer.getKit(ladder, i) != null) {
+                buttons.put(i + 10, new LoadKitButton(practicePlayer, ladder, i));
+                buttons.put(i + 19, new RemoveKitButton(practicePlayer, ladder, i));
             }
         }
 
@@ -103,5 +45,104 @@ public class KitEditorMenu extends Menu {
     @Override
     public int size(Map<Integer, Button> buttons) {
         return 27;
+    }
+
+    public static class SaveKitButton extends Button {
+
+        private final PracticePlayer practicePlayer;
+        private final Ladder ladder;
+        private final int index;
+        private final int slot;
+
+        public SaveKitButton(PracticePlayer practicePlayer, Ladder ladder, int index) {
+            this.practicePlayer = practicePlayer;
+            this.ladder = ladder;
+            this.index = index;
+            this.slot = index + 1;
+        }
+
+        @Override
+        public ItemStack getButtonItem(Player player) {
+            return new ItemBuilder(Material.CHEST).name("&eSave kit &d" + ladder.getName() + " #" + slot).build();
+        }
+
+        @Override
+        public boolean shouldUpdate(Player player, ClickType clickType) {
+            if (clickType.isLeftClick()) {
+                NamedKit newKit = practicePlayer.getKit(ladder, index);
+
+                if (newKit == null) {
+                    newKit = new NamedKit(ladder.getName() + " #" + slot);
+                    newKit.setArmor(ladder.getKit().getArmor());
+                    newKit.setInventory(ladder.getKit().getInventory());
+                    practicePlayer.setKit(ladder, newKit, index);
+                }
+
+                newKit.setArmor(player.getInventory().getArmorContents());
+                newKit.setInventory(player.getInventory().getContents());
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public static class LoadKitButton extends Button {
+
+        private final PracticePlayer practicePlayer;
+        private final Ladder ladder;
+        private final int index;
+        private final int slot;
+
+        public LoadKitButton(PracticePlayer practicePlayer, Ladder ladder, int index) {
+            this.practicePlayer = practicePlayer;
+            this.ladder = ladder;
+            this.index = index;
+            this.slot = index + 1;
+        }
+
+        @Override
+        public ItemStack getButtonItem(Player player) {
+            return new ItemBuilder(Material.BOOK).name("&eLoad kit &d" + ladder.getName() + " #" + slot).build();
+        }
+
+        @Override
+        public void clicked(Player player, ClickType clickType) {
+            if (clickType.isLeftClick()) {
+                NamedKit kit = practicePlayer.getKit(ladder, index);
+                kit.apply(practicePlayer);
+                player.getOpenInventory().close();
+            }
+        }
+    }
+
+    public static class RemoveKitButton extends Button {
+
+        private final PracticePlayer practicePlayer;
+        private final Ladder ladder;
+        private final int index;
+        private final int slot;
+
+        public RemoveKitButton(PracticePlayer practicePlayer, Ladder ladder, int index) {
+            this.practicePlayer = practicePlayer;
+            this.ladder = ladder;
+            this.index = index;
+            this.slot = index + 1;
+        }
+
+        @Override
+        public ItemStack getButtonItem(Player player) {
+            return new ItemBuilder(Material.REDSTONE).name("&eRemove kit &d" + ladder.getName() + " #" + slot).build();
+        }
+
+        @Override
+        public boolean shouldUpdate(Player player, ClickType clickType) {
+            if (clickType.isLeftClick()) {
+                practicePlayer.removeKit(ladder, index);
+                return true;
+            }
+
+            return false;
+        }
     }
 }

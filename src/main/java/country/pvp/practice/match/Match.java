@@ -80,7 +80,7 @@ public class Match implements Recipient {
             public void run() {
                 if (count.decrementAndGet() > 0) {
                     broadcast(Messages.MATCH_COUNTDOWN.match("{time}", count.get()));
-                } else if (count.get() == 0) {
+                } else {
                     state = MatchState.FIGHT;
                     broadcast(Messages.MATCH_START);
                     cancel();
@@ -134,7 +134,6 @@ public class Match implements Recipient {
         MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
         matchData.setDead(true);
 
-
         if (matchData.getLastAttacker() != null) {
             PracticePlayer killer = matchData.getLastAttacker();
 
@@ -155,8 +154,8 @@ public class Match implements Recipient {
 
         updateVisibility();
         player.respawn();
-        player.setVelocity(new Vector());
         player.teleport(player.getLocation().add(0, 3, 0));
+        player.setVelocity(new Vector());
     }
 
     public void handleRespawn(PracticePlayer player) {

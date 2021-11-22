@@ -16,9 +16,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KitChooseMenu extends Menu {
 
-    private final PracticePlayer practicePlayer;
     private final LadderManager ladderManager;
     private final KitEditorService kitEditorService;
+
+    private final PracticePlayer practicePlayer;
 
     @Override
     public String getTitle(Player player) {
@@ -30,21 +31,30 @@ public class KitChooseMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Ladder ladder : ladderManager.getAll()) {
-            buttons.put(buttons.size(), new Button() {
-                @Override
-                public ItemStack getButtonItem(Player player) {
-                    return ladder.getIcon();
-                }
-
-                @Override
-                public void clicked(Player player, ClickType clickType) {
-                    if (clickType.isLeftClick()) {
-                        kitEditorService.moveToEditor(practicePlayer, ladder);
-                    }
-                }
-            });
+            buttons.put(buttons.size(), new KitChoiceButton(kitEditorService, practicePlayer, ladder));
         }
 
         return buttons;
+    }
+
+    @RequiredArgsConstructor
+    public static class KitChoiceButton extends Button {
+
+        private final KitEditorService kitEditorService;
+
+        private final PracticePlayer practicePlayer;
+        private final Ladder ladder;
+
+        @Override
+        public ItemStack getButtonItem(Player player) {
+            return ladder.getIcon();
+        }
+
+        @Override
+        public void clicked(Player player, ClickType clickType) {
+            if (clickType.isLeftClick()) {
+                kitEditorService.moveToEditor(practicePlayer, ladder);
+            }
+        }
     }
 }

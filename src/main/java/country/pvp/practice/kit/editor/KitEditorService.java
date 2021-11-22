@@ -2,6 +2,7 @@ package country.pvp.practice.kit.editor;
 
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
+import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.settings.PracticeSettings;
@@ -17,6 +18,7 @@ public class KitEditorService {
     public void moveToEditor(PracticePlayer player, Ladder ladder) {
         player.setState(PlayerState.EDITING_KIT);
         player.setStateData(PlayerState.EDITING_KIT, new KitEditingData(ladder));
+        PlayerUtil.resetPlayer(player.getPlayer());
         visibilityUpdater.update(player);
         player.teleport(practiceSettings.getEditorLocation());
         ladder.getKit().apply(player);
