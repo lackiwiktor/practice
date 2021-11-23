@@ -18,6 +18,11 @@ public class SoloTeam extends Team {
     }
 
     @Override
+    public int getPing() {
+        return player.getPing();
+    }
+
+    @Override
     public String getName() {
         return player.getName();
     }

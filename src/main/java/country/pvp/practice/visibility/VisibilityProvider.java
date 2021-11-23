@@ -1,9 +1,9 @@
 package country.pvp.practice.visibility;
 
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.MatchData;
+import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.match.PlayerSpectatingData;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.data.PlayerState;
 
 public class VisibilityProvider {
 
@@ -15,28 +15,23 @@ public class VisibilityProvider {
      * @return visibility
      */
     public Visibility provide(PracticePlayer observer, PracticePlayer observable) {
-        if (observer.isInLobby() || observer.isInQueue() || observer.isInEditor()) {
-            return Visibility.HIDDEN;
-        }
-
-        if (observer.isInMatch()) {
-            if (observable.isInMatch()) {
-                MatchData matchData = observer.getStateData(PlayerState.IN_MATCH);
-                Match match = matchData.getMatch();
-
-                if (match.isInMatch(observable)) {
-                    if (!match.isAlive(observable)) {
-                        return Visibility.HIDDEN;
-                    }
-
-                    return Visibility.SHOWN;
-                } else {
-                    return Visibility.HIDDEN;
+        switch (observer.getState()) {
+            case IN_MATCH:
+                if (observable.isInMatch()) {
+                    PlayerMatchData matchData = observable.getStateData();
+                    Match match = matchData.getMatch();
+                    return match.isInMatch(observer) && match.isAlive(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
                 }
-            } else return Visibility.HIDDEN;
+                return Visibility.HIDDEN;
+            case SPECTATING:
+                if (observable.isInMatch()) {
+                    PlayerSpectatingData spectatingData = observer.getStateData();
+
+                    return spectatingData.getMatch().isInMatch(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
+                }
+                return Visibility.HIDDEN;
+            default:
+                return Visibility.HIDDEN;
         }
-
-
-        return Visibility.SHOWN;
     }
 }

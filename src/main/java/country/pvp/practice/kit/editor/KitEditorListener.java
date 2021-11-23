@@ -6,7 +6,6 @@ import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -33,7 +32,7 @@ public class KitEditorListener extends PlayerListener {
             return;
         }
 
-        KitEditingData kitEditingData = practicePlayer.getStateData(PlayerState.EDITING_KIT);
+        PlayerEditingData kitEditingData = practicePlayer.getStateData();
         Ladder ladder = kitEditingData.getLadder();
 
         switch (event.getClickedBlock().getType()) {

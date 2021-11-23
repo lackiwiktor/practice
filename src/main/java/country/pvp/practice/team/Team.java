@@ -3,7 +3,7 @@ package country.pvp.practice.team;
 import com.mongodb.assertions.Assertions;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.MatchData;
+import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
@@ -17,12 +17,14 @@ public abstract class Team implements Recipient {
 
     public abstract Set<PracticePlayer> getPlayers();
 
+    public abstract int getPing();
+
     public int size() {
         return getPlayers().size();
     }
 
-    public MatchData getMatchData(PracticePlayer player) {
-        return player.getStateData(PlayerState.IN_MATCH);
+    public PlayerMatchData getMatchData(PracticePlayer player) {
+        return player.getStateData();
     }
 
     public boolean hasPlayer(PracticePlayer player) {
@@ -55,7 +57,7 @@ public abstract class Team implements Recipient {
 
     public void setMatchData(Match match) {
         for (PracticePlayer player : getPlayers()) {
-            player.setStateData(PlayerState.IN_MATCH, new MatchData(match));
+            player.setState(PlayerState.IN_MATCH, new PlayerMatchData(match));
         }
     }
 
@@ -67,13 +69,13 @@ public abstract class Team implements Recipient {
     }
 
     public boolean isAlive(PracticePlayer player) {
-        MatchData matchData = getMatchData(player);
+        PlayerMatchData matchData = getMatchData(player);
 
         return !matchData.isDead();
     }
 
     public boolean hasDisconnected(PracticePlayer player) {
-        MatchData matchData = getMatchData(player);
+        PlayerMatchData matchData = getMatchData(player);
 
         Assertions.assertFalse(matchData == null);
 

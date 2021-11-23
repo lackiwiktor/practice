@@ -3,7 +3,6 @@ package country.pvp.practice.queue;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.PracticePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -21,7 +20,7 @@ public class QueueRemovePlayerListener extends PlayerListener {
 
         if (!practicePlayer.isInQueue()) return;
 
-        QueueData queueData = practicePlayer.getStateData(PlayerState.QUEUING);
+        PlayerQueueData queueData = practicePlayer.getStateData();
         queueData.getQueue().removePlayer(practicePlayer, false);
     }
 }

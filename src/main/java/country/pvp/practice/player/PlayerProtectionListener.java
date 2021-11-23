@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -75,6 +76,11 @@ public class PlayerProtectionListener extends PlayerListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void inventoryInteract(InventoryInteractEvent event) {
         cancelIfInState((Player) event.getWhoClicked(), event, true, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void inventoryClick(InventoryClickEvent event) {
+        cancelIfInState((Player) event.getWhoClicked(), event, true, PlayerState.IN_LOBBY, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

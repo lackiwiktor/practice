@@ -13,6 +13,10 @@ public class PlayerManager {
         return players.get(player.getUniqueId());
     }
 
+    public Optional<PracticePlayer> get(String name) {
+        return players.values().stream().filter(it -> it.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
     public void add(PracticePlayer player) {
         players.put(player.getUuid(), player);
     }

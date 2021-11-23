@@ -11,7 +11,6 @@ import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarListener;
-import country.pvp.practice.kit.KitCommand;
 import country.pvp.practice.kit.editor.KitChooseProvider;
 import country.pvp.practice.kit.editor.KitEditorListener;
 import country.pvp.practice.ladder.Ladder;
@@ -20,9 +19,10 @@ import country.pvp.practice.ladder.LadderService;
 import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.MatchKitListener;
+import country.pvp.practice.kit.PlayerKitListener;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchPlayerListener;
+import country.pvp.practice.match.command.SpectateCommand;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
@@ -83,12 +83,12 @@ public class Practice {
         register(PracticeBoard.class);
         register(PlayerProtectionListener.class);
         register(MenuListener.class);
-        register(MatchKitListener.class);
+        register(PlayerKitListener.class);
         register(MatchPlayerListener.class);
         register(QueueRemovePlayerListener.class);
         register(KitEditorListener.class);
 
-        schedule(BoardTask.class, 1L, TimeUnit.SECONDS, true);
+        schedule(BoardTask.class, 100L, TimeUnit.MILLISECONDS, true);
         schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
 
         loadSettings();
@@ -100,7 +100,7 @@ public class Practice {
         registerCommand(ArenaCommands.class);
         registerCommand(LadderCommands.class);
         registerCommand(PracticeSettingsCommand.class);
-        registerCommand(KitCommand.class);
+        registerCommand(SpectateCommand.class);
 
         loadOnlinePlayers();
     }
@@ -139,6 +139,7 @@ public class Practice {
                 .overrideCommands(true)
                 .bind(Arena.class, injector.getInstance(ArenaProvider.class))
                 .bind(Ladder.class, injector.getInstance(LadderProvider.class))
+                .bind(PracticePlayer.class, injector.getInstance(PracticePlayerProvider.class))
                 .containerCreator(BukkitCommandContainer.CREATOR)
                 .binding(new BukkitBindings())
                 .helpGenerator(new PracticeHelpGenerator())

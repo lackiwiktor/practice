@@ -6,10 +6,7 @@ import country.pvp.practice.kit.Kit;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.message.Recipient;
-import country.pvp.practice.player.data.PlayerKits;
-import country.pvp.practice.player.data.PlayerState;
-import country.pvp.practice.player.data.PlayerStateData;
-import country.pvp.practice.player.data.PlayerStatistics;
+import country.pvp.practice.player.data.*;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -45,20 +42,59 @@ public class PracticePlayer implements DataObject, Recipient {
         this.uuid = uuid;
     }
 
+    @Override
+    public String getCollection() {
+        return "players";
+    }
+
+    @Override
+    public String getId() {
+        return uuid.toString();
+    }
+
+    @Override
+    public Document getDocument() {
+        org.bson.Document document = new org.bson.Document("_id", getId());
+        document.put("name", name);
+        document.put("nameLowerCase", name.toLowerCase(Locale.ROOT));
+        document.put("statistics", statistics.getDocument());
+        document.put("kits", kits.getDocument());
+
+        return document;
+    }
+
+    @Override
+    public void receive(String message) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.sendMessage(message);
+    }
+
+    @Override
+    public void applyDocument(Document document) {
+        if (name == null) name = document.getString("name");
+        statistics.applyDocument(document.get("statistics", Document.class));
+        kits.applyDocument(document.get("kits", Document.class));
+    }
+
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
 
-    public boolean isInMatch() {
-        return state == PlayerState.IN_MATCH && hasStateData(PlayerState.IN_MATCH);
+    public boolean isInLobby() {
+        return state == PlayerState.IN_LOBBY;
     }
 
     public boolean isInQueue() {
-        return state == PlayerState.QUEUING && hasStateData(PlayerState.QUEUING);
+        return state == PlayerState.QUEUING && hasStateData();
     }
 
-    public boolean isInLobby() {
-        return state == PlayerState.IN_LOBBY;
+    public boolean isInMatch() {
+        return state == PlayerState.IN_MATCH && hasStateData();
+    }
+
+    public boolean isInEditor() {
+        return state == PlayerState.EDITING_KIT && hasStateData();
     }
 
     public void setBar(ItemStack[] bar) {
@@ -70,25 +106,23 @@ public class PracticePlayer implements DataObject, Recipient {
         }
     }
 
-    public void setStateData(PlayerState state, Object data) {
-        stateData.setStateData(state, data);
+    public <V extends PlayerData> void setState(PlayerState state, PlayerData data) {
+        this.state = state;
+        stateData.setStateData(data);
     }
 
-    public void removeStateData(PlayerState state) {
-        stateData.removeStateData(state);
+    public void removeStateData() {
+        stateData.removeStateData();
     }
 
-    public <V> V getStateData(PlayerState state) {
-        return stateData.getStateData(state);
+    public <V extends PlayerData> V getStateData() {
+        return stateData.get();
     }
 
-    public boolean hasStateData(PlayerState state) {
-        return stateData.hasStateData(state);
+    public boolean hasStateData() {
+        return stateData.hasStateData();
     }
 
-    public void clearPlayerData() {
-        stateData.clear();
-    }
 
     public int getRank(Ladder ladder) {
         return statistics.getRank(ladder);
@@ -128,46 +162,11 @@ public class PracticePlayer implements DataObject, Recipient {
         player.setAllowFlight(false);
     }
 
-    @Override
-    public String getCollection() {
-        return "players";
-    }
-
-    @Override
-    public String getId() {
-        return uuid.toString();
-    }
-
     public boolean hasPermission(String permission) {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
 
         return player.hasPermission(permission);
-    }
-
-    @Override
-    public Document getDocument() {
-        org.bson.Document document = new org.bson.Document("_id", getId());
-        document.put("name", name);
-        document.put("nameLowerCase", name.toLowerCase(Locale.ROOT));
-        document.put("statistics", statistics.getDocument());
-        document.put("kits", kits.getDocument());
-
-        return document;
-    }
-
-    @Override
-    public void receive(String message) {
-        Player player = getPlayer();
-        Preconditions.checkNotNull(player, "player");
-        player.sendMessage(message);
-    }
-
-    @Override
-    public void applyDocument(Document document) {
-        if (name == null) name = document.getString("name");
-        statistics.applyDocument(document.get("statistics", Document.class));
-        kits.applyDocument(document.get("kits", Document.class));
     }
 
     public void teleport(Location location) {
@@ -199,19 +198,6 @@ public class PracticePlayer implements DataObject, Recipient {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PracticePlayer that = (PracticePlayer) o;
-        return Objects.equals(uuid, that.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uuid);
-    }
-
     public void respawn() {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
@@ -230,11 +216,26 @@ public class PracticePlayer implements DataObject, Recipient {
         return player.getLocation();
     }
 
-    public boolean isInEditor() {
-        return state == PlayerState.EDITING_KIT && hasStateData(PlayerState.EDITING_KIT);
-    }
-
     public boolean isOnline() {
         return getPlayer() != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PracticePlayer that = (PracticePlayer) o;
+        return Objects.equals(uuid, that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
+    }
+
+    public int getPing() {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        return -1;
     }
 }
