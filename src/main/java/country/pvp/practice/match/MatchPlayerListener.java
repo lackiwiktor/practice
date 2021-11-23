@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,7 +27,7 @@ public class MatchPlayerListener extends PlayerListener {
 
         if (!damagedPlayer.isInMatch()) return;
 
-        MatchData matchData = damagedPlayer.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = damagedPlayer.getStateData();
         Match match = matchData.getMatch();
 
         if (match.getState() != MatchState.FIGHT) {
@@ -39,10 +38,11 @@ public class MatchPlayerListener extends PlayerListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void entityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
+
         PracticePlayer damagedPlayer = get((Player) event.getEntity());
         if (!damagedPlayer.isInMatch()) return;
 
-        MatchData matchData = damagedPlayer.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = damagedPlayer.getStateData();
         Match match = matchData.getMatch();
 
         if (match.getState() != MatchState.FIGHT) {
@@ -52,7 +52,11 @@ public class MatchPlayerListener extends PlayerListener {
 
         if (!(event.getDamager() instanceof Player)) return;
         PracticePlayer damagerPlayer = get((Player) event.getDamager());
-        if (!damagerPlayer.isInMatch()) return;
+
+        if (!damagerPlayer.isInMatch()) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (match.getTeam(damagedPlayer).hasPlayer(damagerPlayer)) {
             event.setCancelled(true);
@@ -68,7 +72,7 @@ public class MatchPlayerListener extends PlayerListener {
         PracticePlayer player = get(event.getEntity());
         if (!player.isInMatch()) return;
 
-        MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = player.getStateData();
         Match match = matchData.getMatch();
         match.handleDeath(player);
     }
@@ -80,7 +84,7 @@ public class MatchPlayerListener extends PlayerListener {
 
         event.setRespawnLocation(event.getPlayer().getLocation());
 
-        MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = player.getStateData();
         Match match = matchData.getMatch();
         match.handleRespawn(player);
     }
@@ -91,7 +95,7 @@ public class MatchPlayerListener extends PlayerListener {
         PracticePlayer player = get(event);
         if (!player.isInMatch()) return;
 
-        MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = player.getStateData();
         Match match = matchData.getMatch();
         match.handleDisconnect(player);
     }

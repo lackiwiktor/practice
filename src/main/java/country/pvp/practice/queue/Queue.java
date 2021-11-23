@@ -16,12 +16,10 @@ import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.team.SoloTeam;
 import lombok.Data;
 
-import java.util.LinkedList;
-
 @Data
 public class Queue {
 
-    private final java.util.Queue<QueueData> entries = new LinkedList<>();
+    private final java.util.Queue<PlayerQueueData> entries = new NonDuplicatePriorityQueue<>();
 
     private final Ladder ladder;
     private final boolean ranked;
@@ -30,10 +28,9 @@ public class Queue {
     private final MatchProvider matchProvider;
 
     public void addPlayer(PracticePlayer player) {
-        QueueData entry = new QueueData(player, this);
+        PlayerQueueData entry = new PlayerQueueData(player, this);
         entries.add(entry);
-        player.setState(PlayerState.QUEUING);
-        player.setStateData(PlayerState.QUEUING, entry);
+        player.setState(PlayerState.QUEUING, entry);
         itemBarManager.apply(ItemBarType.QUEUE, player);
         Messager.message(player, Messages.PLAYER_JOINED_QUEUE.match(
                 new MessagePattern("{queue}", ladder.getDisplayName()),
@@ -41,7 +38,7 @@ public class Queue {
     }
 
     public void removePlayer(PracticePlayer player, boolean leftQueue) {
-        player.removeStateData(PlayerState.QUEUING);
+        player.removeStateData();
 
         if (leftQueue) {
             entries.removeIf(it -> it.getPlayer().equals(player));
@@ -54,8 +51,8 @@ public class Queue {
     public void tick() {
         if (entries.size() < 2) return;
 
-        QueueData queueData1 = entries.poll();
-        QueueData queueData2 = entries.poll();
+        PlayerQueueData queueData1 = entries.poll();
+        PlayerQueueData queueData2 = entries.poll();
 
         removePlayer(queueData1.getPlayer(), false);
         removePlayer(queueData2.getPlayer(), false);
@@ -72,7 +69,7 @@ public class Queue {
         return entries.size();
     }
 
-    private Match createMatch(QueueData queueData1, QueueData queueData2, Arena arena) {
+    private Match createMatch(PlayerQueueData queueData1, PlayerQueueData queueData2, Arena arena) {
         return matchProvider.provide(ladder, arena, ranked, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
 }

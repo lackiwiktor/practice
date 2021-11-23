@@ -2,11 +2,12 @@ package country.pvp.practice.itembar;
 
 import com.google.common.collect.Maps;
 import country.pvp.practice.Practice;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.PlayerSpectatingData;
 import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.data.PlayerState;
+import country.pvp.practice.queue.PlayerQueueData;
 import country.pvp.practice.queue.Queue;
-import country.pvp.practice.queue.QueueData;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,20 +19,27 @@ public class ItemBarManager {
 
     public ItemBarManager() {
         add(ItemBarType.LOBBY, new ItemBar(
-                new ItemBarItem(new ItemBuilder(Material.IRON_SWORD).name("Unranked").unbreakable().build(),
+                new ItemBarItem(new ItemBuilder(Material.IRON_SWORD).name("&7Unranked").unbreakable().build(),
                         ((player, interact) -> Practice.getQueueMenuProvider().provide(false, player).openMenu(player.getPlayer()))),
-                new ItemBarItem(new ItemBuilder(Material.DIAMOND_SWORD).name("Ranked").unbreakable().build(),
+                new ItemBarItem(new ItemBuilder(Material.DIAMOND_SWORD).name("&6Ranked").unbreakable().build(),
                         ((player, interact) -> Practice.getQueueMenuProvider().provide(true, player).openMenu(player.getPlayer()))),
                 null,
                 null,
-                new ItemBarItem(new ItemBuilder(Material.ANVIL).name("Kit Editor").unbreakable().build(),
+                new ItemBarItem(new ItemBuilder(Material.ANVIL).name("&eKit Editor").unbreakable().build(),
                         (((player, interact) -> Practice.getKitChooseProvider().provide(player).openMenu(player.getPlayer()))))));
         add(ItemBarType.QUEUE, new ItemBar(
-                new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("Leave Queue").unbreakable().build(),
+                new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("&cLeave Queue").unbreakable().build(),
                         ((player, interact) -> {
-                            QueueData queueData = player.getStateData(PlayerState.QUEUING);
+                            PlayerQueueData queueData = player.getStateData();
                             Queue queue = queueData.getQueue();
                             queue.removePlayer(player, true);
+                        }))));
+        add(ItemBarType.SPECTATOR, new ItemBar(
+                new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("&cStop spectating").unbreakable().build(),
+                        ((player, interact) -> {
+                            PlayerSpectatingData spectatingData = player.getStateData();
+                            Match match = spectatingData.getMatch();
+                            match.stopSpectating(player);
                         }))));
     }
 

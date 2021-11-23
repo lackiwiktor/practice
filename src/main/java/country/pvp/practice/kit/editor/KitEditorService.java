@@ -16,8 +16,7 @@ public class KitEditorService {
     private final PracticeSettings practiceSettings;
 
     public void moveToEditor(PracticePlayer player, Ladder ladder) {
-        player.setState(PlayerState.EDITING_KIT);
-        player.setStateData(PlayerState.EDITING_KIT, new KitEditingData(ladder));
+        player.setState(PlayerState.EDITING_KIT, new PlayerEditingData(ladder));
         PlayerUtil.resetPlayer(player.getPlayer());
         visibilityUpdater.update(player);
         player.teleport(practiceSettings.getEditorLocation());

@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class KitEditorMenu extends Menu {
+class KitEditorMenu extends Menu {
 
     private final PracticePlayer practicePlayer;
     private final Ladder ladder;
@@ -47,7 +47,7 @@ public class KitEditorMenu extends Menu {
         return 27;
     }
 
-    public static class SaveKitButton extends Button {
+    private static class SaveKitButton extends Button {
 
         private final PracticePlayer practicePlayer;
         private final Ladder ladder;
@@ -87,7 +87,7 @@ public class KitEditorMenu extends Menu {
         }
     }
 
-    public static class LoadKitButton extends Button {
+    private static class LoadKitButton extends Button {
 
         private final PracticePlayer practicePlayer;
         private final Ladder ladder;
@@ -116,7 +116,7 @@ public class KitEditorMenu extends Menu {
         }
     }
 
-    public static class RemoveKitButton extends Button {
+    private static class RemoveKitButton extends Button {
 
         private final PracticePlayer practicePlayer;
         private final Ladder ladder;

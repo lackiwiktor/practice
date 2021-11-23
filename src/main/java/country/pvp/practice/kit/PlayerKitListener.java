@@ -1,13 +1,13 @@
-package country.pvp.practice.match;
+package country.pvp.practice.kit;
 
 import com.google.inject.Inject;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,14 +16,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 
-public class MatchKitListener extends PlayerListener {
+public class PlayerKitListener extends PlayerListener {
 
     @Inject
-    public MatchKitListener(PlayerManager playerManager) {
+    public PlayerKitListener(PlayerManager playerManager) {
         super(playerManager);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler
     public void clickEvent(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
@@ -34,7 +34,7 @@ public class MatchKitListener extends PlayerListener {
         PracticePlayer practicePlayer = get(event);
         if (!practicePlayer.isInMatch()) return;
 
-        MatchData matchData = practicePlayer.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = practicePlayer.getStateData();
         Match match = matchData.getMatch();
         practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> it.apply(practicePlayer));
     }
@@ -45,7 +45,7 @@ public class MatchKitListener extends PlayerListener {
         PracticePlayer practicePlayer = get(event);
         if (!practicePlayer.isInMatch()) return;
 
-        MatchData matchData = practicePlayer.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = practicePlayer.getStateData();
         Match match = matchData.getMatch();
         practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
     }
@@ -57,7 +57,7 @@ public class MatchKitListener extends PlayerListener {
         PracticePlayer practicePlayer = get((Player) event.getWhoClicked());
         if (!practicePlayer.isInMatch()) return;
 
-        MatchData matchData = practicePlayer.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = practicePlayer.getStateData();
         Match match = matchData.getMatch();
         practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
     }
@@ -67,7 +67,7 @@ public class MatchKitListener extends PlayerListener {
         PracticePlayer practicePlayer = get(event.getEntity());
         if (!practicePlayer.isInMatch()) return;
 
-        MatchData matchData = practicePlayer.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = practicePlayer.getStateData();
         Match match = matchData.getMatch();
         event.getDrops().removeIf(it -> practicePlayer.getMatchingKit(match.getLadder(), it).isPresent());
     }

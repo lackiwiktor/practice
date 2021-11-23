@@ -1,8 +1,11 @@
 package country.pvp.practice.match;
 
+import com.google.common.collect.Sets;
 import country.pvp.practice.PracticePlugin;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.concurrent.TaskDispatcher;
+import country.pvp.practice.itembar.ItemBarManager;
+import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.message.MessagePattern;
@@ -21,6 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,6 +35,7 @@ public class Match implements Recipient {
     private final VisibilityUpdater visibilityUpdater;
     private final LobbyService lobbyService;
     private final MatchManager matchManager;
+    private final ItemBarManager itemBarManager;
 
     private final UUID id = UUID.randomUUID(); //match-id
     private final Ladder ladder;
@@ -38,6 +43,7 @@ public class Match implements Recipient {
     private final Team teamA;
     private final Team teamB;
     private final boolean ranked;
+    private final Set<PracticePlayer> spectators = Sets.newHashSet();
 
     private Team winner;
 
@@ -131,7 +137,7 @@ public class Match implements Recipient {
     }
 
     public void handleDeath(PracticePlayer player) {
-        MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = player.getStateData();
         matchData.setDead(true);
 
         if (matchData.getLastAttacker() != null) {
@@ -174,7 +180,7 @@ public class Match implements Recipient {
         broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
         broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
 
-        MatchData matchData = player.getStateData(PlayerState.IN_MATCH);
+        PlayerMatchData matchData = player.getStateData();
 
         matchData.setDead(true);
         matchData.setDisconnected(true);
@@ -226,6 +232,30 @@ public class Match implements Recipient {
 
     public String getFormattedDisplayName(PracticePlayer player, PracticePlayer other) {
         return getFormattedDisplayName(player, getTeam(other));
+    }
+
+    public void startSpectating(PracticePlayer spectator, PracticePlayer player) {
+        spectators.add(spectator);
+        itemBarManager.apply(ItemBarType.SPECTATOR, spectator);
+        broadcast("&ePlayer &f" + spectator.getName() + "&e started spectating this match.");
+        spectator.teleport(player.getLocation());
+        setupSpectator(spectator);
+        spectator.setState(PlayerState.SPECTATING, new PlayerSpectatingData(this));
+
+        for (PracticePlayer playerA : teamA.getOnlinePlayers()) {
+            visibilityUpdater.update(spectator, playerA);
+            visibilityUpdater.update(playerA, spectator);
+        }
+
+        for (PracticePlayer playerB : teamB.getOnlinePlayers()) {
+            visibilityUpdater.update(spectator, playerB);
+            visibilityUpdater.update(playerB, spectator);
+        }
+    }
+
+    public void stopSpectating(PracticePlayer spectator) {
+        spectators.remove(spectator);
+        lobbyService.moveToLobby(spectator);
     }
 
     @Override

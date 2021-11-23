@@ -1,6 +1,7 @@
 package country.pvp.practice.queue;
 
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.data.PlayerData;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 @Data
-public class QueueData implements Comparable<QueueData> {
+public class PlayerQueueData implements Comparable<PlayerQueueData>, PlayerData {
 
     private final PracticePlayer player;
     private final Queue queue;
@@ -31,7 +32,7 @@ public class QueueData implements Comparable<QueueData> {
     }
 
     @Override
-    public int compareTo(@NotNull QueueData queueData) {
+    public int compareTo(@NotNull PlayerQueueData queueData) {
         if (queue.isRanked()) return getPlayerRank() - queueData.getPlayerRank();
         return (int) (joinTimeStamp - queueData.joinTimeStamp);
     }
@@ -40,7 +41,7 @@ public class QueueData implements Comparable<QueueData> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        QueueData queueData = (QueueData) o;
+        PlayerQueueData queueData = (PlayerQueueData) o;
         return Objects.equals(player, queueData.player);
     }
 
