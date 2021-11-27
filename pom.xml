@@ -57,6 +57,16 @@
         </resources>
     </build>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <directory>C:\Users\ponktacology\Desktop\minecraft\plugins</directory>
+            </build>
+        </profile>
+    </profiles>
+
+
     <repositories>
         <repository>
             <id>IntellectualSites Releases</id>

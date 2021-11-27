@@ -27,6 +27,7 @@ public class PracticePlayer implements DataObject, Recipient {
     private final PlayerKits kits = new PlayerKits();
     private String name;
     private PlayerState state = PlayerState.IN_LOBBY;
+    private boolean loaded;
 
     public PracticePlayer(Player player) {
         this(player.getUniqueId());
@@ -75,6 +76,7 @@ public class PracticePlayer implements DataObject, Recipient {
         if (name == null) name = document.getString("name");
         statistics.applyDocument(document.get("statistics", Document.class));
         kits.applyDocument(document.get("kits", Document.class));
+        loaded = true;
     }
 
     public Player getPlayer() {
@@ -123,9 +125,12 @@ public class PracticePlayer implements DataObject, Recipient {
         return stateData.hasStateData();
     }
 
+    public void setElo(Ladder ladder, int elo) {
+        statistics.setElo(ladder, elo);
+    }
 
-    public int getRank(Ladder ladder) {
-        return statistics.getRank(ladder);
+    public int getElo(Ladder ladder) {
+        return statistics.getElo(ladder);
     }
 
     public void removeKit(Ladder ladder, int index) {

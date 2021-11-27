@@ -26,7 +26,7 @@ public class MatchManager {
         return matches.stream().filter(it -> it.getLadder().equals(ladder) && it.isRanked() == ranked).mapToInt(Match::getPlayersCount).sum();
     }
 
-    public int getPlayersInFight() {
+    public int getPlayersInFightCount() {
         return matches.stream().mapToInt(Match::getPlayersCount).sum();
     }
 

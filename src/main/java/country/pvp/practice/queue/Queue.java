@@ -62,6 +62,9 @@ public class Queue {
 
         Arena arena = arenaManager.getRandom();
 
+        Messager.messageSuccess(queueData1, Messages.QUEUE_FOUND_OPPONENT.match("{player}", queueData2.getName()));
+        Messager.messageSuccess(queueData2, Messages.QUEUE_FOUND_OPPONENT.match("{player}", queueData1.getName()));
+
         createMatch(queueData1, queueData2, arena).start();
     }
 

@@ -22,6 +22,7 @@ import country.pvp.practice.match.Match;
 import country.pvp.practice.kit.PlayerKitListener;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchPlayerListener;
+import country.pvp.practice.match.command.MatchCommand;
 import country.pvp.practice.match.command.SpectateCommand;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.*;
@@ -88,8 +89,9 @@ public class Practice {
         register(QueueRemovePlayerListener.class);
         register(KitEditorListener.class);
 
-        schedule(BoardTask.class, 100L, TimeUnit.MILLISECONDS, true);
         schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
+        schedule(BoardTask.class, 100L, TimeUnit.MILLISECONDS, true);
+        schedule(PlayerSaveTask.class, 1L, TimeUnit.MINUTES, true);
 
         loadSettings();
         loadArenas();
@@ -101,6 +103,7 @@ public class Practice {
         registerCommand(LadderCommands.class);
         registerCommand(PracticeSettingsCommand.class);
         registerCommand(SpectateCommand.class);
+        registerCommand(MatchCommand.class);
 
         loadOnlinePlayers();
     }

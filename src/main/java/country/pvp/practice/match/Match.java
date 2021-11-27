@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import country.pvp.practice.PracticePlugin;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.concurrent.TaskDispatcher;
+import country.pvp.practice.elo.EloUtil;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.ladder.Ladder;
@@ -24,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -160,12 +162,13 @@ public class Match implements Recipient {
 
         updateVisibility();
         PlayerUtil.resetPlayer(player.getPlayer());
-        player.respawn();
         player.setVelocity(new Vector());
         player.teleport(player.getLocation().add(0, 3, 0));
+
+        handleRespawn(player);
     }
 
-    public void handleRespawn(PracticePlayer player) {
+    void handleRespawn(PracticePlayer player) {
         Team team = getTeam(player);
 
         if (team.isDead()) {
@@ -204,6 +207,16 @@ public class Match implements Recipient {
         if (winner != null) {
             broadcast(winner, Messages.MATCH_WON);
             broadcast(getOpponent(winner), Messages.MATCH_LOST);
+
+            Team loser = getOpponent(winner);
+
+            if(ranked) {
+                int winnerNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), true);
+                int loserNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), false);
+
+                loser.setElo(ladder, loserNewRating);
+                winner.setElo(ladder, winnerNewRating);
+            }
         }
 
         Runnable runnable = () -> {
@@ -237,7 +250,7 @@ public class Match implements Recipient {
     public void startSpectating(PracticePlayer spectator, PracticePlayer player) {
         spectators.add(spectator);
         itemBarManager.apply(ItemBarType.SPECTATOR, spectator);
-        broadcast("&ePlayer &f" + spectator.getName() + "&e started spectating this match.");
+        broadcast(Messages.MATCH_PLAYER_STARTED_SPECTATING.match("{player}", spectator.getName()));
         spectator.teleport(player.getLocation());
         setupSpectator(spectator);
         spectator.setState(PlayerState.SPECTATING, new PlayerSpectatingData(this));
@@ -254,6 +267,7 @@ public class Match implements Recipient {
     }
 
     public void stopSpectating(PracticePlayer spectator) {
+        broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
         spectators.remove(spectator);
         lobbyService.moveToLobby(spectator);
     }
@@ -266,6 +280,18 @@ public class Match implements Recipient {
 
     public int getPlayersCount() {
         return teamA.size() + teamB.size();
+    }
+
+    public String getTeamADisplayName() {
+        return teamA.getName();
+    }
+
+    public String getTeamBDisplayName() {
+        return teamB.getName();
+    }
+
+    public Optional<Team> getWinner() {
+        return Optional.ofNullable(winner);
     }
 
     @Override

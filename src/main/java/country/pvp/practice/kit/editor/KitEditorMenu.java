@@ -6,6 +6,7 @@ import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.menu.Button;
 import country.pvp.practice.menu.Menu;
+import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -17,6 +18,8 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 class KitEditorMenu extends Menu {
+
+    private final PlayerService playerService;
 
     private final PracticePlayer practicePlayer;
     private final Ladder ladder;
@@ -31,7 +34,7 @@ class KitEditorMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (int i = 0; i < 7; i++) {
-            buttons.put(i + 1, new SaveKitButton(practicePlayer, ladder, i));
+            buttons.put(i + 1, new SaveKitButton(playerService, practicePlayer, ladder, i));
 
             if (practicePlayer.getKit(ladder, i) != null) {
                 buttons.put(i + 10, new LoadKitButton(practicePlayer, ladder, i));
@@ -47,14 +50,18 @@ class KitEditorMenu extends Menu {
         return 27;
     }
 
+
     private static class SaveKitButton extends Button {
+
+        private final PlayerService playerService;
 
         private final PracticePlayer practicePlayer;
         private final Ladder ladder;
         private final int index;
         private final int slot;
 
-        public SaveKitButton(PracticePlayer practicePlayer, Ladder ladder, int index) {
+        public SaveKitButton(PlayerService playerService, PracticePlayer practicePlayer, Ladder ladder, int index) {
+            this.playerService = playerService;
             this.practicePlayer = practicePlayer;
             this.ladder = ladder;
             this.index = index;
@@ -80,6 +87,8 @@ class KitEditorMenu extends Menu {
 
                 newKit.setArmor(player.getInventory().getArmorContents());
                 newKit.setInventory(player.getInventory().getContents());
+
+                playerService.saveAsync(practicePlayer);
                 return true;
             }
 

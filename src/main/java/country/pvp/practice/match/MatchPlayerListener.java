@@ -50,10 +50,16 @@ public class MatchPlayerListener extends PlayerListener {
             return;
         }
 
+        if (!match.isAlive(damagedPlayer)) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (!(event.getDamager() instanceof Player)) return;
+
         PracticePlayer damagerPlayer = get((Player) event.getDamager());
 
-        if (!damagerPlayer.isInMatch()) {
+        if(!match.isInMatch(damagerPlayer) || !match.isAlive(damagerPlayer)) {
             event.setCancelled(true);
             return;
         }
@@ -77,8 +83,11 @@ public class MatchPlayerListener extends PlayerListener {
         match.handleDeath(player);
     }
 
+    /*
     @EventHandler
     public void playerRespawn(PlayerRespawnEvent event) {
+        System.out.println("NOT HANDLED??");
+
         PracticePlayer player = get(event);
         if (!player.isInMatch()) return;
 
@@ -87,7 +96,10 @@ public class MatchPlayerListener extends PlayerListener {
         PlayerMatchData matchData = player.getStateData();
         Match match = matchData.getMatch();
         match.handleRespawn(player);
+
+        System.out.println("NOT HANDLED??2");
     }
+     */
 
     @EventHandler
     public void playerQuit(PlayerQuitEvent event) {

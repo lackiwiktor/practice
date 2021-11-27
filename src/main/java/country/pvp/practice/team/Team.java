@@ -15,10 +15,6 @@ import java.util.stream.Collectors;
 
 public abstract class Team implements Recipient {
 
-    public abstract Set<PracticePlayer> getPlayers();
-
-    public abstract int getPing();
-
     public int size() {
         return getPlayers().size();
     }
@@ -97,4 +93,12 @@ public abstract class Team implements Recipient {
     }
 
     public abstract String getName();
+
+    public abstract Set<PracticePlayer> getPlayers();
+
+    public abstract int getPing();
+
+    public abstract int getElo(Ladder ladder);
+
+    public abstract void setElo(Ladder ladder, int elo);
 }

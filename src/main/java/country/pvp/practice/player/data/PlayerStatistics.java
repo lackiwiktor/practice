@@ -9,31 +9,32 @@ import java.util.Map;
 
 public class PlayerStatistics implements SerializableObject {
 
-    private final Map<String, Integer> ranks = Maps.newHashMap();
+    private final Map<String, Integer> ratings = Maps.newHashMap();
 
-    public int getRank(Ladder ladder) {
-        return ranks.getOrDefault(ladder.getName(), 1000);
+    public int getElo(Ladder ladder) {
+        return ratings.getOrDefault(ladder.getName(), 1000);
     }
 
-    public void setRank(String ladder, int rank) {
-        ranks.put(ladder, rank);
+
+    void setElo(String ladder, int rank) {
+        ratings.put(ladder, rank);
+    }
+
+    public void setElo(Ladder ladder, int rank) {
+        setElo(ladder.getName(), rank);
     }
 
     @Override
     public Document getDocument() {
         Document document = new Document();
-
-        for (Map.Entry<String, Integer> entry : ranks.entrySet()) {
-            document.put(entry.getKey(), entry.getValue());
-        }
-
+        document.putAll(ratings);
         return document;
     }
 
     @Override
     public void applyDocument(Document document) {
         for (Map.Entry<String, Object> entry : document.entrySet()) {
-            setRank(entry.getKey(), (Integer) entry.getValue());
+            setElo(entry.getKey(), (Integer) entry.getValue());
         }
     }
 }

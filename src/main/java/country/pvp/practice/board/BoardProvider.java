@@ -31,7 +31,8 @@ public class BoardProvider {
             PlayerQueueData queueData = player.getStateData();
             lines.add("  Time: " + TimeUtil.formatTimeMillisToClock(TimeUtil.elapsed(queueData.getJoinTimeStamp())));
             if (queueData.isRanked()) {
-                lines.add("  Elo Range: " + (1000 - queueData.getEloRangeFactor()) + "-" + (1000 + queueData.getEloRangeFactor()));
+                int baseElo = player.getElo(queueData.getLadder());
+                lines.add("  Elo Range: " + Math.max(baseElo - queueData.getEloRangeFactor(), 0) + "-" + (baseElo + queueData.getEloRangeFactor()));
             }
             lines.add("  Ladder: " + MessageUtil.color(queueData.getLadderDisplayName()));
         } else if (player.isInMatch()) {
@@ -46,12 +47,12 @@ public class BoardProvider {
                     lines.add(ChatColor.GRAY + "Their Ping: " + ChatColor.WHITE + match.getOpponent(player).getPing());
                     break;
                 case END:
-                    lines.add(ChatColor.GRAY + "Winner: " + ChatColor.WHITE + (match.getWinner() == null ? "none" : match.getWinner().getName()));
+                    lines.add(ChatColor.GRAY + "Winner: " + ChatColor.WHITE + (match.getWinner().isPresent() ? match.getWinner().get().getName() : "none"));
                     break;
             }
         } else {
             lines.add(ChatColor.GRAY + "Online: " + ChatColor.WHITE + Bukkit.getServer().getOnlinePlayers().size());
-            lines.add(ChatColor.GRAY + "Playing: " + ChatColor.WHITE + queueManager.getPlayersInQueueCount());
+            lines.add(ChatColor.GRAY + "Playing: " + ChatColor.WHITE + matchManager.getPlayersInFightCount());
         }
 
         lines.add(0, BAR);

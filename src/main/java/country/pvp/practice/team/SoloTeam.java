@@ -1,5 +1,6 @@
 package country.pvp.practice.team;
 
+import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,16 @@ public class SoloTeam extends Team {
     @Override
     public int getPing() {
         return player.getPing();
+    }
+
+    @Override
+    public int getElo(Ladder ladder) {
+        return player.getElo(ladder);
+    }
+
+    @Override
+    public void setElo(Ladder ladder, int elo) {
+         player.setElo(ladder, elo);
     }
 
     @Override

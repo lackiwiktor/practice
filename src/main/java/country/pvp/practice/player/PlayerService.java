@@ -15,10 +15,12 @@ public class PlayerService extends MongoRepository<PracticePlayer> {
     @Override
     public void load(PracticePlayer entity) {
         org.bson.Document document = database.getCollection(entity.getCollection()).find(Filters.eq("_id", entity.getId())).first();
+
         if (document == null) {
             save(entity);
             return;
         }
+
         entity.applyDocument(document);
     }
 }

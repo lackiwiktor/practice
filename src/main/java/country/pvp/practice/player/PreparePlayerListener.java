@@ -28,6 +28,7 @@ public class PreparePlayerListener extends PlayerListener {
         try {
             playerService.load(practicePlayer);
             playerManager.add(practicePlayer);
+            practicePlayer.setLoaded(true);
         } catch (Exception e) {
             e.printStackTrace();
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Error");
