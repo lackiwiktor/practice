@@ -159,14 +159,14 @@ public class Match implements Recipient {
         }
 
         updateVisibility();
+        PlayerUtil.resetPlayer(player.getPlayer());
         player.respawn();
-        player.teleport(player.getLocation().add(0, 3, 0));
         player.setVelocity(new Vector());
+        player.teleport(player.getLocation().add(0, 3, 0));
     }
 
     public void handleRespawn(PracticePlayer player) {
         Team team = getTeam(player);
-        PlayerUtil.resetPlayer(player.getPlayer());
 
         if (team.isDead()) {
             end(getOpponent(team));

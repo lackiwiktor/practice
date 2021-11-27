@@ -16,6 +16,7 @@ public enum Messages {
     MATCH_PLAYER_DISCONNECT("MATCH_PLAYER_DISCONNECT", "&cPlayer {player} &chas disconnected!"),
     MATCH_PLAYER_KILLED_BY_UNKNOWN("MATCH_PLAYER_KILLED_BY_UNKNOWN", "&ePlayer {player} &ehas died!"),
     MATCH_PLAYER_KILLED_BY_PLAYER("MATCH_PLAYER_KILLED_BY_PLAYER", "&ePlayer {player} &ehas been killed by {killer}&e!");
+
     private final String name;
     private final String value;
 
