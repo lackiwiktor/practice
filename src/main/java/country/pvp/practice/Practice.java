@@ -25,6 +25,7 @@ import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.MatchPlayerListener;
 import country.pvp.practice.match.command.MatchCommand;
 import country.pvp.practice.match.command.SpectateCommand;
+import country.pvp.practice.match.snapshot.SnapshotExpiryTask;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
@@ -95,6 +96,7 @@ public class Practice {
         schedule(BoardTask.class, 100L, TimeUnit.MILLISECONDS, true);
         schedule(PlayerSaveTask.class, 1L, TimeUnit.MINUTES, true);
         schedule(PearlCooldownTask.class, 100L, TimeUnit.MILLISECONDS, true);
+        schedule(SnapshotExpiryTask.class, 2L, TimeUnit.SECONDS, true);
 
         loadSettings();
         loadArenas();
