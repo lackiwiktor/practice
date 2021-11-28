@@ -5,6 +5,7 @@ import country.pvp.practice.serialization.LocationAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 public class PracticeSettings implements DataObject {
@@ -13,17 +14,17 @@ public class PracticeSettings implements DataObject {
     private Location editorLocation;
 
     @Override
-    public String getCollection() {
+    public @NotNull String getCollection() {
         return "settings";
     }
 
     @Override
-    public String getId() {
+    public @NotNull String getId() {
         return "practice-settings";
     }
 
     @Override
-    public Document getDocument() {
+    public @NotNull Document getDocument() {
         Document document = new Document("_id", getId());
 
         document.put("spawnLocation", LocationAdapter.toJson(spawnLocation));
@@ -33,7 +34,7 @@ public class PracticeSettings implements DataObject {
     }
 
     @Override
-    public void applyDocument(Document document) {
+    public void applyDocument(@NotNull Document document) {
         spawnLocation = LocationAdapter.fromJson(document.getString("spawnLocation"));
         editorLocation = LocationAdapter.fromJson(document.getString("editorLocation"));
     }

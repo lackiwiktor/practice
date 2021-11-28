@@ -8,6 +8,8 @@ import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,15 +18,15 @@ import java.util.stream.Collectors;
 @Data
 public class Ladder implements DataObject {
 
-    private final String name;
+    private final @NotNull String name;
     private String displayName;
     private ItemStack icon;
-    private Kit kit = new Kit();
+    private @NotNull Kit kit = new Kit();
     private ItemStack[] editorItems;
     private boolean ranked;
 
     @Override
-    public Document getDocument() {
+    public @NotNull Document getDocument() {
         Document document = new Document("_id", getId());
         document.put("displayName", displayName);
         document.put("icon", ItemStackAdapter.toJson(icon));
@@ -36,7 +38,7 @@ public class Ladder implements DataObject {
 
 
     @Override
-    public void applyDocument(Document document) {
+    public void applyDocument(@NotNull Document document) {
         displayName = document.getString("displayName");
         icon = ItemStackAdapter.fromJson(document.getString("icon"));
         kit.applyDocument(document.get("kit", Document.class));
@@ -45,12 +47,12 @@ public class Ladder implements DataObject {
     }
 
     @Override
-    public String getCollection() {
+    public @NotNull String getCollection() {
         return "ladders";
     }
 
     @Override
-    public String getId() {
+    public @NotNull String getId() {
         return name;
     }
 
@@ -58,7 +60,7 @@ public class Ladder implements DataObject {
         return displayName != null && icon != null;
     }
 
-    public ItemStack getIcon() {
+    public @Nullable ItemStack getIcon() {
         if (!isSetup()) return null;
 
         return new ItemBuilder(icon.clone()).name(displayName).build();
@@ -72,7 +74,7 @@ public class Ladder implements DataObject {
         kit.setArmor(armor);
     }
 
-    public ItemStack[] getEditorItems() {
+    public ItemStack @NotNull [] getEditorItems() {
         return editorItems == null ? new ItemStack[0] : Arrays.stream(editorItems).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 

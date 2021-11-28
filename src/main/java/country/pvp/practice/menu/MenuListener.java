@@ -9,11 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class MenuListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onButtonPress(InventoryClickEvent event) {
+    public void onButtonPress(@NotNull InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
 
@@ -67,7 +68,7 @@ public class MenuListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onInventoryClose(InventoryCloseEvent event) {
+    public void onInventoryClose(@NotNull InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
 

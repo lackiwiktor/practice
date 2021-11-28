@@ -13,24 +13,25 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 @RequiredArgsConstructor
 class KitEditorMenu extends Menu {
 
-    private final PlayerService playerService;
+    private final @NotNull PlayerService playerService;
 
-    private final PracticePlayer practicePlayer;
-    private final Ladder ladder;
+    private final @NotNull PracticePlayer practicePlayer;
+    private final @NotNull Ladder ladder;
 
     @Override
-    public String getTitle(Player player) {
+    public @NotNull String getTitle(Player player) {
         return "Kit editor";
     }
 
     @Override
-    public Map<Integer, Button> getButtons(Player player) {
+    public @NotNull Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (int i = 0; i < 7; i++) {
@@ -74,7 +75,7 @@ class KitEditorMenu extends Menu {
         }
 
         @Override
-        public boolean shouldUpdate(Player player, ClickType clickType) {
+        public boolean shouldUpdate(@NotNull Player player, @NotNull ClickType clickType) {
             if (clickType.isLeftClick()) {
                 NamedKit newKit = practicePlayer.getKit(ladder, index);
 
@@ -116,7 +117,7 @@ class KitEditorMenu extends Menu {
         }
 
         @Override
-        public void clicked(Player player, ClickType clickType) {
+        public void clicked(@NotNull Player player, @NotNull ClickType clickType) {
             if (clickType.isLeftClick()) {
                 NamedKit kit = practicePlayer.getKit(ladder, index);
                 kit.apply(practicePlayer);
@@ -145,7 +146,7 @@ class KitEditorMenu extends Menu {
         }
 
         @Override
-        public boolean shouldUpdate(Player player, ClickType clickType) {
+        public boolean shouldUpdate(Player player, @NotNull ClickType clickType) {
             if (clickType.isLeftClick()) {
                 practicePlayer.removeKit(ladder, index);
                 return true;

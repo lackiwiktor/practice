@@ -1,8 +1,10 @@
 package country.pvp.practice.player.data;
 
+import org.jetbrains.annotations.Nullable;
+
 public class PlayerStateData {
 
-    private PlayerData data;
+    private @Nullable PlayerData data;
 
     public void setStateData(PlayerData stateData) {
         data = stateData;
@@ -12,7 +14,7 @@ public class PlayerStateData {
         data = null;
     }
 
-    public <V extends PlayerData> V get() {
+    public <V extends PlayerData> @Nullable V get() {
         return (V) data;
     }
 

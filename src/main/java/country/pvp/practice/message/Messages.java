@@ -2,6 +2,8 @@ package country.pvp.practice.message;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,10 +22,10 @@ public enum Messages {
     MATCH_PLAYER_KILLED_BY_UNKNOWN("MATCH_PLAYER_KILLED_BY_UNKNOWN", "&ePlayer {player} &ehas died!"),
     MATCH_PLAYER_KILLED_BY_PLAYER("MATCH_PLAYER_KILLED_BY_PLAYER", "&ePlayer {player} &ehas been killed by {killer}&e!");
 
-    private final String name;
-    private final String value;
+    private final @NotNull String name;
+    private final @NotNull String value;
 
-    public String get() {
+    public @NotNull String get() {
         return value;
     }
 
@@ -31,7 +33,7 @@ public enum Messages {
         return match(new MessagePattern(placeholder, value));
     }
 
-    public String match(MessagePattern... patterns) {
+    public String match(MessagePattern @Nullable ... patterns) {
         if (patterns == null) return value;
 
         String matched = value;

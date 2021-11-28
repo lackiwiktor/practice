@@ -6,6 +6,8 @@ import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -23,7 +25,7 @@ public class NamedKit extends Kit {
     }
 
     @Override
-    public void applyDocument(Document document) {
+    public void applyDocument(@NotNull Document document) {
         super.applyDocument(document);
         name = document.getString("name");
     }
@@ -36,7 +38,7 @@ public class NamedKit extends Kit {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NamedKit namedKit = (NamedKit) o;

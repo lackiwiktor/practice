@@ -13,16 +13,17 @@ import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ArenaCommands {
 
-    private final ArenaManager arenaManager;
-    private final ArenaService arenaService;
+    private final @NotNull ArenaManager arenaManager;
+    private final @NotNull ArenaService arenaService;
 
     @Command("arena create")
     @Permission("practice.admin")
-    public void create(@Sender Player sender, @Name("name") String name) {
+    public void create(@Sender Player sender, @Name("name") @NotNull String name) {
         if (arenaManager.get(name) != null) {
             Messager.messageError(sender, "Arena with this name already exists.");
             return;
@@ -36,7 +37,7 @@ public class ArenaCommands {
 
     @Command("arena remove")
     @Permission("practice.admin")
-    public void remove(@Sender Player sender, @Name("arena") Arena arena) {
+    public void remove(@Sender Player sender, @Name("arena") @NotNull Arena arena) {
         arenaManager.remove(arena);
         arenaService.deleteAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully removed arena.");
@@ -44,7 +45,7 @@ public class ArenaCommands {
 
     @Command("arena displayName")
     @Permission("practice.admin")
-    public void displayName(@Sender Player sender, @Name("arena") Arena arena, @Name("displayName") String name) {
+    public void displayName(@Sender Player sender, @Name("arena") @NotNull Arena arena, @Name("displayName") String name) {
         arena.setDisplayName(name);
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's display name.");
@@ -52,7 +53,7 @@ public class ArenaCommands {
 
     @Command("arena icon")
     @Permission("practice.admin")
-    public void icon(@Sender Player sender, @Name("arena") Arena arena) {
+    public void icon(@Sender @NotNull Player sender, @Name("arena") @NotNull Arena arena) {
         ItemStack itemInHand = sender.getItemInHand();
 
         if (itemInHand == null) {
@@ -67,7 +68,7 @@ public class ArenaCommands {
 
     @Command("arena spawnLocation1")
     @Permission("practice.admin")
-    public void spawnLocation1(@Sender Player sender, @Name("arena") Arena arena) {
+    public void spawnLocation1(@Sender @NotNull Player sender, @Name("arena") @NotNull Arena arena) {
         arena.setSpawnLocation1(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's first spawn location.");
@@ -75,7 +76,7 @@ public class ArenaCommands {
 
     @Command("arena spawnLocation2")
     @Permission("practice.admin")
-    public void spawnLocation2(@Sender Player sender, @Name("arena") Arena arena) {
+    public void spawnLocation2(@Sender @NotNull Player sender, @Name("arena") @NotNull Arena arena) {
         arena.setSpawnLocation2(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's second spawn location.");
@@ -83,7 +84,7 @@ public class ArenaCommands {
 
     @Command("arena center")
     @Permission("practice.admin")
-    public void center(@Sender Player sender, @Name("arena") Arena arena) {
+    public void center(@Sender @NotNull Player sender, @Name("arena") @NotNull Arena arena) {
         arena.setCenter(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's center location.");
@@ -91,7 +92,7 @@ public class ArenaCommands {
 
     @Command("arena spectatorLocation")
     @Permission("practice.admin")
-    public void spectatorLocation(@Sender Player sender, @Name("arena") Arena arena) {
+    public void spectatorLocation(@Sender @NotNull Player sender, @Name("arena") @NotNull Arena arena) {
         arena.setSpectatorLocation(sender.getLocation());
         arenaService.saveAsync(arena);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's spectator location.");

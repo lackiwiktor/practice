@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -18,15 +19,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MatchMenu extends Menu {
 
-    private final MatchManager matchManager;
+    private final @NotNull MatchManager matchManager;
 
     @Override
-    public String getTitle(Player player) {
+    public @NotNull String getTitle(Player player) {
         return "Match List";
     }
 
     @Override
-    public Map<Integer, Button> getButtons(Player player) {
+    public @NotNull Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Match match : matchManager.getAll()) {
@@ -39,7 +40,7 @@ public class MatchMenu extends Menu {
     @RequiredArgsConstructor
     static class MatchOverviewButton extends Button {
 
-        private final Match match;
+        private final @NotNull Match match;
 
         @Override
         public ItemStack getButtonItem(Player player) {
@@ -61,7 +62,7 @@ public class MatchMenu extends Menu {
                     .build();
         }
 
-        private String formatLore(PracticePlayer player) {
+        private String formatLore(@NotNull PracticePlayer player) {
             String lore;
             if (match.isAlive(player)) {
                 lore = ChatColor.WHITE.toString()

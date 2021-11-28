@@ -13,6 +13,7 @@ import country.pvp.practice.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,10 +22,10 @@ public class BoardProvider {
 
     private static final String BAR = ChatColor.GRAY + ChatColor.STRIKETHROUGH.toString() + "----------------------";
 
-    private final QueueManager queueManager;
-    private final MatchManager matchManager;
+    private final @NotNull QueueManager queueManager;
+    private final @NotNull MatchManager matchManager;
 
-    public List<String> provide(PracticePlayer player) {
+    public @NotNull List<String> provide(@NotNull PracticePlayer player) {
         List<String> lines = Lists.newArrayList();
 
         if (player.isInQueue()) {

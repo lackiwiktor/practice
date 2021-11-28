@@ -11,15 +11,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ItemBarListener implements Listener {
 
-    private final PlayerManager playerManager;
-    private final ItemBarManager itemBarManager;
+    private final @NotNull PlayerManager playerManager;
+    private final @NotNull ItemBarManager itemBarManager;
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void clickEvent(PlayerInteractEvent event) {
+    public void clickEvent(@NotNull PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
 

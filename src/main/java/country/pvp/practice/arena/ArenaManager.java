@@ -1,6 +1,7 @@
 package country.pvp.practice.arena;
 
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -13,20 +14,20 @@ public class ArenaManager {
     private final Map<String, Arena> arenas = Maps.newHashMap();
     //  private final Map<Arena, Set<DuplicatedArena>> duplicatedArenas = Maps.newHashMap();
 
-    public void add(Arena arena) {
+    public void add(@NotNull Arena arena) {
         arenas.put(arena.getName().toUpperCase(Locale.ROOT), arena);
     }
 
-    public void remove(Arena arena) {
+    public void remove(@NotNull Arena arena) {
         arenas.remove(arena.getName().toUpperCase(Locale.ROOT));
         //   duplicatedArenas.remove(arena);
     }
 
-    public Arena get(String name) {
+    public Arena get(@NotNull String name) {
         return arenas.get(name.toUpperCase(Locale.ROOT));
     }
 
-    public void addAll(Set<Arena> arenas) {
+    public void addAll(@NotNull Set<Arena> arenas) {
         arenas.forEach(this::add);
     }
 
@@ -38,7 +39,7 @@ public class ArenaManager {
         return duplicatedArenas.get(arena);
     } */
 
-    public Set<Arena> getAll() {
+    public @NotNull Set<Arena> getAll() {
         return Collections.unmodifiableSet(arenas.values().stream().filter(Arena::isSetup).collect(Collectors.toSet()));
     }
 

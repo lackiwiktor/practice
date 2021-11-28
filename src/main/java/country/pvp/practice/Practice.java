@@ -43,6 +43,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -52,27 +53,27 @@ public class Practice {
 
     private static Practice instance;
 
-    private final Injector injector;
-    private final PlayerManager playerManager;
-    private final PlayerService playerService;
-    private final LadderManager ladderManager;
-    private final LadderService ladderService;
-    private final ArenaManager arenaManager;
-    private final ArenaService arenaService;
-    private final QueueManager queueManager;
-    private final QueueMenuProvider queueMenuProvider;
-    private final PracticeSettings practiceSettings;
-    private final PracticeSettingsService practiceSettingsService;
-    private final KitChooseProvider kitChooseProvider;
-    private final MatchManager matchManager;
+    private final @NotNull Injector injector;
+    private final @NotNull PlayerManager playerManager;
+    private final @NotNull PlayerService playerService;
+    private final @NotNull LadderManager ladderManager;
+    private final @NotNull LadderService ladderService;
+    private final @NotNull ArenaManager arenaManager;
+    private final @NotNull ArenaService arenaService;
+    private final @NotNull QueueManager queueManager;
+    private final @NotNull QueueMenuProvider queueMenuProvider;
+    private final @NotNull PracticeSettings practiceSettings;
+    private final @NotNull PracticeSettingsService practiceSettingsService;
+    private final @NotNull KitChooseProvider kitChooseProvider;
+    private final @NotNull MatchManager matchManager;
 
     private Blade blade;
 
-    public static QueueMenuProvider getQueueMenuProvider() {
+    public static @NotNull QueueMenuProvider getQueueMenuProvider() {
         return instance.queueMenuProvider;
     }
 
-    public static KitChooseProvider getKitChooseProvider() {
+    public static @NotNull KitChooseProvider getKitChooseProvider() {
         return instance.kitChooseProvider;
     }
 

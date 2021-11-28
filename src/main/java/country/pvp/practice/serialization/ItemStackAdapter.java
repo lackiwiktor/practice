@@ -7,6 +7,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -56,7 +58,7 @@ public class ItemStackAdapter {
         DEFAULT_DAMAGE = stack.getDurability();
     }
 
-    public static String toJson(ItemStack stack) {
+    public static @Nullable String toJson(@Nullable ItemStack stack) {
         // Check for "nothing"
         if (stack == null) return null;
         if (stack.getTypeId() == 0) return null;
@@ -71,7 +73,7 @@ public class ItemStackAdapter {
         return json.toString();
     }
 
-    public static ItemStack fromJson(String jsonString) {
+    public static @Nullable ItemStack fromJson(@Nullable String jsonString) {
         if (jsonString == null) return null;
         JsonElement jsonElement = new JsonParser().parse(jsonString);
         // Check for "nothing"
@@ -90,7 +92,7 @@ public class ItemStackAdapter {
         return stack;
     }
 
-    public static ItemStack fromJson(JsonElement jsonElement) {
+    public static @Nullable ItemStack fromJson(@Nullable JsonElement jsonElement) {
         // Check for "nothing"
         if (jsonElement == null) return null;
 
@@ -111,7 +113,7 @@ public class ItemStackAdapter {
     // NOARG STACK CONSTRUCTOR
     // -------------------------------------------- //
 
-    public static ItemStack createItemStack() {
+    public static @NotNull ItemStack createItemStack() {
         return new ItemStack(0);
     }
 
@@ -119,7 +121,7 @@ public class ItemStackAdapter {
     // ALL
     // -------------------------------------------- //
 
-    public static void transferAll(ItemStack stack, JsonObject json, boolean stack2json) {
+    public static void transferAll(@NotNull ItemStack stack, @NotNull JsonObject json, boolean stack2json) {
         transferBasic(stack, json, stack2json);
 
         ItemMeta meta = stack.getItemMeta();
@@ -134,7 +136,7 @@ public class ItemStackAdapter {
     // BASIC
     // -------------------------------------------- //
 
-    public static void transferBasic(ItemStack stack, JsonObject json, boolean stack2json) {
+    public static void transferBasic(@NotNull ItemStack stack, @NotNull JsonObject json, boolean stack2json) {
         transferId(stack, json, stack2json);
         transferCount(stack, json, stack2json);
         transferDamage(stack, json, stack2json);
@@ -144,7 +146,7 @@ public class ItemStackAdapter {
     // BASIC: ID
     // -------------------------------------------- //
 
-    public static void transferId(ItemStack stack, JsonObject json, boolean stack2json) {
+    public static void transferId(@NotNull ItemStack stack, @NotNull JsonObject json, boolean stack2json) {
         if (stack2json) {
             int id = stack.getTypeId();
             if (id == DEFAULT_ID) return;
@@ -160,7 +162,7 @@ public class ItemStackAdapter {
     // BASIC: COUNT
     // -------------------------------------------- //
 
-    public static void transferCount(ItemStack stack, JsonObject json, boolean stack2json) {
+    public static void transferCount(@NotNull ItemStack stack, @NotNull JsonObject json, boolean stack2json) {
         if (stack2json) {
             int count = stack.getAmount();
             if (count == DEFAULT_COUNT) return;
@@ -176,7 +178,7 @@ public class ItemStackAdapter {
     // BASIC: DAMAGE
     // -------------------------------------------- //
 
-    public static void transferDamage(ItemStack stack, JsonObject json, boolean stack2json) {
+    public static void transferDamage(@NotNull ItemStack stack, @NotNull JsonObject json, boolean stack2json) {
         // Durability is a weird name since it is the amount of damage.
         if (stack2json) {
             int damage = stack.getDurability();
@@ -193,7 +195,7 @@ public class ItemStackAdapter {
     // META
     // -------------------------------------------- //
 
-    public static void transferMeta(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferMeta(@NotNull ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         transferUnspecificMeta(meta, json, meta2json);
         transferSpecificMeta(meta, json, meta2json);
     }
@@ -202,7 +204,7 @@ public class ItemStackAdapter {
     // UNSPECIFIC META
     // -------------------------------------------- //
 
-    public static void transferUnspecificMeta(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferUnspecificMeta(@NotNull ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         transferName(meta, json, meta2json);
         transferLore(meta, json, meta2json);
         transferEnchants(meta, json, meta2json);
@@ -213,7 +215,7 @@ public class ItemStackAdapter {
     // UNSPECIFIC META: NAME
     // -------------------------------------------- //
 
-    public static void transferName(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferName(@NotNull ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasDisplayName()) return;
             json.addProperty(NAME, meta.getDisplayName());
@@ -228,7 +230,7 @@ public class ItemStackAdapter {
     // UNSPECIFIC META: LORE
     // -------------------------------------------- //
 
-    public static void transferLore(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferLore(@NotNull ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasLore()) return;
             json.add(LORE, convertStringList(meta.getLore()));
@@ -243,7 +245,7 @@ public class ItemStackAdapter {
     // UNSPECIFIC META: ENCHANTS
     // -------------------------------------------- //
 
-    public static void transferEnchants(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferEnchants(@NotNull ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasEnchants()) return;
             json.add(ENCHANTS, convertEnchantLevelMap(meta.getEnchants()));
@@ -260,7 +262,7 @@ public class ItemStackAdapter {
     // UNSPECIFIC META: REPAIRCOST
     // -------------------------------------------- //
 
-    public static void transferRepaircost(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferRepaircost(ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (!(meta instanceof Repairable)) return;
         Repairable repairable = (Repairable) meta;
 
@@ -279,7 +281,7 @@ public class ItemStackAdapter {
     // SPECIFIC META
     // -------------------------------------------- //
 
-    public static void transferSpecificMeta(ItemMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferSpecificMeta(ItemMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta instanceof BookMeta) {
             transferBookMeta((BookMeta) meta, json, meta2json);
         } else if (meta instanceof LeatherArmorMeta) {
@@ -299,13 +301,13 @@ public class ItemStackAdapter {
     // SPECIFIC META: BOOK
     // -------------------------------------------- //
 
-    public static void transferBookMeta(BookMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferBookMeta(@NotNull BookMeta meta, @NotNull JsonObject json, boolean meta2json) {
         transferTitle(meta, json, meta2json);
         transferAuthor(meta, json, meta2json);
         transferPages(meta, json, meta2json);
     }
 
-    public static void transferTitle(BookMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferTitle(@NotNull BookMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasTitle()) return;
             json.addProperty(BOOK_TITLE, meta.getTitle());
@@ -316,7 +318,7 @@ public class ItemStackAdapter {
         }
     }
 
-    public static void transferAuthor(BookMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferAuthor(@NotNull BookMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasTitle()) return;
             json.addProperty(BOOK_AUTHOR, meta.getAuthor());
@@ -327,7 +329,7 @@ public class ItemStackAdapter {
         }
     }
 
-    public static void transferPages(BookMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferPages(@NotNull BookMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasTitle()) return;
             json.add(BOOK_PAGES, convertStringList(meta.getPages()));
@@ -343,7 +345,7 @@ public class ItemStackAdapter {
     // -------------------------------------------- //
 
     public static void transferLeatherArmorMeta(
-            LeatherArmorMeta meta, JsonObject json, boolean meta2json) {
+            @NotNull LeatherArmorMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             Color color = meta.getColor();
 
@@ -359,7 +361,7 @@ public class ItemStackAdapter {
     // SPECIFIC META: MAP
     // -------------------------------------------- //
 
-    public static void transferMapMeta(MapMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferMapMeta(@NotNull MapMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.isScaling()) return;
             json.addProperty(MAP_SCALING, true);
@@ -375,7 +377,7 @@ public class ItemStackAdapter {
     // SPECIFIC META: POTION
     // -------------------------------------------- //
 
-    public static void transferPotionMeta(PotionMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferPotionMeta(@NotNull PotionMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasCustomEffects()) return;
             json.add(POTION_EFFECTS, convertPotionEffectList(meta.getCustomEffects()));
@@ -395,7 +397,7 @@ public class ItemStackAdapter {
     // SPECIFIC META: SKULL
     // -------------------------------------------- //
 
-    public static void transferSkullMeta(SkullMeta meta, JsonObject json, boolean meta2json) {
+    public static void transferSkullMeta(@NotNull SkullMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasOwner()) return;
             json.addProperty(SKULL_OWNER, meta.getOwner());
@@ -407,7 +409,7 @@ public class ItemStackAdapter {
     }
 
     public static void transferEnchantmentStorageMeta(
-            EnchantmentStorageMeta meta, JsonObject json, boolean meta2json) {
+            @NotNull EnchantmentStorageMeta meta, @NotNull JsonObject json, boolean meta2json) {
         if (meta2json) {
             if (!meta.hasStoredEnchants()) return;
             json.add(STORED_ENCHANTS, convertEnchantLevelMap(meta.getStoredEnchants()));
@@ -426,7 +428,7 @@ public class ItemStackAdapter {
 
     // String List
 
-    public static JsonArray convertStringList(Collection<String> strings) {
+    public static @NotNull JsonArray convertStringList(@NotNull Collection<String> strings) {
         JsonArray ret = new JsonArray();
         for (String string : strings) {
             ret.add(new JsonPrimitive(string));
@@ -434,7 +436,7 @@ public class ItemStackAdapter {
         return ret;
     }
 
-    public static List<String> convertStringList(JsonElement jsonElement) {
+    public static @NotNull List<String> convertStringList(@NotNull JsonElement jsonElement) {
         JsonArray array = jsonElement.getAsJsonArray();
         List<String> ret = new ArrayList<>();
 
@@ -447,7 +449,7 @@ public class ItemStackAdapter {
 
     // PotionEffect List
 
-    public static JsonArray convertPotionEffectList(Collection<PotionEffect> potionEffects) {
+    public static @NotNull JsonArray convertPotionEffectList(@NotNull Collection<PotionEffect> potionEffects) {
         JsonArray ret = new JsonArray();
         for (PotionEffect e : potionEffects) {
             ret.add(PotionEffectAdapter.toJson(e));
@@ -455,7 +457,7 @@ public class ItemStackAdapter {
         return ret;
     }
 
-    public static List<PotionEffect> convertPotionEffectList(JsonElement jsonElement) {
+    public static @Nullable List<PotionEffect> convertPotionEffectList(@Nullable JsonElement jsonElement) {
         if (jsonElement == null) return null;
         if (!jsonElement.isJsonArray()) return null;
         JsonArray array = jsonElement.getAsJsonArray();
@@ -473,7 +475,7 @@ public class ItemStackAdapter {
 
     // EnchantLevelMap
 
-    public static JsonObject convertEnchantLevelMap(Map<Enchantment, Integer> enchantLevelMap) {
+    public static @NotNull JsonObject convertEnchantLevelMap(@NotNull Map<Enchantment, Integer> enchantLevelMap) {
 
         final JsonObject toReturn = new JsonObject();
 
@@ -483,7 +485,7 @@ public class ItemStackAdapter {
         return toReturn;
     }
 
-    public static Map<Enchantment, Integer> convertEnchantLevelMap(JsonElement jsonElement) {
+    public static @NotNull Map<Enchantment, Integer> convertEnchantLevelMap(@NotNull JsonElement jsonElement) {
 
         final JsonObject json = jsonElement.getAsJsonObject();
 

@@ -10,24 +10,25 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 @RequiredArgsConstructor
 public class KitChooseMenu extends Menu {
 
-    private final LadderManager ladderManager;
-    private final KitEditorService kitEditorService;
+    private final @NotNull LadderManager ladderManager;
+    private final @NotNull KitEditorService kitEditorService;
 
-    private final PracticePlayer practicePlayer;
+    private final @NotNull PracticePlayer practicePlayer;
 
     @Override
-    public String getTitle(Player player) {
+    public @NotNull String getTitle(Player player) {
         return "Choose kit";
     }
 
     @Override
-    public Map<Integer, Button> getButtons(Player player) {
+    public @NotNull Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Ladder ladder : ladderManager.getAll()) {
@@ -40,10 +41,10 @@ public class KitChooseMenu extends Menu {
     @RequiredArgsConstructor
     public static class KitChoiceButton extends Button {
 
-        private final KitEditorService kitEditorService;
+        private final @NotNull KitEditorService kitEditorService;
 
-        private final PracticePlayer practicePlayer;
-        private final Ladder ladder;
+        private final @NotNull PracticePlayer practicePlayer;
+        private final @NotNull Ladder ladder;
 
         @Override
         public ItemStack getButtonItem(Player player) {
@@ -51,7 +52,7 @@ public class KitChooseMenu extends Menu {
         }
 
         @Override
-        public void clicked(Player player, ClickType clickType) {
+        public void clicked(Player player, @NotNull ClickType clickType) {
             if (clickType.isLeftClick()) {
                 kitEditorService.moveToEditor(practicePlayer, ladder);
             }

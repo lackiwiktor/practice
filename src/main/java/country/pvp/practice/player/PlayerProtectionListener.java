@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -36,55 +37,55 @@ public class PlayerProtectionListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void playerJoin(PlayerJoinEvent event) {
+    public void playerJoin(@NotNull PlayerJoinEvent event) {
         event.setJoinMessage(null);
         PracticePlayer practicePlayer = get(event);
         lobbyService.moveToLobby(practicePlayer);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void entitySpawn(EntitySpawnEvent event) {
+    public void entitySpawn(@NotNull EntitySpawnEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void breakEvent(BlockBreakEvent event) {
+    public void breakEvent(@NotNull BlockBreakEvent event) {
         cancelIfInState(event.getPlayer(), event, true, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void placeBlock(BlockPlaceEvent event) {
+    public void placeBlock(@NotNull BlockPlaceEvent event) {
         cancelIfInState(event.getPlayer(), event, true, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void entityDamage(EntityDamageEvent event) {
+    public void entityDamage(@NotNull EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         cancelIfInState((Player) event.getEntity(), event, false, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void dropItem(PlayerDropItemEvent event) {
+    public void dropItem(@NotNull PlayerDropItemEvent event) {
         cancelIfInState(event.getPlayer(), event, false, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void pickupItem(PlayerPickupItemEvent event) {
+    public void pickupItem(@NotNull PlayerPickupItemEvent event) {
         cancelIfInState(event.getPlayer(), event, false, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void inventoryInteract(InventoryInteractEvent event) {
+    public void inventoryInteract(@NotNull InventoryInteractEvent event) {
         cancelIfInState((Player) event.getWhoClicked(), event, true, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void inventoryClick(InventoryClickEvent event) {
+    public void inventoryClick(@NotNull InventoryClickEvent event) {
         cancelIfInState((Player) event.getWhoClicked(), event, true, PlayerState.IN_LOBBY, PlayerState.QUEUING, PlayerState.SPECTATING);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void foodLevelChange(FoodLevelChangeEvent event) {
+    public void foodLevelChange(@NotNull FoodLevelChangeEvent event) {
         cancelIfInState((Player) event.getEntity(), event, false, PlayerState.IN_LOBBY, PlayerState.EDITING_KIT, PlayerState.QUEUING, PlayerState.SPECTATING);
 
         if (event.isCancelled()) {
@@ -92,7 +93,7 @@ public class PlayerProtectionListener extends PlayerListener {
         }
     }
 
-    private void cancelIfInState(Player player, Cancellable event, boolean permBypass, PlayerState... states) {
+    private void cancelIfInState(@NotNull Player player, @NotNull Cancellable event, boolean permBypass, PlayerState... states) {
         PracticePlayer practicePlayer = get(player);
 
         if (Arrays.asList(states).contains(practicePlayer.getState()) && (!permBypass || !practicePlayer.hasPermission("practice.admin"))) {

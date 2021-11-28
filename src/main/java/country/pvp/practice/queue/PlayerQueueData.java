@@ -7,14 +7,15 @@ import country.pvp.practice.player.data.PlayerData;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 @Data
 public class PlayerQueueData implements Comparable<PlayerQueueData>, PlayerData, Recipient {
 
-    private final PracticePlayer player;
-    private final Queue queue;
+    private final @NotNull PracticePlayer player;
+    private final @NotNull Queue queue;
     private final long joinTimeStamp = System.currentTimeMillis();
 
     private int getPlayerRank() {
@@ -44,7 +45,7 @@ public class PlayerQueueData implements Comparable<PlayerQueueData>, PlayerData,
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlayerQueueData queueData = (PlayerQueueData) o;

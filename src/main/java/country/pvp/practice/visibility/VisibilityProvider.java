@@ -4,6 +4,7 @@ import country.pvp.practice.match.Match;
 import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.match.PlayerSpectatingData;
 import country.pvp.practice.player.PracticePlayer;
+import org.jetbrains.annotations.NotNull;
 
 public class VisibilityProvider {
 
@@ -14,7 +15,7 @@ public class VisibilityProvider {
      * @param observable player who is looked on
      * @return visibility
      */
-    public Visibility provide(PracticePlayer observer, PracticePlayer observable) {
+    public @NotNull Visibility provide(@NotNull PracticePlayer observer, @NotNull PracticePlayer observable) {
         switch (observer.getState()) {
             case IN_MATCH:
                 if (observable.isInMatch()) {

@@ -3,6 +3,8 @@ package country.pvp.practice.team;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -11,10 +13,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SoloTeam extends Team {
 
-    private final PracticePlayer player;
+    private final @NotNull PracticePlayer player;
 
     @Override
-    public Set<PracticePlayer> getPlayers() {
+    public @NotNull Set<PracticePlayer> getPlayers() {
         return Collections.singleton(player);
     }
 
@@ -39,7 +41,7 @@ public class SoloTeam extends Team {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SoloTeam soloTeam = (SoloTeam) o;

@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class LadderProvider implements BladeProvider<Ladder> {
 
-    private final LadderManager ladderManager;
+    private final @NotNull LadderManager ladderManager;
 
     @Override
     public @Nullable Ladder provide(@NotNull BladeContext context, @NotNull BladeParameter parameter, @Nullable String input) throws BladeExitMessage {

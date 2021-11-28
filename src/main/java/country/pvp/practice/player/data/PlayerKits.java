@@ -6,6 +6,7 @@ import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,20 +19,20 @@ public class PlayerKits implements SerializableObject {
 
     private final Map<String, NamedKit[]> kits = Maps.newHashMap();
 
-    public void setKit(Ladder ladder, NamedKit kit, int index) {
+    public void setKit(@NotNull Ladder ladder, NamedKit kit, int index) {
         getKits(ladder)[index] = kit;
     }
 
-    public NamedKit getKit(Ladder ladder, int index) {
+    public NamedKit getKit(@NotNull Ladder ladder, int index) {
         return getKits(ladder)[index];
     }
 
-    public NamedKit[] getKits(Ladder ladder) {
+    public NamedKit[] getKits(@NotNull Ladder ladder) {
         return kits.computeIfAbsent(ladder.getName(), (k) -> new NamedKit[7]);
     }
 
     @Override
-    public Document getDocument() {
+    public @NotNull Document getDocument() {
         Document document = new Document();
 
         for (Map.Entry<String, NamedKit[]> entry : kits.entrySet()) {
@@ -42,7 +43,7 @@ public class PlayerKits implements SerializableObject {
     }
 
     @Override
-    public void applyDocument(Document document) {
+    public void applyDocument(@NotNull Document document) {
         for (Map.Entry<String, Object> entry : document.entrySet()) {
             List<Document> documents = (List<Document>) entry.getValue();
             NamedKit[] kits = documents.stream().map(it -> {
@@ -56,11 +57,11 @@ public class PlayerKits implements SerializableObject {
         }
     }
 
-    public void removeKit(Ladder ladder, int index) {
+    public void removeKit(@NotNull Ladder ladder, int index) {
         getKits(ladder)[index] = null;
     }
 
-    public boolean hasKits(Ladder ladder) {
+    public boolean hasKits(@NotNull Ladder ladder) {
         return Arrays.stream(getKits(ladder)).anyMatch(Objects::nonNull);
     }
 }

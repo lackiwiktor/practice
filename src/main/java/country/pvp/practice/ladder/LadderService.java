@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
 import country.pvp.practice.data.mongo.MongoRepository;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class LadderService extends MongoRepository<Ladder> {
         super(database);
     }
 
-    public Set<Ladder> loadAll() {
+    public @NotNull Set<Ladder> loadAll() {
         Set<Ladder> ladders = Sets.newHashSet();
 
         database.getCollection("ladders").find().forEach(it -> {

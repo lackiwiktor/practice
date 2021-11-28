@@ -5,15 +5,16 @@ import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class KitChooseProvider {
 
-    private final LadderManager ladderManager;
-    private final PlayerService playerService;
-    private final KitEditorService kitEditorService;
+    private final @NotNull LadderManager ladderManager;
+    private final @NotNull PlayerService playerService;
+    private final @NotNull KitEditorService kitEditorService;
 
-    public KitChooseMenu provide(PracticePlayer player) {
+    public @NotNull KitChooseMenu provide(PracticePlayer player) {
         return new KitChooseMenu(ladderManager, kitEditorService, player);
     }
 }

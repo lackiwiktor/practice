@@ -8,21 +8,22 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 @RequiredArgsConstructor
 public class KitEditorChest extends Menu {
 
-    private final Ladder ladder;
+    private final @NotNull Ladder ladder;
 
     @Override
-    public String getTitle(Player player) {
+    public @NotNull String getTitle(Player player) {
         return "Editor items";
     }
 
     @Override
-    public Map<Integer, Button> getButtons(Player player) {
+    public @NotNull Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         ItemStack[] items = ladder.getEditorItems();
@@ -42,10 +43,10 @@ public class KitEditorChest extends Menu {
     @RequiredArgsConstructor
     public static class KitEditorChestButton extends Button {
 
-        private final ItemStack item;
+        private final @NotNull ItemStack item;
 
         @Override
-        public ItemStack getButtonItem(Player player) {
+        public @NotNull ItemStack getButtonItem(Player player) {
             return item;
         }
 

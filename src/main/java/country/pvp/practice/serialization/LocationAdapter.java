@@ -7,11 +7,12 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.jetbrains.annotations.Nullable;
 
 @UtilityClass
 public class LocationAdapter {
 
-    public static String toJson(Location location) {
+    public static @Nullable String toJson(@Nullable Location location) {
         if (location == null) {
             return (null);
         }
@@ -28,7 +29,7 @@ public class LocationAdapter {
         return jsonObject.toString();
     }
 
-    public static Location fromJson(String json) {
+    public static @Nullable Location fromJson(@Nullable String json) {
         if (json == null) return null;
         JsonElement jsonElement = new JsonParser().parse(json);
         if (jsonElement == null || !jsonElement.isJsonObject()) {

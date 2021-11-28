@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ArenaProvider implements BladeProvider<Arena> {
 
-    private final ArenaManager arenaManager;
+    private final @NotNull ArenaManager arenaManager;
 
     @Override
     public @Nullable Arena provide(@NotNull BladeContext context, @NotNull BladeParameter parameter, @Nullable String input) throws BladeExitMessage {

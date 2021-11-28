@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 
 public class PlayerKitListener extends PlayerListener {
@@ -24,7 +25,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler
-    public void clickEvent(PlayerInteractEvent event) {
+    public void clickEvent(@NotNull PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
 
@@ -40,7 +41,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void dropItem(PlayerDropItemEvent event) {
+    public void dropItem(@NotNull PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
         PracticePlayer practicePlayer = get(event);
         if (!practicePlayer.isInMatch()) return;
@@ -51,7 +52,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void clickEvent(InventoryClickEvent event) {
+    public void clickEvent(@NotNull InventoryClickEvent event) {
         ItemStack item = event.getCurrentItem();
         if (item == null) return;
         PracticePlayer practicePlayer = get((Player) event.getWhoClicked());
@@ -63,7 +64,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler
-    public void deathEvent(PlayerDeathEvent event) {
+    public void deathEvent(@NotNull PlayerDeathEvent event) {
         PracticePlayer practicePlayer = get(event.getEntity());
         if (!practicePlayer.isInMatch()) return;
 

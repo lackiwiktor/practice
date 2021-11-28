@@ -1,6 +1,7 @@
 package country.pvp.practice.time;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +16,7 @@ public class TimeUtil {
         return TimeUnit.MILLISECONDS.convert(time, unit) / 50;
     }
 
-    public static String formatTimeMillisToClock(long millis) {
+    public static @NotNull String formatTimeMillisToClock(long millis) {
         return millis / 1000L <= 0
                 ? "0:00"
                 : String.format(

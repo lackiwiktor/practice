@@ -9,15 +9,16 @@ import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class LobbyService {
 
-    private final VisibilityUpdater visibilityUpdater;
-    private final ItemBarManager itemBarManager;
-    private final PracticeSettings practiceSettings;
+    private final @NotNull VisibilityUpdater visibilityUpdater;
+    private final @NotNull ItemBarManager itemBarManager;
+    private final @NotNull PracticeSettings practiceSettings;
 
-    public void moveToLobby(PracticePlayer player) {
+    public void moveToLobby(@NotNull PracticePlayer player) {
         player.setState(PlayerState.IN_LOBBY);
         player.removeStateData();
         PlayerUtil.resetPlayer(player.getPlayer());

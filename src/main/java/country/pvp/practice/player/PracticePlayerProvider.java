@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class PracticePlayerProvider implements BladeProvider<PracticePlayer> {
 
-    private final PlayerManager playerManager;
+    private final @NotNull PlayerManager playerManager;
 
     @Override
     public @Nullable PracticePlayer provide(@NotNull BladeContext context, @NotNull BladeParameter parameter, @Nullable String input) throws BladeExitMessage {

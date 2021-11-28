@@ -8,14 +8,15 @@ import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class KitEditorService {
 
-    private final VisibilityUpdater visibilityUpdater;
-    private final PracticeSettings practiceSettings;
+    private final @NotNull VisibilityUpdater visibilityUpdater;
+    private final @NotNull PracticeSettings practiceSettings;
 
-    public void moveToEditor(PracticePlayer player, Ladder ladder) {
+    public void moveToEditor(@NotNull PracticePlayer player, @NotNull Ladder ladder) {
         player.setState(PlayerState.EDITING_KIT, new PlayerEditingData(ladder));
         PlayerUtil.resetPlayer(player.getPlayer());
         visibilityUpdater.update(player);

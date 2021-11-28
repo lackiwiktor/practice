@@ -19,8 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MatchProvider implements BladeProvider<Match> {
 
-    private final PlayerManager playerManager;
-    private final MatchManager matchManager;
+    private final @NotNull PlayerManager playerManager;
+    private final @NotNull MatchManager matchManager;
 
     @Override
     public @Nullable Match provide(@NotNull BladeContext context, @NotNull BladeParameter parameter, @Nullable String input) throws BladeExitMessage {

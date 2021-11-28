@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class PreparePlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void loginEvent(AsyncPlayerPreLoginEvent event) {
+    public void loginEvent(@NotNull AsyncPlayerPreLoginEvent event) {
         PracticePlayer practicePlayer = new PracticePlayer(event.getUniqueId(), event.getName());
 
         try {
@@ -37,7 +38,7 @@ public class PreparePlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void quitEvent(PlayerQuitEvent event) {
+    public void quitEvent(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Optional.ofNullable(playerManager.remove(player))
                 .ifPresent(playerService::saveAsync);

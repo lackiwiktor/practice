@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class MatchPlayerListener extends PlayerListener {
 
@@ -21,7 +22,7 @@ public class MatchPlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void entityDamage(EntityDamageEvent event) {
+    public void entityDamage(@NotNull EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         PracticePlayer damagedPlayer = get((Player) event.getEntity());
 
@@ -36,7 +37,7 @@ public class MatchPlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void entityDamage(EntityDamageByEntityEvent event) {
+    public void entityDamage(@NotNull EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
 
         PracticePlayer damagedPlayer = get((Player) event.getEntity());
@@ -73,7 +74,7 @@ public class MatchPlayerListener extends PlayerListener {
     }
 
     @EventHandler
-    public void playerDeath(PlayerDeathEvent event) {
+    public void playerDeath(@NotNull PlayerDeathEvent event) {
         event.setDeathMessage(null);
         PracticePlayer player = get(event.getEntity());
         if (!player.isInMatch()) return;
@@ -102,7 +103,7 @@ public class MatchPlayerListener extends PlayerListener {
      */
 
     @EventHandler
-    public void playerQuit(PlayerQuitEvent event) {
+    public void playerQuit(@NotNull PlayerQuitEvent event) {
         event.setQuitMessage(null);
         PracticePlayer player = get(event);
         if (!player.isInMatch()) return;

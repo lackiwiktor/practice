@@ -23,6 +23,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -34,22 +36,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Data
 public class Match implements Recipient {
 
-    private final VisibilityUpdater visibilityUpdater;
-    private final LobbyService lobbyService;
-    private final MatchManager matchManager;
-    private final ItemBarManager itemBarManager;
+    private final @NotNull VisibilityUpdater visibilityUpdater;
+    private final @NotNull LobbyService lobbyService;
+    private final @NotNull MatchManager matchManager;
+    private final @NotNull ItemBarManager itemBarManager;
 
     private final UUID id = UUID.randomUUID(); //match-id
-    private final Ladder ladder;
-    private final Arena arena;
-    private final Team teamA;
-    private final Team teamB;
+    private final @NotNull Ladder ladder;
+    private final @NotNull Arena arena;
+    private final @NotNull Team teamA;
+    private final @NotNull Team teamB;
     private final boolean ranked;
     private final Set<PracticePlayer> spectators = Sets.newHashSet();
 
-    private Team winner;
+    private @Nullable Team winner;
 
-    private MatchState state = MatchState.COUNTDOWN;
+    private @NotNull MatchState state = MatchState.COUNTDOWN;
     private BukkitRunnable countDownRunnable;
 
     public void start() {
@@ -64,7 +66,7 @@ public class Match implements Recipient {
         startCountDown();
     }
 
-    void prepareTeam(Team team, Location spawnLocation) {
+    void prepareTeam(@NotNull Team team, Location spawnLocation) {
         team.setMatchData(this);
         team.setPlayersState(PlayerState.IN_MATCH);
         team.teleport(spawnLocation);
@@ -101,15 +103,15 @@ public class Match implements Recipient {
         Messager.message(this, message);
     }
 
-    void broadcast(Messages message) {
+    void broadcast(@NotNull Messages message) {
         Messager.message(this, message);
     }
 
-    void broadcast(Team team, Messages message) {
+    void broadcast(Team team, @NotNull Messages message) {
         Messager.message(team, message);
     }
 
-    void broadcast(Team team, String message) {
+    void broadcast(@NotNull Team team, String message) {
         Messager.message(team, message);
     }
 
@@ -118,15 +120,15 @@ public class Match implements Recipient {
         countDownRunnable.cancel();
     }
 
-    public Team getOpponent(Team team) {
+    public @NotNull Team getOpponent(@NotNull Team team) {
         return team.equals(teamA) ? teamB : teamA;
     }
 
-    public Team getOpponent(PracticePlayer player) {
+    public @NotNull Team getOpponent(PracticePlayer player) {
         return teamA.hasPlayer(player) ? teamB : teamA;
     }
 
-    public Team getTeam(PracticePlayer player) {
+    public @NotNull Team getTeam(PracticePlayer player) {
         return teamA.hasPlayer(player) ? teamA : teamB;
     }
 
@@ -134,11 +136,11 @@ public class Match implements Recipient {
         return teamA.hasPlayer(player) || teamB.hasPlayer(player);
     }
 
-    public boolean isAlive(PracticePlayer player) {
+    public boolean isAlive(@NotNull PracticePlayer player) {
         return getTeam(player).isAlive(player);
     }
 
-    public void handleDeath(PracticePlayer player) {
+    public void handleDeath(@NotNull PracticePlayer player) {
         PlayerMatchData matchData = player.getStateData();
         matchData.setDead(true);
 
@@ -168,7 +170,7 @@ public class Match implements Recipient {
         handleRespawn(player);
     }
 
-    void handleRespawn(PracticePlayer player) {
+    void handleRespawn(@NotNull PracticePlayer player) {
         Team team = getTeam(player);
 
         if (team.isDead()) {
@@ -179,7 +181,7 @@ public class Match implements Recipient {
         setupSpectator(player);
     }
 
-    public void handleDisconnect(PracticePlayer player) {
+    public void handleDisconnect(@NotNull PracticePlayer player) {
         broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
         broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
 
@@ -195,11 +197,11 @@ public class Match implements Recipient {
         }
     }
 
-    void setupSpectator(PracticePlayer player) {
+    void setupSpectator(@NotNull PracticePlayer player) {
         player.enableFlying();
     }
 
-    void end(Team winner) {
+    void end(@Nullable Team winner) {
         state = MatchState.END;
         this.winner = winner;
         cancelCountDown();
@@ -239,15 +241,15 @@ public class Match implements Recipient {
         end(null);
     }
 
-    public String getFormattedDisplayName(PracticePlayer player, Team team) {
+    public @NotNull String getFormattedDisplayName(@NotNull PracticePlayer player, @NotNull Team team) {
         return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
     }
 
-    public String getFormattedDisplayName(PracticePlayer player, PracticePlayer other) {
+    public @NotNull String getFormattedDisplayName(@NotNull PracticePlayer player, PracticePlayer other) {
         return getFormattedDisplayName(player, getTeam(other));
     }
 
-    public void startSpectating(PracticePlayer spectator, PracticePlayer player) {
+    public void startSpectating(@NotNull PracticePlayer spectator, @NotNull PracticePlayer player) {
         spectators.add(spectator);
         itemBarManager.apply(ItemBarType.SPECTATOR, spectator);
         broadcast(Messages.MATCH_PLAYER_STARTED_SPECTATING.match("{player}", spectator.getName()));
@@ -266,7 +268,7 @@ public class Match implements Recipient {
         }
     }
 
-    public void stopSpectating(PracticePlayer spectator) {
+    public void stopSpectating(@NotNull PracticePlayer spectator) {
         broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
         spectators.remove(spectator);
         lobbyService.moveToLobby(spectator);
@@ -295,7 +297,7 @@ public class Match implements Recipient {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Match match = (Match) o;

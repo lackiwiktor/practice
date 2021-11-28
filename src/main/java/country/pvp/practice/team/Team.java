@@ -9,6 +9,7 @@ import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public abstract class Team implements Recipient {
         return getPlayers().size();
     }
 
-    public PlayerMatchData getMatchData(PracticePlayer player) {
+    public PlayerMatchData getMatchData(@NotNull PracticePlayer player) {
         return player.getStateData();
     }
 
@@ -39,7 +40,7 @@ public abstract class Team implements Recipient {
         }
     }
 
-    public void giveKits(Ladder ladder) {
+    public void giveKits(@NotNull Ladder ladder) {
         for (PracticePlayer player : getOnlinePlayers()) {
             player.giveKits(ladder);
         }
@@ -64,13 +65,13 @@ public abstract class Team implements Recipient {
         }
     }
 
-    public boolean isAlive(PracticePlayer player) {
+    public boolean isAlive(@NotNull PracticePlayer player) {
         PlayerMatchData matchData = getMatchData(player);
 
         return !matchData.isDead();
     }
 
-    public boolean hasDisconnected(PracticePlayer player) {
+    public boolean hasDisconnected(@NotNull PracticePlayer player) {
         PlayerMatchData matchData = getMatchData(player);
 
         Assertions.assertFalse(matchData == null);

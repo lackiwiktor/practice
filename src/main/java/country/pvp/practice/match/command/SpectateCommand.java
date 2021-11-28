@@ -11,14 +11,15 @@ import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
 import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class SpectateCommand {
 
-    private final PlayerManager playerManager;
+    private final @NotNull PlayerManager playerManager;
 
     @Command("spectate")
-    public void specate(@Sender Player sender, @Name("player") PracticePlayer player) {
+    public void specate(@Sender @NotNull Player sender, @Name("player") @NotNull PracticePlayer player) {
         PracticePlayer practicePlayer = playerManager.get(sender);
 
         if (!practicePlayer.isInLobby()) {

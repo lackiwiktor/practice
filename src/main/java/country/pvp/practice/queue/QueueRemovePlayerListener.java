@@ -6,6 +6,7 @@ import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class QueueRemovePlayerListener extends PlayerListener {
 
@@ -15,7 +16,7 @@ public class QueueRemovePlayerListener extends PlayerListener {
     }
 
     @EventHandler
-    public void quitEvent(PlayerQuitEvent event) {
+    public void quitEvent(@NotNull PlayerQuitEvent event) {
         PracticePlayer practicePlayer = get(event);
 
         if (!practicePlayer.isInQueue()) return;
