@@ -16,6 +16,8 @@ public enum Messages {
     MATCH_CANCELLED("MATCH_CANCELLED", "&4This match has been cancelled. ({reason})"),
     MATCH_PLAYER_EQUIP_KIT("MATCH_PLAYER_EQUIP_KIT", "&eYou have equipped {kit}."),
     MATCH_PLAYER_DISCONNECT("MATCH_PLAYER_DISCONNECT", "&c{player} &chas disconnected!"),
+    MATCH_PLAYER_PEARL_COOLDOWN("MATCH_PLAYER_PEARL_COOLDOWN_EXPIRED", "&bYou will be able to use enderpearl again in &f{time}&b."),
+    MATCH_PLAYER_PEARL_COOLDOWN_EXPIRED("MATCH_PLAYER_PEARL_COOLDOWN_EXPIRED", "&aPearl cooldown has expired."),
     MATCH_PLAYER_STARTED_SPECTATING("MATCH_PLAYER_STARTED_SPECTATING", "&f{player}&e started spectating this match."),
     MATCH_PLAYER_STOPPED_SPECTATING("MATCH_PLAYER_STOPPED_SPECTATING", "&f{player}&e is no longer spectating this match."),
     MATCH_PLAYER_KILLED_BY_UNKNOWN("MATCH_PLAYER_KILLED_BY_UNKNOWN", "&e{player} &ehas died!"),

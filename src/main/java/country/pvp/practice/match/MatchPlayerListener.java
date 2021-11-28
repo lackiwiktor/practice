@@ -1,20 +1,31 @@
 package country.pvp.practice.match;
 
 import com.google.inject.Inject;
+import country.pvp.practice.concurrent.TaskDispatcher;
+import country.pvp.practice.message.Messager;
+import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.time.TimeUtil;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.concurrent.TimeUnit;
 
 public class MatchPlayerListener extends PlayerListener {
 
@@ -39,7 +50,7 @@ public class MatchPlayerListener extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void entityDamage(EntityDamageByEntityEvent event) {
+    public void entityDamageByEntity(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
 
         PracticePlayer damagedPlayer = get((Player) event.getEntity());
@@ -108,10 +119,10 @@ public class MatchPlayerListener extends PlayerListener {
      */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void breakEvent(BlockBreakEvent event) {
+    public void breakBlock(BlockBreakEvent event) {
         PracticePlayer practicePlayer = get(event.getPlayer());
 
-        if(practicePlayer.isInMatch()) {
+        if (practicePlayer.isInMatch()) {
             PlayerMatchData matchData = practicePlayer.getStateData();
             Match match = matchData.getMatch();
 
@@ -123,7 +134,7 @@ public class MatchPlayerListener extends PlayerListener {
     public void placeBlock(BlockPlaceEvent event) {
         PracticePlayer practicePlayer = get(event.getPlayer());
 
-        if(practicePlayer.isInMatch()) {
+        if (practicePlayer.isInMatch()) {
             PlayerMatchData matchData = practicePlayer.getStateData();
             Match match = matchData.getMatch();
 
@@ -143,7 +154,7 @@ public class MatchPlayerListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPotionSplashEvent(PotionSplashEvent event) {
+    public void potionSplash(PotionSplashEvent event) {
         if (event.getPotion().getShooter() instanceof Player) {
             Player shooter = (Player) event.getPotion().getShooter();
             PracticePlayer player = playerManager.get(shooter);
@@ -163,8 +174,52 @@ public class MatchPlayerListener extends PlayerListener {
                     PracticePlayer affectedPlayer = playerManager.get((Player) entity);
 
                     if (!affectedPlayer.isInMatch() || !match.isInMatch(affectedPlayer))
-                        event.setIntensity((LivingEntity) entity, 0);
+                        event.setIntensity(entity, 0);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void playerConsume(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        PracticePlayer practicePlayer = get(player);
+
+        if (practicePlayer.isInMatch()) {
+            if (event.getItem().getType() == Material.POTION) {
+                TaskDispatcher.runLater(() -> player.setItemInHand(new ItemStack(Material.AIR)), 1L, TimeUnit.MILLISECONDS);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void playerInteract(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
+
+        PracticePlayer practicePlayer = get(event);
+
+        if (!practicePlayer.isInMatch()) return;
+
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+
+        if (item.getType() == Material.ENDER_PEARL) {
+            PlayerMatchData matchData = practicePlayer.getStateData();
+            Match match = matchData.getMatch();
+
+            if (match.getState() != MatchState.FIGHT) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (!matchData.hasPearlCooldownExpired()) {
+                String time = TimeUtil.millisToSeconds(matchData.getPearlCooldownRemaining());
+                Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
+                        time + (time.equalsIgnoreCase("1.0") ? "" : "s")));
+                event.setCancelled(true);
+            } else {
+                matchData.resetPearlCooldown();
             }
         }
     }

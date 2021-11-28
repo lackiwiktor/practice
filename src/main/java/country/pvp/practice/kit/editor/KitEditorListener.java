@@ -11,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.jetbrains.annotations.NotNull;
 
 public class KitEditorListener extends PlayerListener {
 
@@ -26,7 +25,7 @@ public class KitEditorListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void interactEvent( PlayerInteractEvent event) {
+    public void interactEvent(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         PracticePlayer practicePlayer = get(event);
@@ -54,10 +53,11 @@ public class KitEditorListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void dropItem( PlayerDropItemEvent event) {
+    public void dropItem(PlayerDropItemEvent event) {
         PracticePlayer practicePlayer = get(event);
-        if (!practicePlayer.isInEditor()) return;
 
-        event.getItemDrop().remove();
+        if (practicePlayer.isInEditor()) {
+            event.getItemDrop().remove();
+        }
     }
 }

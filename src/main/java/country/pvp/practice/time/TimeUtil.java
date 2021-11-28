@@ -2,6 +2,7 @@ package country.pvp.practice.time;
 
 import lombok.experimental.UtilityClass;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
@@ -24,5 +25,9 @@ public class TimeUtil {
                         - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
                 TimeUnit.MILLISECONDS.toSeconds(millis)
                         - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+    }
+
+    public static String millisToSeconds(long millis) {
+        return new DecimalFormat("#0.0").format(millis / 1000.0F);
     }
 }
