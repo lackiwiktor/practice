@@ -18,7 +18,7 @@ public class TaskDispatcher {
     private static final ExecutorService EXECUTOR_SERVICE =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
 
-    public static @NotNull Future<?> async(@NotNull Runnable runnable) {
+    public static Future<?> async( Runnable runnable) {
         return EXECUTOR_SERVICE.submit(runnable);
     }
 

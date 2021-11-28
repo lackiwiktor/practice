@@ -19,11 +19,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MatchProvider implements BladeProvider<Match> {
 
-    private final @NotNull PlayerManager playerManager;
-    private final @NotNull MatchManager matchManager;
+    private final PlayerManager playerManager;
+    private final MatchManager matchManager;
 
     @Override
-    public @Nullable Match provide(@NotNull BladeContext context, @NotNull BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+    public @Nullable Match provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
         if (input == null) return null;
 
         Optional<PracticePlayer> practicePlayerOptional = playerManager.get(input);

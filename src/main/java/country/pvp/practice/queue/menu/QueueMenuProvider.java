@@ -10,10 +10,10 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class QueueMenuProvider {
 
-    private final @NotNull QueueManager queueManager;
-    private final @NotNull MatchManager matchManager;
+    private final QueueManager queueManager;
+    private final MatchManager matchManager;
 
-    public @NotNull QueueMenu provide(boolean ranked, PracticePlayer player) {
+    public QueueMenu provide(boolean ranked, PracticePlayer player) {
         return new QueueMenu(queueManager, matchManager, ranked, player);
     }
 }

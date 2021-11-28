@@ -15,7 +15,7 @@ public class ArenaService extends MongoRepository<Arena> {
         super(database);
     }
 
-    public @NotNull Set<Arena> loadAll() {
+    public Set<Arena> loadAll() {
         Set<Arena> arenas = Sets.newHashSet();
 
         database.getCollection("arenas").find().forEach(it -> {

@@ -16,10 +16,10 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class SpectateCommand {
 
-    private final @NotNull PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
     @Command("spectate")
-    public void specate(@Sender @NotNull Player sender, @Name("player") @NotNull PracticePlayer player) {
+    public void specate(@Sender Player sender, @Name("player") PracticePlayer player) {
         PracticePlayer practicePlayer = playerManager.get(sender);
 
         if (!practicePlayer.isInLobby()) {

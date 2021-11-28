@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class KitEditorService {
 
-    private final @NotNull VisibilityUpdater visibilityUpdater;
-    private final @NotNull PracticeSettings practiceSettings;
+    private final VisibilityUpdater visibilityUpdater;
+    private final PracticeSettings practiceSettings;
 
-    public void moveToEditor(@NotNull PracticePlayer player, @NotNull Ladder ladder) {
+    public void moveToEditor( PracticePlayer player, Ladder ladder) {
         player.setState(PlayerState.EDITING_KIT, new PlayerEditingData(ladder));
         PlayerUtil.resetPlayer(player.getPlayer());
         visibilityUpdater.update(player);

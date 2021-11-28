@@ -13,22 +13,21 @@ import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
-import country.pvp.practice.team.SoloTeam;
+import country.pvp.practice.match.team.SoloTeam;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
 
 @Data
 public class Queue {
 
     private final java.util.Queue<PlayerQueueData> entries = new NonDuplicatePriorityQueue<>();
 
-    private final @NotNull Ladder ladder;
+    private final Ladder ladder;
     private final boolean ranked;
-    private final @NotNull ItemBarManager itemBarManager;
-    private final @NotNull ArenaManager arenaManager;
-    private final @NotNull MatchProvider matchProvider;
+    private final ItemBarManager itemBarManager;
+    private final ArenaManager arenaManager;
+    private final MatchProvider matchProvider;
 
-    public void addPlayer(@NotNull PracticePlayer player) {
+    public void addPlayer( PracticePlayer player) {
         PlayerQueueData entry = new PlayerQueueData(player, this);
         entries.add(entry);
         player.setState(PlayerState.QUEUING, entry);
@@ -38,7 +37,7 @@ public class Queue {
                 new MessagePattern("{ranked}", ranked ? "&branked" : "&dunranked")));
     }
 
-    public void removePlayer(@NotNull PracticePlayer player, boolean leftQueue) {
+    public void removePlayer( PracticePlayer player, boolean leftQueue) {
         player.removeStateData();
 
         if (leftQueue) {
@@ -73,7 +72,7 @@ public class Queue {
         return entries.size();
     }
 
-    private @NotNull Match createMatch(@NotNull PlayerQueueData queueData1, @NotNull PlayerQueueData queueData2, Arena arena) {
+    private Match createMatch( PlayerQueueData queueData1, PlayerQueueData queueData2, Arena arena) {
         return matchProvider.provide(ladder, arena, ranked, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
 }

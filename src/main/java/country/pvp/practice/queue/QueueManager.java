@@ -18,11 +18,11 @@ public class QueueManager {
 
     private final Map<Boolean, List<Queue>> queues = Maps.newHashMap();
 
-    private final @NotNull ItemBarManager itemBarManager;
-    private final @NotNull ArenaManager arenaManager;
-    private final @NotNull MatchProvider matchProvider;
+    private final ItemBarManager itemBarManager;
+    private final ArenaManager arenaManager;
+    private final MatchProvider matchProvider;
 
-    public void initQueue(@NotNull Ladder ladder) {
+    public void initQueue( Ladder ladder) {
         queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(ladder, false, itemBarManager, arenaManager, matchProvider));
         if (ladder.isRanked())
             queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(ladder, true, itemBarManager, arenaManager, matchProvider));

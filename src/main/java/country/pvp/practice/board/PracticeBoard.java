@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class PracticeBoard extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onJoin(@NotNull PlayerJoinEvent event) {
+    public void onJoin( PlayerJoinEvent event) {
         Player player = event.getPlayer();
         FastBoard board = new FastBoard(player);
         board.updateTitle(TITLE);
@@ -39,7 +38,7 @@ public class PracticeBoard extends PlayerListener {
     }
 
     @EventHandler
-    public void onQuit(@NotNull PlayerQuitEvent event) {
+    public void onQuit( PlayerQuitEvent event) {
         PracticePlayer practicePlayer = get(event);
         FastBoard board = this.boards.remove(practicePlayer);
         if (board != null) {
@@ -53,7 +52,7 @@ public class PracticeBoard extends PlayerListener {
         }
     }
 
-    private void updateBoard(@NotNull PracticePlayer player, @NotNull FastBoard board) {
+    private void updateBoard( PracticePlayer player, FastBoard board) {
         board.updateLines(provider.provide(player));
     }
 }

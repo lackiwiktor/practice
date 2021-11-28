@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class KitChooseProvider {
 
-    private final @NotNull LadderManager ladderManager;
-    private final @NotNull PlayerService playerService;
-    private final @NotNull KitEditorService kitEditorService;
+    private final LadderManager ladderManager;
+    private final PlayerService playerService;
+    private final KitEditorService kitEditorService;
 
-    public @NotNull KitChooseMenu provide(PracticePlayer player) {
+    public KitChooseMenu provide(PracticePlayer player) {
         return new KitChooseMenu(ladderManager, kitEditorService, player);
     }
 }

@@ -1,4 +1,4 @@
-package country.pvp.practice.team;
+package country.pvp.practice.match.team;
 
 import com.mongodb.assertions.Assertions;
 import country.pvp.practice.ladder.Ladder;
@@ -9,7 +9,6 @@ import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public abstract class Team implements Recipient {
         return getPlayers().size();
     }
 
-    public PlayerMatchData getMatchData(@NotNull PracticePlayer player) {
+    public PlayerMatchData getMatchData( PracticePlayer player) {
         return player.getStateData();
     }
 
@@ -40,7 +39,7 @@ public abstract class Team implements Recipient {
         }
     }
 
-    public void giveKits(@NotNull Ladder ladder) {
+    public void giveKits( Ladder ladder) {
         for (PracticePlayer player : getOnlinePlayers()) {
             player.giveKits(ladder);
         }
@@ -65,13 +64,13 @@ public abstract class Team implements Recipient {
         }
     }
 
-    public boolean isAlive(@NotNull PracticePlayer player) {
+    public boolean isAlive( PracticePlayer player) {
         PlayerMatchData matchData = getMatchData(player);
 
         return !matchData.isDead();
     }
 
-    public boolean hasDisconnected(@NotNull PracticePlayer player) {
+    public boolean hasDisconnected( PracticePlayer player) {
         PlayerMatchData matchData = getMatchData(player);
 
         Assertions.assertFalse(matchData == null);

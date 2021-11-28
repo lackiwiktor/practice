@@ -10,8 +10,8 @@ import java.util.function.BiConsumer;
 @RequiredArgsConstructor
 public class ItemBarItem {
 
-  private final @NotNull ItemStack item;
-  private final @NotNull BiConsumer<PracticePlayer, BarInteract> click;
+  private final ItemStack item;
+  private final BiConsumer<PracticePlayer, BarInteract> click;
 
   public void click(PracticePlayer player, BarInteract interact) {
     click.accept(player, interact);

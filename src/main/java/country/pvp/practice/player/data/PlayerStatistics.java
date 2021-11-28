@@ -12,7 +12,7 @@ public class PlayerStatistics implements SerializableObject {
 
     private final Map<String, Integer> ratings = Maps.newHashMap();
 
-    public int getElo(@NotNull Ladder ladder) {
+    public int getElo( Ladder ladder) {
         return ratings.getOrDefault(ladder.getName(), 1000);
     }
 
@@ -21,19 +21,19 @@ public class PlayerStatistics implements SerializableObject {
         ratings.put(ladder, rank);
     }
 
-    public void setElo(@NotNull Ladder ladder, int rank) {
+    public void setElo( Ladder ladder, int rank) {
         setElo(ladder.getName(), rank);
     }
 
     @Override
-    public @NotNull Document getDocument() {
+    public Document getDocument() {
         Document document = new Document();
         document.putAll(ratings);
         return document;
     }
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument( Document document) {
         for (Map.Entry<String, Object> entry : document.entrySet()) {
             setElo(entry.getKey(), (Integer) entry.getValue());
         }

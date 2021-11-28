@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class MenuListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onButtonPress(@NotNull InventoryClickEvent event) {
+    public void onButtonPress( InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
 
@@ -42,7 +42,7 @@ public class MenuListener implements Listener {
                     if (newMenu == openMenu) {
                         boolean buttonUpdate = button.shouldUpdate(player, event.getClick());
 
-                        if ((newMenu.isUpdateAfterClick() && buttonUpdate) || buttonUpdate) {
+                        if (buttonUpdate) {
                             openMenu.setClosedByMenu(true);
                             newMenu.openMenu(player);
                         }
@@ -68,7 +68,7 @@ public class MenuListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onInventoryClose(@NotNull InventoryCloseEvent event) {
+    public void onInventoryClose( InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         Menu openMenu = Menu.currentlyOpenedMenus.get(player.getName());
 

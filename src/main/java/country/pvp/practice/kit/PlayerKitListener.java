@@ -3,6 +3,8 @@ package country.pvp.practice.kit;
 import com.google.inject.Inject;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.message.Messager;
+import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
@@ -14,7 +16,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 
 public class PlayerKitListener extends PlayerListener {
@@ -25,7 +26,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler
-    public void clickEvent(@NotNull PlayerInteractEvent event) {
+    public void clickEvent(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
 
@@ -37,11 +38,14 @@ public class PlayerKitListener extends PlayerListener {
 
         PlayerMatchData matchData = practicePlayer.getStateData();
         Match match = matchData.getMatch();
-        practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> it.apply(practicePlayer));
+        practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> {
+            Messager.message(practicePlayer, Messages.MATCH_PLAYER_EQUIP_KIT.match("{kit}", it.getName()));
+            it.apply(practicePlayer);
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void dropItem(@NotNull PlayerDropItemEvent event) {
+    public void dropItem(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
         PracticePlayer practicePlayer = get(event);
         if (!practicePlayer.isInMatch()) return;
@@ -52,7 +56,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void clickEvent(@NotNull InventoryClickEvent event) {
+    public void clickEvent(InventoryClickEvent event) {
         ItemStack item = event.getCurrentItem();
         if (item == null) return;
         PracticePlayer practicePlayer = get((Player) event.getWhoClicked());
@@ -64,7 +68,7 @@ public class PlayerKitListener extends PlayerListener {
     }
 
     @EventHandler
-    public void deathEvent(@NotNull PlayerDeathEvent event) {
+    public void deathEvent(PlayerDeathEvent event) {
         PracticePlayer practicePlayer = get(event.getEntity());
         if (!practicePlayer.isInMatch()) return;
 

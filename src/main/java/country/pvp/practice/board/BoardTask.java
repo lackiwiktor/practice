@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class BoardTask implements Runnable {
 
-    private final @NotNull PracticeBoard board;
+    private final PracticeBoard board;
 
     @Override
     public void run() {

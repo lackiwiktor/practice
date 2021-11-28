@@ -10,7 +10,6 @@ import country.pvp.practice.queue.PlayerQueueData;
 import country.pvp.practice.queue.Queue;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class ItemBarManager {
                         ((player, interact) -> {
                             PlayerSpectatingData spectatingData = player.getStateData();
                             Match match = spectatingData.getMatch();
-                            match.stopSpectating(player);
+                            match.stopSpectating(player, true);
                         }))));
     }
 
@@ -67,7 +66,7 @@ public class ItemBarManager {
         return itemBars.get(type);
     }
 
-    public void apply(ItemBarType type, @NotNull PracticePlayer player) {
+    public void apply(ItemBarType type, PracticePlayer player) {
         PlayerUtil.resetPlayer(player.getPlayer());
         get(type).apply(player);
     }

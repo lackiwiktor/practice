@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import lombok.experimental.UtilityClass;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
@@ -47,7 +46,7 @@ public class PotionEffectAdapter {
     return (new PotionEffect(effectType, duration, amplifier, ambient));
   }
 
-  public static @Nullable PotionEffect fromJson(@NotNull String json) {
+  public static @Nullable PotionEffect fromJson( String json) {
     JsonElement jsonElement = new JsonParser().parse(json);
     return fromJson(jsonElement);
   }

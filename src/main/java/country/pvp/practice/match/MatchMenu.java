@@ -19,15 +19,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MatchMenu extends Menu {
 
-    private final @NotNull MatchManager matchManager;
+    private final MatchManager matchManager;
 
     @Override
-    public @NotNull String getTitle(Player player) {
+    public String getTitle(Player player) {
         return "Match List";
     }
 
     @Override
-    public @NotNull Map<Integer, Button> getButtons(Player player) {
+    public Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Match match : matchManager.getAll()) {
@@ -40,7 +40,7 @@ public class MatchMenu extends Menu {
     @RequiredArgsConstructor
     static class MatchOverviewButton extends Button {
 
-        private final @NotNull Match match;
+        private final Match match;
 
         @Override
         public ItemStack getButtonItem(Player player) {
@@ -62,7 +62,7 @@ public class MatchMenu extends Menu {
                     .build();
         }
 
-        private String formatLore(@NotNull PracticePlayer player) {
+        private String formatLore( PracticePlayer player) {
             String lore;
             if (match.isAlive(player)) {
                 lore = ChatColor.WHITE.toString()

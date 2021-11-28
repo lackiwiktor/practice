@@ -14,8 +14,8 @@ import java.util.Objects;
 @Data
 public class PlayerQueueData implements Comparable<PlayerQueueData>, PlayerData, Recipient {
 
-    private final @NotNull PracticePlayer player;
-    private final @NotNull Queue queue;
+    private final PracticePlayer player;
+    private final Queue queue;
     private final long joinTimeStamp = System.currentTimeMillis();
 
     private int getPlayerRank() {
@@ -39,7 +39,7 @@ public class PlayerQueueData implements Comparable<PlayerQueueData>, PlayerData,
     }
 
     @Override
-    public int compareTo(@NotNull PlayerQueueData queueData) {
+    public int compareTo( PlayerQueueData queueData) {
         if (queue.isRanked()) return getPlayerRank() - queueData.getPlayerRank();
         return (int) (joinTimeStamp - queueData.joinTimeStamp);
     }

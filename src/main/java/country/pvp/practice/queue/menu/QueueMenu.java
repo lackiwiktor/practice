@@ -16,19 +16,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class QueueMenu extends Menu {
 
-    private final @NotNull QueueManager queueManager;
-    private final @NotNull MatchManager matchManager;
+    private final QueueManager queueManager;
+    private final MatchManager matchManager;
 
     private final boolean ranked;
-    private final @NotNull PracticePlayer practicePlayer;
+    private final PracticePlayer practicePlayer;
 
     @Override
-    public @NotNull String getTitle(Player player) {
+    public String getTitle(Player player) {
         return "Select kit...";
     }
 
     @Override
-    public @NotNull Map<Integer, Button> getButtons(Player player) {
+    public Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Queue queue : queueManager.getQueues(ranked)) {

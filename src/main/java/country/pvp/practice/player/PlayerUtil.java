@@ -3,21 +3,24 @@ package country.pvp.practice.player;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 public class PlayerUtil {
 
-    public static void resetPlayer(@NotNull Player player) {
+    public static void resetPlayer( Player player) {
         player.getOpenInventory().close();
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(new ItemStack[]{null, null, null, null});
-        player.setHealth(20);
-        player.setGameMode(GameMode.SURVIVAL);
+        player.getInventory().setArmorContents(new ItemStack[4]);
+        player.getInventory().setContents(new ItemStack[36]);
+        player.setHealth(20.0D);
+        player.setSaturation(20.0F);
+        player.setFallDistance(0.0F);
         player.setFoodLevel(20);
-        player.setFireTicks(1);
-        player.setFallDistance(0F);
-        player.setExhaustion(0F);
-        player.setSaturation(12F);
+        player.setFireTicks(0);
+        player.setMaximumNoDamageTicks(20);
+        player.setExp(0.0F);
+        player.setLevel(0);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+        player.setGameMode(GameMode.SURVIVAL);
         player.getInventory().setHeldItemSlot(0);
         player.getActivePotionEffects().forEach(it -> player.removePotionEffect(it.getType()));
     }

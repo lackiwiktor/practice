@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class QueueTask implements Runnable {
 
-    private final @NotNull QueueManager queueManager;
+    private final QueueManager queueManager;
 
     @Override
     public void run() {

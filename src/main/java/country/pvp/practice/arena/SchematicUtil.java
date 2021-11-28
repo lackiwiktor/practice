@@ -8,7 +8,6 @@ import com.sk89q.worldedit.schematic.SchematicFormat;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
@@ -17,7 +16,7 @@ public class SchematicUtil {
 
     @SneakyThrows
     @SuppressWarnings("deprecation")
-    public static boolean pasteSchematic(File file, @NotNull Location location) {
+    public static boolean pasteSchematic(File file, Location location) {
         SchematicFormat format = SchematicFormat.MCEDIT;
         CuboidClipboard clipboard = format.load(file);
         Vector pastePos = new Vector(location.getBlockX(), location.getBlockY(), location.getBlockZ());

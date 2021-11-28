@@ -12,12 +12,12 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class PracticeSettingsCommand {
 
-    private final @NotNull PracticeSettings practiceSettings;
-    private final @NotNull PracticeSettingsService practiceSettingsService;
+    private final PracticeSettings practiceSettings;
+    private final PracticeSettingsService practiceSettingsService;
 
     @Command(value = "setspawn", description = "Sets the spawn location")
     @Permission("practice.admin")
-    public void setSpawn(@Sender @NotNull Player sender) {
+    public void setSpawn(@Sender Player sender) {
         practiceSettings.setSpawnLocation(sender.getLocation());
         practiceSettingsService.saveAsync(practiceSettings);
         Messager.messageSuccess(sender, "Successfully set the spawn location.");
@@ -25,7 +25,7 @@ public class PracticeSettingsCommand {
 
     @Command(value = "seteditor", description = "Sets the editor location")
     @Permission("practice.admin")
-    public void setEditor(@Sender @NotNull Player sender) {
+    public void setEditor(@Sender Player sender) {
         practiceSettings.setEditorLocation(sender.getLocation());
         practiceSettingsService.saveAsync(practiceSettings);
         Messager.messageSuccess(sender, "Successfully set the editor location.");

@@ -8,7 +8,6 @@ import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -18,41 +17,44 @@ import java.util.stream.Collectors;
 @Data
 public class Ladder implements DataObject {
 
-    private final @NotNull String name;
+    private final String name;
     private String displayName;
     private ItemStack icon;
-    private @NotNull Kit kit = new Kit();
+    private Kit kit = new Kit();
     private ItemStack[] editorItems;
     private boolean ranked;
+    private boolean build;
 
     @Override
-    public @NotNull Document getDocument() {
+    public Document getDocument() {
         Document document = new Document("_id", getId());
         document.put("displayName", displayName);
         document.put("icon", ItemStackAdapter.toJson(icon));
         document.put("kit", kit.getDocument());
         document.put("ranked", ranked);
+        document.put("build", build);
         document.put("editorItems", Arrays.stream(editorItems).map(ItemStackAdapter::toJson).collect(Collectors.toList()));
         return document;
     }
 
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument(Document document) {
         displayName = document.getString("displayName");
         icon = ItemStackAdapter.fromJson(document.getString("icon"));
         kit.applyDocument(document.get("kit", Document.class));
         ranked = document.getBoolean("ranked");
+        build = document.getBoolean("build");
         editorItems = (ItemStack[]) document.get("editorItems", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
     }
 
     @Override
-    public @NotNull String getCollection() {
+    public String getCollection() {
         return "ladders";
     }
 
     @Override
-    public @NotNull String getId() {
+    public String getId() {
         return name;
     }
 
@@ -74,7 +76,7 @@ public class Ladder implements DataObject {
         kit.setArmor(armor);
     }
 
-    public ItemStack @NotNull [] getEditorItems() {
+    public ItemStack[] getEditorItems() {
         return editorItems == null ? new ItemStack[0] : Arrays.stream(editorItems).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 

@@ -6,10 +6,10 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public class MessagePattern {
 
-    private final @NotNull String placeholder;
-    private final @NotNull Object value;
+    private final String placeholder;
+    private final Object value;
 
-    public @NotNull String translate(@NotNull String message) {
+    public String translate( String message) {
         return message.replace(placeholder, value.toString());
     }
 }

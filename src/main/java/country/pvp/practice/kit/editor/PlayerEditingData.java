@@ -7,5 +7,5 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 class PlayerEditingData implements PlayerData {
-    private final @NotNull Ladder ladder;
+    private final Ladder ladder;
 }

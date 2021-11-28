@@ -16,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ItemBarListener implements Listener {
 
-    private final @NotNull PlayerManager playerManager;
-    private final @NotNull ItemBarManager itemBarManager;
+    private final PlayerManager playerManager;
+    private final ItemBarManager itemBarManager;
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void clickEvent(@NotNull PlayerInteractEvent event) {
+    public void clickEvent( PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
 

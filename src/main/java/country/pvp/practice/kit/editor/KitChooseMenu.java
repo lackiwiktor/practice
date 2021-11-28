@@ -17,18 +17,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KitChooseMenu extends Menu {
 
-    private final @NotNull LadderManager ladderManager;
-    private final @NotNull KitEditorService kitEditorService;
+    private final LadderManager ladderManager;
+    private final KitEditorService kitEditorService;
 
-    private final @NotNull PracticePlayer practicePlayer;
+    private final PracticePlayer practicePlayer;
 
     @Override
-    public @NotNull String getTitle(Player player) {
+    public String getTitle(Player player) {
         return "Choose kit";
     }
 
     @Override
-    public @NotNull Map<Integer, Button> getButtons(Player player) {
+    public Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Ladder ladder : ladderManager.getAll()) {
@@ -41,10 +41,10 @@ public class KitChooseMenu extends Menu {
     @RequiredArgsConstructor
     public static class KitChoiceButton extends Button {
 
-        private final @NotNull KitEditorService kitEditorService;
+        private final KitEditorService kitEditorService;
 
-        private final @NotNull PracticePlayer practicePlayer;
-        private final @NotNull Ladder ladder;
+        private final PracticePlayer practicePlayer;
+        private final Ladder ladder;
 
         @Override
         public ItemStack getButtonItem(Player player) {
@@ -52,7 +52,7 @@ public class KitChooseMenu extends Menu {
         }
 
         @Override
-        public void clicked(Player player, @NotNull ClickType clickType) {
+        public void clicked(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 kitEditorService.moveToEditor(practicePlayer, ladder);
             }

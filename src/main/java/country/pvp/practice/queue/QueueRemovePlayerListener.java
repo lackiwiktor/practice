@@ -16,7 +16,7 @@ public class QueueRemovePlayerListener extends PlayerListener {
     }
 
     @EventHandler
-    public void quitEvent(@NotNull PlayerQuitEvent event) {
+    public void quitEvent( PlayerQuitEvent event) {
         PracticePlayer practicePlayer = get(event);
 
         if (!practicePlayer.isInQueue()) return;

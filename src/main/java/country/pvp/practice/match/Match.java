@@ -1,10 +1,14 @@
 package country.pvp.practice.match;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import country.pvp.practice.message.Bars;
+import country.pvp.practice.message.component.ChatComponentBuilder;
+import country.pvp.practice.message.component.ChatHelper;
 import country.pvp.practice.PracticePlugin;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.concurrent.TaskDispatcher;
-import country.pvp.practice.elo.EloUtil;
+import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.ladder.Ladder;
@@ -16,42 +20,43 @@ import country.pvp.practice.message.Recipient;
 import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
-import country.pvp.practice.team.Team;
+import country.pvp.practice.match.snapshot.InventorySnapshotManager;
+import country.pvp.practice.match.snapshot.InventorySnapshot;
+import country.pvp.practice.match.team.Team;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 public class Match implements Recipient {
 
-    private final @NotNull VisibilityUpdater visibilityUpdater;
-    private final @NotNull LobbyService lobbyService;
-    private final @NotNull MatchManager matchManager;
-    private final @NotNull ItemBarManager itemBarManager;
+    private final VisibilityUpdater visibilityUpdater;
+    private final LobbyService lobbyService;
+    private final MatchManager matchManager;
+    private final ItemBarManager itemBarManager;
+    private final InventorySnapshotManager snapshotManager;
 
     private final UUID id = UUID.randomUUID(); //match-id
-    private final @NotNull Ladder ladder;
-    private final @NotNull Arena arena;
-    private final @NotNull Team teamA;
-    private final @NotNull Team teamB;
+    private final Ladder ladder;
+    private final Arena arena;
+    private final Team teamA;
+    private final Team teamB;
     private final boolean ranked;
     private final Set<PracticePlayer> spectators = Sets.newHashSet();
+    private final Map<PracticePlayer, InventorySnapshot> snapshots = Maps.newHashMap();
 
     private @Nullable Team winner;
 
-    private @NotNull MatchState state = MatchState.COUNTDOWN;
+    private MatchState state = MatchState.COUNTDOWN;
     private BukkitRunnable countDownRunnable;
 
     public void start() {
@@ -66,7 +71,7 @@ public class Match implements Recipient {
         startCountDown();
     }
 
-    void prepareTeam(@NotNull Team team, Location spawnLocation) {
+    void prepareTeam(Team team, Location spawnLocation) {
         team.setMatchData(this);
         team.setPlayersState(PlayerState.IN_MATCH);
         team.teleport(spawnLocation);
@@ -75,8 +80,8 @@ public class Match implements Recipient {
     }
 
     void updateVisibility() {
-        for (PracticePlayer playerA : teamA.getOnlinePlayers()) {
-            for (PracticePlayer playerB : teamB.getOnlinePlayers()) {
+        for (PracticePlayer playerA : getAllOnlinePlayers()) {
+            for (PracticePlayer playerB : getAllOnlinePlayers()) {
                 visibilityUpdater.update(playerA, playerB);
                 visibilityUpdater.update(playerB, playerA);
             }
@@ -103,15 +108,15 @@ public class Match implements Recipient {
         Messager.message(this, message);
     }
 
-    void broadcast(@NotNull Messages message) {
+    void broadcast(Messages message) {
         Messager.message(this, message);
     }
 
-    void broadcast(Team team, @NotNull Messages message) {
+    void broadcast(Team team, Messages message) {
         Messager.message(team, message);
     }
 
-    void broadcast(@NotNull Team team, String message) {
+    void broadcast(Team team, String message) {
         Messager.message(team, message);
     }
 
@@ -120,15 +125,15 @@ public class Match implements Recipient {
         countDownRunnable.cancel();
     }
 
-    public @NotNull Team getOpponent(@NotNull Team team) {
+    public Team getOpponent(Team team) {
         return team.equals(teamA) ? teamB : teamA;
     }
 
-    public @NotNull Team getOpponent(PracticePlayer player) {
+    public Team getOpponent(PracticePlayer player) {
         return teamA.hasPlayer(player) ? teamB : teamA;
     }
 
-    public @NotNull Team getTeam(PracticePlayer player) {
+    public Team getTeam(PracticePlayer player) {
         return teamA.hasPlayer(player) ? teamA : teamB;
     }
 
@@ -136,11 +141,12 @@ public class Match implements Recipient {
         return teamA.hasPlayer(player) || teamB.hasPlayer(player);
     }
 
-    public boolean isAlive(@NotNull PracticePlayer player) {
+    public boolean isAlive(PracticePlayer player) {
         return getTeam(player).isAlive(player);
     }
 
-    public void handleDeath(@NotNull PracticePlayer player) {
+    public void handleDeath(PracticePlayer player) {
+        createInventorySnapshot(player);
         PlayerMatchData matchData = player.getStateData();
         matchData.setDead(true);
 
@@ -170,7 +176,7 @@ public class Match implements Recipient {
         handleRespawn(player);
     }
 
-    void handleRespawn(@NotNull PracticePlayer player) {
+    void handleRespawn(PracticePlayer player) {
         Team team = getTeam(player);
 
         if (team.isDead()) {
@@ -181,7 +187,8 @@ public class Match implements Recipient {
         setupSpectator(player);
     }
 
-    public void handleDisconnect(@NotNull PracticePlayer player) {
+    public void handleDisconnect(PracticePlayer player) {
+        createInventorySnapshot(player);
         broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
         broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
 
@@ -192,12 +199,12 @@ public class Match implements Recipient {
 
         Team team = getTeam(player);
 
-        if (team.isDead()) {
+        if (team.isDead() && state != MatchState.END) {
             end(getOpponent(team));
         }
     }
 
-    void setupSpectator(@NotNull PracticePlayer player) {
+    void setupSpectator(PracticePlayer player) {
         player.enableFlying();
     }
 
@@ -206,34 +213,41 @@ public class Match implements Recipient {
         this.winner = winner;
         cancelCountDown();
 
-        if (winner != null) {
-            broadcast(winner, Messages.MATCH_WON);
-            broadcast(getOpponent(winner), Messages.MATCH_LOST);
+        for (PracticePlayer player : getAllAlivePlayers()) {
+            createInventorySnapshot(player);
+        }
 
+        if (winner != null) {
             Team loser = getOpponent(winner);
 
-            if(ranked) {
+            if (ranked) {
                 int winnerNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), true);
-                int loserNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), false);
+                int loserNewRating = EloUtil.getNewRating(loser.getElo(ladder), winner.getElo(ladder), false);
 
                 loser.setElo(ladder, loserNewRating);
                 winner.setElo(ladder, winnerNewRating);
             }
+
+            BaseComponent[] components = createFinalComponent(winner, loser);
+
+            for (PracticePlayer player : getAllOnlinePlayers()) {
+                player.sendComponent(components);
+            }
         }
 
         Runnable runnable = () -> {
-            for (PracticePlayer player : teamA.getOnlinePlayers()) {
+            for (PracticePlayer player : getAllOnlinePlayers()) {
                 lobbyService.moveToLobby(player);
             }
 
-            for (PracticePlayer player : teamB.getOnlinePlayers()) {
-                lobbyService.moveToLobby(player);
+            for (PracticePlayer spectator : spectators) {
+                stopSpectating(spectator, false);
             }
 
             matchManager.remove(this);
         };
 
-        TaskDispatcher.runLater(runnable, 3L, TimeUnit.SECONDS);
+        TaskDispatcher.runLater(runnable, 5L, TimeUnit.SECONDS);
     }
 
     public void cancel(String reason) {
@@ -241,15 +255,15 @@ public class Match implements Recipient {
         end(null);
     }
 
-    public @NotNull String getFormattedDisplayName(@NotNull PracticePlayer player, @NotNull Team team) {
+    public String getFormattedDisplayName(PracticePlayer player, Team team) {
         return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
     }
 
-    public @NotNull String getFormattedDisplayName(@NotNull PracticePlayer player, PracticePlayer other) {
+    public String getFormattedDisplayName(PracticePlayer player, PracticePlayer other) {
         return getFormattedDisplayName(player, getTeam(other));
     }
 
-    public void startSpectating(@NotNull PracticePlayer spectator, @NotNull PracticePlayer player) {
+    public void startSpectating(PracticePlayer spectator, PracticePlayer player) {
         spectators.add(spectator);
         itemBarManager.apply(ItemBarType.SPECTATOR, spectator);
         broadcast(Messages.MATCH_PLAYER_STARTED_SPECTATING.match("{player}", spectator.getName()));
@@ -257,19 +271,27 @@ public class Match implements Recipient {
         setupSpectator(spectator);
         spectator.setState(PlayerState.SPECTATING, new PlayerSpectatingData(this));
 
-        for (PracticePlayer playerA : teamA.getOnlinePlayers()) {
-            visibilityUpdater.update(spectator, playerA);
-            visibilityUpdater.update(playerA, spectator);
-        }
-
-        for (PracticePlayer playerB : teamB.getOnlinePlayers()) {
-            visibilityUpdater.update(spectator, playerB);
-            visibilityUpdater.update(playerB, spectator);
+        for (PracticePlayer matchPlayer : getAllOnlinePlayers()) {
+            visibilityUpdater.update(spectator, matchPlayer);
+            visibilityUpdater.update(matchPlayer, spectator);
         }
     }
 
-    public void stopSpectating(@NotNull PracticePlayer spectator) {
-        broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
+    void createInventorySnapshot(PracticePlayer player) {
+        InventorySnapshot snapshot = InventorySnapshot.create(player);
+
+        Team team = getTeam(player);
+        if (team.size() == 1) {
+            Team opponent = getOpponent(team);
+            PracticePlayer opponentPlayer = opponent.getPlayers().stream().findAny().orElse(null);
+            snapshot.setOpponent(opponentPlayer == null ? null : opponentPlayer.getUuid());
+        }
+
+        snapshotManager.add(snapshot);
+    }
+
+    public void stopSpectating(PracticePlayer spectator, boolean broadcast) {
+        if (broadcast) broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
         spectators.remove(spectator);
         lobbyService.moveToLobby(spectator);
     }
@@ -296,6 +318,24 @@ public class Match implements Recipient {
         return Optional.ofNullable(winner);
     }
 
+    public Set<PracticePlayer> getAllOnlinePlayers() {
+        Set<PracticePlayer> players = new HashSet<>(teamA.getOnlinePlayers());
+        players.addAll(teamB.getOnlinePlayers());
+        return players;
+    }
+
+    public Set<PracticePlayer> getAllAlivePlayers() {
+        Set<PracticePlayer> players = new HashSet<>(teamA.getAlivePlayers());
+        players.addAll(teamB.getAlivePlayers());
+        return players;
+    }
+
+    public Set<PracticePlayer> getAllPlayers() {
+        Set<PracticePlayer> players = new HashSet<>(teamA.getPlayers());
+        players.addAll(teamB.getPlayers());
+        return players;
+    }
+
     @Override
     public boolean equals(@Nullable Object o) {
         if (this == o) return true;
@@ -307,5 +347,46 @@ public class Match implements Recipient {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public BaseComponent[] createFinalComponent(Team winner, Team loser) {
+        BaseComponent[] winnerComponent = createComponent(winner, true);
+        BaseComponent[] loserComponent = createComponent(loser, false);
+
+        ChatComponentBuilder builder = new ChatComponentBuilder("");
+        builder.append(Bars.CHAT_BAR);
+        builder.append("\n");
+        builder.append(ChatColor.GOLD.toString().concat("Post-Match Inventories ").concat(ChatColor.GRAY.toString()).concat("(click name to view)"));
+        builder.append("\n");
+        builder.append(winnerComponent);
+        builder.append(ChatColor.GRAY + " - ");
+        builder.append(loserComponent);
+        builder.append("\n");
+        builder.append(Bars.CHAT_BAR);
+
+        return builder.create();
+    }
+
+    public BaseComponent[] createComponent(Team team, boolean winner) {
+        ChatComponentBuilder builder = new ChatComponentBuilder(winner ? ChatColor.GREEN + "Winner: " : ChatColor.RED + "Loser: ");
+
+        for (PracticePlayer player : team.getPlayers()) {
+            builder.append(createComponent(player));
+        }
+
+        return builder.create();
+    }
+
+    public BaseComponent[] createComponent(PracticePlayer player) {
+        return new ChatComponentBuilder(ChatColor.YELLOW + player.getName())
+                .attachToEachPart(
+                        ChatHelper.hover(ChatColor.GREEN.toString().concat("Click to view inventory of ").concat(ChatColor.GOLD.toString()).concat(player.getName())))
+                .attachToEachPart(
+                        ChatHelper.click("/viewinv ".concat(player.getUuid().toString())))
+                .create();
+    }
+
+    public boolean isBuild() {
+        return ladder.isBuild();
     }
 }

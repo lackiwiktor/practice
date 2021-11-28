@@ -6,5 +6,5 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 public class PlayerSpectatingData implements PlayerData {
-    private final @NotNull Match match;
+    private final Match match;
 }

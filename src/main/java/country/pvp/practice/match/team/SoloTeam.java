@@ -1,9 +1,8 @@
-package country.pvp.practice.team;
+package country.pvp.practice.match.team;
 
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -13,10 +12,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SoloTeam extends Team {
 
-    private final @NotNull PracticePlayer player;
+    private final PracticePlayer player;
 
     @Override
-    public @NotNull Set<PracticePlayer> getPlayers() {
+    public Set<PracticePlayer> getPlayers() {
         return Collections.singleton(player);
     }
 

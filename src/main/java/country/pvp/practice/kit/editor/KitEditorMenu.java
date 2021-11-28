@@ -20,18 +20,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 class KitEditorMenu extends Menu {
 
-    private final @NotNull PlayerService playerService;
+    private final PlayerService playerService;
 
-    private final @NotNull PracticePlayer practicePlayer;
-    private final @NotNull Ladder ladder;
+    private final PracticePlayer practicePlayer;
+    private final Ladder ladder;
 
     @Override
-    public @NotNull String getTitle(Player player) {
+    public String getTitle(Player player) {
         return "Kit editor";
     }
 
     @Override
-    public @NotNull Map<Integer, Button> getButtons(Player player) {
+    public Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (int i = 0; i < 7; i++) {
@@ -75,7 +75,7 @@ class KitEditorMenu extends Menu {
         }
 
         @Override
-        public boolean shouldUpdate(@NotNull Player player, @NotNull ClickType clickType) {
+        public boolean shouldUpdate( Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 NamedKit newKit = practicePlayer.getKit(ladder, index);
 
@@ -117,7 +117,7 @@ class KitEditorMenu extends Menu {
         }
 
         @Override
-        public void clicked(@NotNull Player player, @NotNull ClickType clickType) {
+        public void clicked( Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 NamedKit kit = practicePlayer.getKit(ladder, index);
                 kit.apply(practicePlayer);
@@ -146,7 +146,7 @@ class KitEditorMenu extends Menu {
         }
 
         @Override
-        public boolean shouldUpdate(Player player, @NotNull ClickType clickType) {
+        public boolean shouldUpdate(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 practicePlayer.removeKit(ladder, index);
                 return true;

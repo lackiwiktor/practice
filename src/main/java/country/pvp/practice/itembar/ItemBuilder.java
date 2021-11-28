@@ -16,7 +16,7 @@ public class ItemBuilder {
 
   private final ItemStack is;
 
-  public ItemBuilder(@NotNull Material mat) {
+  public ItemBuilder( Material mat) {
     is = new ItemStack(mat);
   }
 
@@ -28,19 +28,19 @@ public class ItemBuilder {
     }
   }
 
-  public @NotNull ItemBuilder amount(int amount) {
+  public ItemBuilder amount(int amount) {
     is.setAmount(amount);
     return this;
   }
 
-  public @NotNull ItemBuilder name(@NotNull String name) {
+  public ItemBuilder name( String name) {
     ItemMeta meta = is.getItemMeta();
     meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
     is.setItemMeta(meta);
     return this;
   }
 
-  public @NotNull ItemBuilder lore(@NotNull String name) {
+  public ItemBuilder lore( String name) {
     ItemMeta meta = is.getItemMeta();
     List<String> lore = meta.getLore();
 
@@ -56,7 +56,7 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder unbreakable() {
+  public ItemBuilder unbreakable() {
     ItemMeta meta = is.getItemMeta();
     meta.spigot().setUnbreakable(true);
     is.setItemMeta(meta);
@@ -64,7 +64,7 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder lore(String @NotNull ... lore) {
+  public ItemBuilder lore(String ... lore) {
     ItemMeta meta = is.getItemMeta();
     List<String> toSet = meta.getLore();
 
@@ -82,7 +82,7 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder lore(@NotNull List<String> lore) {
+  public ItemBuilder lore( List<String> lore) {
     ItemMeta meta = is.getItemMeta();
     List<String> toSet = meta.getLore();
 
@@ -100,12 +100,12 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder durability(int durability) {
+  public ItemBuilder durability(int durability) {
     is.setDurability((short) durability);
     return this;
   }
 
-  public @NotNull ItemBuilder skull(String name) {
+  public ItemBuilder skull(String name) {
     try {
       SkullMeta im = (SkullMeta) is.getItemMeta();
       is.setDurability((byte) 3);
@@ -116,12 +116,12 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder enchantment(Enchantment enchantment, int level) {
+  public ItemBuilder enchantment(Enchantment enchantment, int level) {
     is.addUnsafeEnchantment(enchantment, level);
     return this;
   }
 
-  public @NotNull ItemBuilder enchantment(@NotNull Map<Enchantment, Integer> enchantmens) {
+  public ItemBuilder enchantment( Map<Enchantment, Integer> enchantmens) {
     for (Map.Entry<Enchantment, Integer> enchantmentIntegerEntry : enchantmens.entrySet()) {
       is.addUnsafeEnchantment(enchantmentIntegerEntry.getKey(), enchantmentIntegerEntry.getValue());
     }
@@ -129,17 +129,17 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder enchantment(Enchantment enchantment) {
+  public ItemBuilder enchantment(Enchantment enchantment) {
     is.addUnsafeEnchantment(enchantment, 1);
     return this;
   }
 
-  public @NotNull ItemBuilder type(Material material) {
+  public ItemBuilder type(Material material) {
     is.setType(material);
     return this;
   }
 
-  public @NotNull ItemBuilder clearLore() {
+  public ItemBuilder clearLore() {
     ItemMeta meta = is.getItemMeta();
 
     meta.setLore(new ArrayList<>());
@@ -148,7 +148,7 @@ public class ItemBuilder {
     return this;
   }
 
-  public @NotNull ItemBuilder clearEnchantments() {
+  public ItemBuilder clearEnchantments() {
     for (Enchantment e : is.getEnchantments().keySet()) {
       is.removeEnchantment(e);
     }

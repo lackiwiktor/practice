@@ -2,30 +2,26 @@ package country.pvp.practice.board;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import country.pvp.practice.message.Bars;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.message.MessageUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.queue.PlayerQueueData;
-import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class BoardProvider {
 
-    private static final String BAR = ChatColor.GRAY + ChatColor.STRIKETHROUGH.toString() + "----------------------";
+    private final MatchManager matchManager;
 
-    private final @NotNull QueueManager queueManager;
-    private final @NotNull MatchManager matchManager;
-
-    public @NotNull List<String> provide(@NotNull PracticePlayer player) {
+    public List<String> provide( PracticePlayer player) {
         List<String> lines = Lists.newArrayList();
 
         if (player.isInQueue()) {
@@ -56,10 +52,10 @@ public class BoardProvider {
             lines.add(ChatColor.GRAY + "Playing: " + ChatColor.WHITE + matchManager.getPlayersInFightCount());
         }
 
-        lines.add(0, BAR);
+        lines.add(0, Bars.SB_BAR);
         lines.add("");
         lines.add(ChatColor.DARK_GRAY + ChatColor.ITALIC.toString() + "www.pvp.country");
-        lines.add(BAR);
+        lines.add(Bars.SB_BAR);
 
         return lines;
     }

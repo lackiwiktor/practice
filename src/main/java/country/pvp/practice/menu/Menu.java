@@ -17,16 +17,16 @@ import java.util.Map;
 @Setter
 public abstract class Menu {
 
-	public static @NotNull Map<String, Menu> currentlyOpenedMenus = new HashMap<>();
+	public static Map<String, Menu> currentlyOpenedMenus = new HashMap<>();
 
 	private Map<Integer, Button> buttons = new HashMap<>();
 	private boolean autoUpdate = false;
 	private boolean updateAfterClick = true;
 	private boolean closedByMenu = false;
 	private boolean placeholder = false;
-	private @NotNull Button placeholderButton = Button.placeholder(Material.STAINED_GLASS_PANE, (byte) 15, " ");
+	private Button placeholderButton = Button.placeholder(Material.STAINED_GLASS_PANE, (byte) 15, " ");
 
-	private ItemStack createItemStack(Player player, @NotNull Button button) {
+	private ItemStack createItemStack(Player player, Button button) {
 		ItemStack item = button.getButtonItem(player);
 
 		if (item.getType() != Material.SKULL_ITEM) {
@@ -42,7 +42,7 @@ public abstract class Menu {
 		return item;
 	}
 
-	public void openMenu(final @NotNull Player player) {
+	public void openMenu(final Player player) {
 		this.buttons = this.getButtons(player);
 
 		Menu previousMenu = Menu.currentlyOpenedMenus.get(player.getName());
@@ -102,7 +102,7 @@ public abstract class Menu {
 		this.setClosedByMenu(false);
 	}
 
-	public int size(@NotNull Map<Integer, Button> buttons) {
+	public int size( Map<Integer, Button> buttons) {
 		int highest = 0;
 
 		for (int buttonValue : buttons.keySet()) {

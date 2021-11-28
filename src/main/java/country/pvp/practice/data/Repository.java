@@ -3,7 +3,6 @@ package country.pvp.practice.data;
 import country.pvp.practice.concurrent.TaskDispatcher;
 
 public interface Repository<V> {
-
     void save(V entity);
 
     void load(V entity);
@@ -21,6 +20,4 @@ public interface Repository<V> {
     default void deleteAsync(V entity) {
         TaskDispatcher.async(() -> delete(entity));
     }
-
-
 }

@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class MatchMenuProvider {
 
-    private final @NotNull MatchManager matchManager;
+    private final MatchManager matchManager;
 
-    public @NotNull MatchMenu provide() {
+    public MatchMenu provide() {
         return new MatchMenu(matchManager);
     }
 }

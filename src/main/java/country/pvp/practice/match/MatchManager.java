@@ -2,7 +2,6 @@ package country.pvp.practice.match;
 
 import com.google.common.collect.Sets;
 import country.pvp.practice.ladder.Ladder;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Set;
@@ -19,7 +18,7 @@ public class MatchManager {
         matches.remove(match);
     }
 
-    public @NotNull Set<Match> getAll() {
+    public Set<Match> getAll() {
         return Collections.unmodifiableSet(matches);
     }
 

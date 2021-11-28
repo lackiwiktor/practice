@@ -17,11 +17,11 @@ public class ItemBar {
         this.items = items;
     }
 
-    public void apply(@NotNull PracticePlayer player) {
+    public void apply( PracticePlayer player) {
         player.setBar(bar());
     }
 
-    public ItemStack @NotNull [] bar() {
+    public ItemStack [] bar() {
         return Arrays.stream(items).map(it -> it == null ? new ItemStack(Material.AIR) : it.getItem()).toArray(ItemStack[]::new);
     }
 }

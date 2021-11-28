@@ -11,6 +11,7 @@ import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarListener;
+import country.pvp.practice.kit.PlayerKitListener;
 import country.pvp.practice.kit.editor.KitChooseProvider;
 import country.pvp.practice.kit.editor.KitEditorListener;
 import country.pvp.practice.ladder.Ladder;
@@ -19,7 +20,6 @@ import country.pvp.practice.ladder.LadderService;
 import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.kit.PlayerKitListener;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchPlayerListener;
 import country.pvp.practice.match.command.MatchCommand;
@@ -33,6 +33,7 @@ import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
+import country.pvp.practice.match.snapshot.command.ViewInventoryCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.vaperion.blade.Blade;
@@ -43,7 +44,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,27 +53,27 @@ public class Practice {
 
     private static Practice instance;
 
-    private final @NotNull Injector injector;
-    private final @NotNull PlayerManager playerManager;
-    private final @NotNull PlayerService playerService;
-    private final @NotNull LadderManager ladderManager;
-    private final @NotNull LadderService ladderService;
-    private final @NotNull ArenaManager arenaManager;
-    private final @NotNull ArenaService arenaService;
-    private final @NotNull QueueManager queueManager;
-    private final @NotNull QueueMenuProvider queueMenuProvider;
-    private final @NotNull PracticeSettings practiceSettings;
-    private final @NotNull PracticeSettingsService practiceSettingsService;
-    private final @NotNull KitChooseProvider kitChooseProvider;
-    private final @NotNull MatchManager matchManager;
+    private final Injector injector;
+    private final PlayerManager playerManager;
+    private final PlayerService playerService;
+    private final LadderManager ladderManager;
+    private final LadderService ladderService;
+    private final ArenaManager arenaManager;
+    private final ArenaService arenaService;
+    private final QueueManager queueManager;
+    private final QueueMenuProvider queueMenuProvider;
+    private final PracticeSettings practiceSettings;
+    private final PracticeSettingsService practiceSettingsService;
+    private final KitChooseProvider kitChooseProvider;
+    private final MatchManager matchManager;
 
     private Blade blade;
 
-    public static @NotNull QueueMenuProvider getQueueMenuProvider() {
+    public static QueueMenuProvider getQueueMenuProvider() {
         return instance.queueMenuProvider;
     }
 
-    public static @NotNull KitChooseProvider getKitChooseProvider() {
+    public static KitChooseProvider getKitChooseProvider() {
         return instance.kitChooseProvider;
     }
 
@@ -105,6 +105,7 @@ public class Practice {
         registerCommand(PracticeSettingsCommand.class);
         registerCommand(SpectateCommand.class);
         registerCommand(MatchCommand.class);
+        registerCommand(ViewInventoryCommand.class);
 
         loadOnlinePlayers();
     }

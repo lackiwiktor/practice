@@ -16,9 +16,9 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public class QueueButton extends Button {
 
-    private final @NotNull MatchManager matchManager;
-    private final @NotNull PracticePlayer practicePlayer;
-    private final @NotNull Queue queue;
+    private final MatchManager matchManager;
+    private final PracticePlayer practicePlayer;
+    private final Queue queue;
 
     @Override
     public ItemStack getButtonItem(Player player) {
@@ -33,7 +33,7 @@ public class QueueButton extends Button {
     }
 
     @Override
-    public void clicked(@NotNull Player player, ClickType clickType) {
+    public void clicked( Player player, ClickType clickType) {
         queue.addPlayer(practicePlayer);
         player.getOpenInventory().close();
     }

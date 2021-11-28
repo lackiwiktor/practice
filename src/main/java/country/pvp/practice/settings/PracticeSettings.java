@@ -14,17 +14,17 @@ public class PracticeSettings implements DataObject {
     private Location editorLocation;
 
     @Override
-    public @NotNull String getCollection() {
+    public String getCollection() {
         return "settings";
     }
 
     @Override
-    public @NotNull String getId() {
+    public String getId() {
         return "practice-settings";
     }
 
     @Override
-    public @NotNull Document getDocument() {
+    public Document getDocument() {
         Document document = new Document("_id", getId());
 
         document.put("spawnLocation", LocationAdapter.toJson(spawnLocation));
@@ -34,7 +34,7 @@ public class PracticeSettings implements DataObject {
     }
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument( Document document) {
         spawnLocation = LocationAdapter.fromJson(document.getString("spawnLocation"));
         editorLocation = LocationAdapter.fromJson(document.getString("editorLocation"));
     }

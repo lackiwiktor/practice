@@ -18,12 +18,12 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class LadderCommands {
 
-    private final @NotNull LadderManager ladderManager;
-    private final @NotNull LadderService ladderService;
+    private final LadderManager ladderManager;
+    private final LadderService ladderService;
 
     @Command("ladder create")
     @Permission("practice.admin")
-    public void create(@Sender Player sender, @Name("name") @NotNull String name) {
+    public void create(@Sender Player sender, @Name("name") String name) {
         if (ladderManager.get(name) != null) {
             Messager.messageError(sender, "Ladder with this name already exists.");
             return;
@@ -37,7 +37,7 @@ public class LadderCommands {
 
     @Command("ladder remove")
     @Permission("practice.admin")
-    public void remove(@Sender Player sender, @Name("ladder") @NotNull Ladder ladder) {
+    public void remove(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladderManager.remove(ladder);
         ladderService.deleteAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully removed ladder.");
@@ -45,7 +45,7 @@ public class LadderCommands {
 
     @Command("ladder displayName")
     @Permission("practice.admin")
-    public void displayName(@Sender Player sender, @Name("ladder") @NotNull Ladder ladder, @Name("displayName") String name) {
+    public void displayName(@Sender Player sender, @Name("ladder") Ladder ladder, @Name("displayName") String name) {
         ladder.setDisplayName(name);
         ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's display name.");
@@ -53,7 +53,7 @@ public class LadderCommands {
 
     @Command("ladder icon")
     @Permission("practice.admin")
-    public void icon(@Sender @NotNull Player sender, @Name("ladder") @NotNull Ladder ladder) {
+    public void icon(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ItemStack itemInHand = sender.getItemInHand();
 
         if (itemInHand == null) {
@@ -68,7 +68,7 @@ public class LadderCommands {
 
     @Command("ladder ranked")
     @Permission("practice.admin")
-    public void ranked(@Sender Player sender, @Name("ladder") @NotNull Ladder ladder, @Name("ranked") boolean ranked) {
+    public void ranked(@Sender Player sender, @Name("ladder") Ladder ladder, @Name("ranked") boolean ranked) {
         ladder.setRanked(ranked);
         ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's ranked status.");
@@ -76,7 +76,7 @@ public class LadderCommands {
 
     @Command("ladder inventory")
     @Permission("practice.admin")
-    public void inventory(@Sender @NotNull Player sender, @Name("ladder") @NotNull Ladder ladder) {
+    public void inventory(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setInventory(sender.getInventory().getContents());
         ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's inventory.");
@@ -84,7 +84,7 @@ public class LadderCommands {
 
     @Command("ladder armor")
     @Permission("practice.admin")
-    public void armor(@Sender @NotNull Player sender, @Name("ladder") @NotNull Ladder ladder) {
+    public void armor(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setArmor(sender.getInventory().getArmorContents());
         ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's armor.");
@@ -92,7 +92,7 @@ public class LadderCommands {
 
     @Command("ladder editoritems")
     @Permission("practice.admin")
-    public void editorItems(@Sender @NotNull Player sender, @Name("ladder") @NotNull Ladder ladder) {
+    public void editorItems(@Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setEditorItems(sender.getInventory().getContents());
         ladderService.saveAsync(ladder);
         Messager.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's editor items.");

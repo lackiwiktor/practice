@@ -7,12 +7,11 @@ import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 @Data
 public class Arena implements DataObject {
 
-    private final @NotNull String name;
+    private final String name;
     private String displayName;
     private String schematic;
     private ItemStack icon;
@@ -45,7 +44,7 @@ public class Arena implements DataObject {
     }
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument( Document document) {
         displayName = document.getString("displayName");
         schematic = document.getString("schematic");
         icon = ItemStackAdapter.fromJson(document.getString("icon"));

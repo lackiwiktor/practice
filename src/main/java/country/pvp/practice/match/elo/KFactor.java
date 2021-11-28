@@ -1,4 +1,4 @@
-package country.pvp.practice.elo;
+package country.pvp.practice.match.elo;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -26,7 +26,7 @@ public class KitEditorListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void interactEvent(@NotNull PlayerInteractEvent event) {
+    public void interactEvent( PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         PracticePlayer practicePlayer = get(event);
@@ -54,7 +54,7 @@ public class KitEditorListener extends PlayerListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void dropItem(@NotNull PlayerDropItemEvent event) {
+    public void dropItem( PlayerDropItemEvent event) {
         PracticePlayer practicePlayer = get(event);
         if (!practicePlayer.isInEditor()) return;
 

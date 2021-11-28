@@ -17,10 +17,10 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class LadderProvider implements BladeProvider<Ladder> {
 
-    private final @NotNull LadderManager ladderManager;
+    private final LadderManager ladderManager;
 
     @Override
-    public @Nullable Ladder provide(@NotNull BladeContext context, @NotNull BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+    public @Nullable Ladder provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
         if (input == null) return null;
 
         return Optional.ofNullable(ladderManager.get(input)).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Wrong ladder"));

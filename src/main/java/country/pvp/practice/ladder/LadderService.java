@@ -15,7 +15,7 @@ public class LadderService extends MongoRepository<Ladder> {
         super(database);
     }
 
-    public @NotNull Set<Ladder> loadAll() {
+    public Set<Ladder> loadAll() {
         Set<Ladder> ladders = Sets.newHashSet();
 
         database.getCollection("ladders").find().forEach(it -> {

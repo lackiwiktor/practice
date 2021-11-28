@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,8 +19,8 @@ import java.util.stream.Collectors;
 @Data
 public class Kit implements SerializableObject {
 
-    private ItemStack @NotNull [] inventory = new ItemStack[36];
-    private ItemStack @NotNull [] armor = new ItemStack[4];
+    private ItemStack [] inventory = new ItemStack[36];
+    private ItemStack [] armor = new ItemStack[4];
 
     @Override
     public Document getDocument() {
@@ -35,12 +34,12 @@ public class Kit implements SerializableObject {
     }
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument( Document document) {
         inventory = (ItemStack[]) document.get("inventory", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
         armor = (ItemStack[]) document.get("armor", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
     }
 
-    public void apply(@NotNull PracticePlayer player) {
+    public void apply( PracticePlayer player) {
         Player bukkitPlayer = player.getPlayer();
         Preconditions.checkNotNull(bukkitPlayer, "player");
         PlayerInventory playerInventory = bukkitPlayer.getInventory();
@@ -49,11 +48,11 @@ public class Kit implements SerializableObject {
         bukkitPlayer.updateInventory();
     }
 
-    public ItemStack @NotNull [] getInventory() {
+    public ItemStack [] getInventory() {
         return Arrays.stream(inventory).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 
-    public ItemStack @NotNull [] getArmor() {
+    public ItemStack [] getArmor() {
         return Arrays.stream(armor).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 

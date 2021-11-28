@@ -6,7 +6,6 @@ import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -17,6 +16,15 @@ public class NamedKit extends Kit {
 
     private String name;
 
+    public static NamedKit from(String name, Kit kit) {
+        NamedKit namedKit = new NamedKit(name);
+
+        namedKit.setArmor(kit.getArmor());
+        namedKit.setInventory(kit.getInventory());
+
+        return namedKit;
+    }
+
     @Override
     public Document getDocument() {
         Document document = super.getDocument();
@@ -25,7 +33,7 @@ public class NamedKit extends Kit {
     }
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument(Document document) {
         super.applyDocument(document);
         name = document.getString("name");
     }

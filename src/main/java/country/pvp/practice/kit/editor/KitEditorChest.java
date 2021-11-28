@@ -15,15 +15,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KitEditorChest extends Menu {
 
-    private final @NotNull Ladder ladder;
+    private final Ladder ladder;
 
     @Override
-    public @NotNull String getTitle(Player player) {
+    public String getTitle(Player player) {
         return "Editor items";
     }
 
     @Override
-    public @NotNull Map<Integer, Button> getButtons(Player player) {
+    public Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         ItemStack[] items = ladder.getEditorItems();
@@ -43,10 +43,10 @@ public class KitEditorChest extends Menu {
     @RequiredArgsConstructor
     public static class KitEditorChestButton extends Button {
 
-        private final @NotNull ItemStack item;
+        private final ItemStack item;
 
         @Override
-        public @NotNull ItemStack getButtonItem(Player player) {
+        public ItemStack getButtonItem(Player player) {
             return item;
         }
 

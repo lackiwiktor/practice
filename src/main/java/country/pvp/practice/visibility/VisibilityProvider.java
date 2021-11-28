@@ -15,7 +15,7 @@ public class VisibilityProvider {
      * @param observable player who is looked on
      * @return visibility
      */
-    public @NotNull Visibility provide(@NotNull PracticePlayer observer, @NotNull PracticePlayer observable) {
+    public Visibility provide( PracticePlayer observer, PracticePlayer observable) {
         switch (observer.getState()) {
             case IN_MATCH:
                 if (observable.isInMatch()) {

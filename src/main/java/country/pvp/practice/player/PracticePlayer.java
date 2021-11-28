@@ -2,12 +2,12 @@ package country.pvp.practice.player;
 
 import com.google.common.base.Preconditions;
 import country.pvp.practice.data.DataObject;
-import country.pvp.practice.kit.Kit;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.player.data.*;
 import lombok.Data;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -31,7 +30,7 @@ public class PracticePlayer implements DataObject, Recipient {
     private PlayerState state = PlayerState.IN_LOBBY;
     private boolean loaded;
 
-    public PracticePlayer(@NotNull Player player) {
+    public PracticePlayer(Player player) {
         this(player.getUniqueId());
         this.name = player.getName();
     }
@@ -46,17 +45,17 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     @Override
-    public @NotNull String getCollection() {
+    public String getCollection() {
         return "players";
     }
 
     @Override
-    public @NotNull String getId() {
+    public String getId() {
         return uuid.toString();
     }
 
     @Override
-    public @NotNull Document getDocument() {
+    public Document getDocument() {
         org.bson.Document document = new org.bson.Document("_id", getId());
         document.put("name", name);
         document.put("nameLowerCase", name.toLowerCase(Locale.ROOT));
@@ -74,7 +73,7 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     @Override
-    public void applyDocument(@NotNull Document document) {
+    public void applyDocument(Document document) {
         if (name == null) name = document.getString("name");
         statistics.applyDocument(document.get("statistics", Document.class));
         kits.applyDocument(document.get("kits", Document.class));
@@ -101,7 +100,7 @@ public class PracticePlayer implements DataObject, Recipient {
         return state == PlayerState.EDITING_KIT && hasStateData();
     }
 
-    public void setBar(ItemStack @NotNull [] bar) {
+    public void setBar(ItemStack[] bar) {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "Player must be online in order to change his item bar");
         for (int i = 0; i < bar.length; i++) {
@@ -127,31 +126,31 @@ public class PracticePlayer implements DataObject, Recipient {
         return stateData.hasStateData();
     }
 
-    public void setElo(@NotNull Ladder ladder, int elo) {
+    public void setElo(Ladder ladder, int elo) {
         statistics.setElo(ladder, elo);
     }
 
-    public int getElo(@NotNull Ladder ladder) {
+    public int getElo(Ladder ladder) {
         return statistics.getElo(ladder);
     }
 
-    public void removeKit(@NotNull Ladder ladder, int index) {
+    public void removeKit(Ladder ladder, int index) {
         kits.removeKit(ladder, index);
     }
 
-    public void setKit(@NotNull Ladder ladder, NamedKit newKit, int index) {
+    public void setKit(Ladder ladder, NamedKit newKit, int index) {
         kits.setKit(ladder, newKit, index);
     }
 
-    public NamedKit getKit(@NotNull Ladder ladder, int index) {
+    public NamedKit getKit(Ladder ladder, int index) {
         return kits.getKit(ladder, index);
     }
 
-    public boolean hasKits(@NotNull Ladder ladder) {
+    public boolean hasKits(Ladder ladder) {
         return kits.hasKits(ladder);
     }
 
-    public NamedKit[] getKits(@NotNull Ladder ladder) {
+    public NamedKit[] getKits(Ladder ladder) {
         return kits.getKits(ladder);
     }
 
@@ -182,19 +181,19 @@ public class PracticePlayer implements DataObject, Recipient {
         player.teleport(location);
     }
 
-    public Optional<? extends Kit> getMatchingKit(@NotNull Ladder ladder, ItemStack itemStack) {
-        Optional<? extends Kit> playerKit = Arrays.stream(kits.getKits(ladder)).filter(it -> it != null && it.getIcon().isSimilar(itemStack)).findFirst();
+    public Optional<NamedKit> getMatchingKit(Ladder ladder, ItemStack itemStack) {
+        Optional<NamedKit> playerKit = Arrays.stream(kits.getKits(ladder)).filter(it -> it != null && it.getIcon().isSimilar(itemStack)).findFirst();
 
         if (!playerKit.isPresent()) {
             if (ladder.getKit().getIcon().isSimilar(itemStack)) {
-                return Optional.of(ladder.getKit()); //Give default kit
+                return Optional.of(NamedKit.from("Default Kit", ladder.getKit())); //Give default kit
             }
         } else return playerKit; //Give custom player kit
 
         return Optional.empty();
     }
 
-    public void giveKits(@NotNull Ladder ladder) {
+    public void giveKits(Ladder ladder) {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         PlayerInventory playerInventory = player.getInventory();
@@ -244,5 +243,11 @@ public class PracticePlayer implements DataObject, Recipient {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         return -1;
+    }
+
+    public void sendComponent(BaseComponent[] components) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.spigot().sendMessage(components);
     }
 }

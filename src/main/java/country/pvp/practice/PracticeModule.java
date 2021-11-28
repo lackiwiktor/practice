@@ -9,6 +9,7 @@ import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
+import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchMenuProvider;
 import country.pvp.practice.match.MatchProvider;
@@ -18,6 +19,7 @@ import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsService;
+import country.pvp.practice.match.snapshot.InventorySnapshotMenuProvider;
 import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
@@ -45,5 +47,7 @@ public class PracticeModule extends AbstractModule {
         bind(MatchManager.class).asEagerSingleton();
         bind(QueueMenuProvider.class).asEagerSingleton();
         bind(MatchMenuProvider.class).asEagerSingleton();
+        bind(InventorySnapshotManager.class).asEagerSingleton();
+        bind(InventorySnapshotMenuProvider.class).asEagerSingleton();
     }
 }
