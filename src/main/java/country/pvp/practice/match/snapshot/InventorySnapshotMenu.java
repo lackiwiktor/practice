@@ -103,7 +103,7 @@ public class InventorySnapshotMenu extends Menu {
         public ItemStack getButtonItem(Player player) {
             return new ItemBuilder(Material.COOKED_BEEF)
                     .amount(hunger)
-                    .name(ChatColor.GREEN.toString() + hunger + "/10 Hunger")
+                    .name(ChatColor.GREEN.toString() + hunger + "/20 Hunger")
                     .build();
         }
     }
@@ -128,7 +128,7 @@ public class InventorySnapshotMenu extends Menu {
         }
 
         private String formatPotionEffect(PotionEffect effect) {
-            return ChatColor.BLUE.toString().concat(getName(effect.getType()).concat(" ") + effect.getAmplifier() + ChatColor.GRAY.toString().concat(" - " + TimeUtil.formatTimeMillisToClock(effect.getDuration() * 50L)));
+            return ChatColor.BLUE.toString().concat(getName(effect.getType()).concat(" ") + (effect.getAmplifier() + 1) + ChatColor.GRAY.toString().concat(" - " + TimeUtil.formatTimeMillisToClock(effect.getDuration() * 50L)));
         }
 
         public static String getName(PotionEffectType type) {
@@ -140,9 +140,13 @@ public class InventorySnapshotMenu extends Menu {
                 return "Weakness";
             } else if (type.getName().equalsIgnoreCase("slowness")) {
                 return "Slowness";
-            } else {
-                return "Unknown";
-            }
+            } else if (type.getName().equals("regeneration")) {
+                return "Regeneration";
+            } else if (type.getName().equals("resistance")) {
+                return "Resistance";
+            } else if (type.getName().equals("absorption")) {
+                return "Absorption";
+            } else return "Unknown";
         }
     }
 

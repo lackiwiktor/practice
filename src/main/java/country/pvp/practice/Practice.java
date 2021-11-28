@@ -21,6 +21,7 @@ import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
+import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.MatchPlayerListener;
 import country.pvp.practice.match.command.MatchCommand;
 import country.pvp.practice.match.command.SpectateCommand;
@@ -93,6 +94,7 @@ public class Practice {
         schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
         schedule(BoardTask.class, 100L, TimeUnit.MILLISECONDS, true);
         schedule(PlayerSaveTask.class, 1L, TimeUnit.MINUTES, true);
+        schedule(PearlCooldownTask.class, 100L, TimeUnit.MILLISECONDS, true);
 
         loadSettings();
         loadArenas();
@@ -122,9 +124,13 @@ public class Practice {
 
     public void loadOnlinePlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PracticePlayer practicePlayer = new PracticePlayer(player);
-            playerService.loadAsync(practicePlayer);
-            playerManager.add(practicePlayer);
+            try {
+                PracticePlayer practicePlayer = new PracticePlayer(player);
+                playerService.loadAsync(practicePlayer);
+                playerManager.add(practicePlayer);
+            } catch (Exception e) {
+                player.kickPlayer("Server is restarting...");
+            }
         }
     }
 
