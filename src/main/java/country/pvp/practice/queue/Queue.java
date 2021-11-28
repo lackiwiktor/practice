@@ -3,6 +3,7 @@ package country.pvp.practice.queue;
 import com.mongodb.assertions.Assertions;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.arena.ArenaManager;
+import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.itembar.ItemBarType;
 import country.pvp.practice.ladder.Ladder;
@@ -27,7 +28,7 @@ public class Queue {
     private final ArenaManager arenaManager;
     private final MatchProvider matchProvider;
 
-    public void addPlayer( PracticePlayer player) {
+    public void addPlayer(PracticePlayer player) {
         PlayerQueueData entry = new PlayerQueueData(player, this);
         entries.add(entry);
         player.setState(PlayerState.QUEUING, entry);
@@ -37,7 +38,7 @@ public class Queue {
                 new MessagePattern("{ranked}", ranked ? "&branked" : "&dunranked")));
     }
 
-    public void removePlayer( PracticePlayer player, boolean leftQueue) {
+    public void removePlayer(PracticePlayer player, boolean leftQueue) {
         player.removeStateData();
 
         if (leftQueue) {
@@ -65,14 +66,14 @@ public class Queue {
         Messager.messageSuccess(queueData1, Messages.QUEUE_FOUND_OPPONENT.match("{player}", queueData2.getName()));
         Messager.messageSuccess(queueData2, Messages.QUEUE_FOUND_OPPONENT.match("{player}", queueData1.getName()));
 
-        createMatch(queueData1, queueData2, arena).start();
+        TaskDispatcher.sync(() -> createMatch(queueData1, queueData2, arena).start());
     }
 
     public int size() {
         return entries.size();
     }
 
-    private Match createMatch( PlayerQueueData queueData1, PlayerQueueData queueData2, Arena arena) {
+    private Match createMatch(PlayerQueueData queueData1, PlayerQueueData queueData2, Arena arena) {
         return matchProvider.provide(ladder, arena, ranked, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
 }

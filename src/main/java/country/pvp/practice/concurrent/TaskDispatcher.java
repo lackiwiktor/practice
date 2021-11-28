@@ -5,7 +5,6 @@ import country.pvp.practice.time.TimeUtil;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +17,7 @@ public class TaskDispatcher {
     private static final ExecutorService EXECUTOR_SERVICE =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
 
-    public static Future<?> async( Runnable runnable) {
+    public static Future<?> async(Runnable runnable) {
         return EXECUTOR_SERVICE.submit(runnable);
     }
 
@@ -32,5 +31,9 @@ public class TaskDispatcher {
 
     public static void runLater(Runnable runnable, long duration, TimeUnit unit) {
         Bukkit.getScheduler().runTaskLater(PracticePlugin.getPlugin(PracticePlugin.class), runnable, TimeUtil.convertTimeToTicks(duration, unit));
+    }
+
+    public static void sync(Runnable runnable) {
+        Bukkit.getScheduler().runTask(PracticePlugin.getPlugin(PracticePlugin.class), runnable);
     }
 }

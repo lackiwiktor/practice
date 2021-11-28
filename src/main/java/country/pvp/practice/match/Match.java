@@ -230,7 +230,7 @@ public class Match implements Recipient {
 
             BaseComponent[] components = createFinalComponent(winner, loser);
 
-            for (PracticePlayer player : getAllOnlinePlayers()) {
+            for (PracticePlayer player : getAllOnlinePlayersIncludingSpectators()) {
                 player.sendComponent(components);
             }
         }
@@ -271,7 +271,7 @@ public class Match implements Recipient {
         setupSpectator(spectator);
         spectator.setState(PlayerState.SPECTATING, new PlayerSpectatingData(this));
 
-        for (PracticePlayer matchPlayer : getAllOnlinePlayers()) {
+        for (PracticePlayer matchPlayer : getAllOnlinePlayersIncludingSpectators()) {
             visibilityUpdater.update(spectator, matchPlayer);
             visibilityUpdater.update(matchPlayer, spectator);
         }
@@ -384,6 +384,12 @@ public class Match implements Recipient {
                 .attachToEachPart(
                         ChatHelper.click("/viewinv ".concat(player.getUuid().toString())))
                 .create();
+    }
+
+    public Set<PracticePlayer> getAllOnlinePlayersIncludingSpectators() {
+        Set<PracticePlayer> players = getAllOnlinePlayers();
+        players.addAll(spectators);
+        return players;
     }
 
     public boolean isBuild() {

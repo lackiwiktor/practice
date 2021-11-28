@@ -8,7 +8,6 @@ import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class QueueManager {
 
-    private final Map<Boolean, List<Queue>> queues = Maps.newHashMap();
+    private final Map<Boolean, List<Queue>> queues = Maps.newConcurrentMap();
 
     private final ItemBarManager itemBarManager;
     private final ArenaManager arenaManager;
