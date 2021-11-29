@@ -6,7 +6,6 @@ import me.vaperion.blade.command.container.BladeParameter;
 import me.vaperion.blade.command.context.BladeContext;
 import me.vaperion.blade.utils.MessageBuilder;
 import org.bukkit.ChatColor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +27,7 @@ public class PracticeHelpGenerator implements me.vaperion.blade.command.help.Hel
         return help;
     }
 
-    public String getUsage( BladeCommand command, String alias) {
+    private String getUsage( BladeCommand command, String alias) {
         boolean hasDesc =
                 command.getDescription() != null && !command.getDescription().trim().isEmpty();
 

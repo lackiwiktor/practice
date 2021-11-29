@@ -10,6 +10,8 @@ public class PlayerUtil {
         player.getOpenInventory().close();
         player.getInventory().setArmorContents(new ItemStack[4]);
         player.getInventory().setContents(new ItemStack[36]);
+        player.getInventory().setHeldItemSlot(0);
+        player.updateInventory();
         player.setHealth(20.0D);
         player.setSaturation(20.0F);
         player.setFallDistance(0.0F);
@@ -21,7 +23,6 @@ public class PlayerUtil {
         player.setAllowFlight(false);
         player.setFlying(false);
         player.setGameMode(GameMode.SURVIVAL);
-        player.getInventory().setHeldItemSlot(0);
         player.getActivePotionEffects().forEach(it -> player.removePotionEffect(it.getType()));
     }
 }

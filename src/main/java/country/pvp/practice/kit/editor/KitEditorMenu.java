@@ -13,12 +13,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 @RequiredArgsConstructor
-class KitEditorMenu extends Menu {
+public class KitEditorMenu extends Menu {
 
     private final PlayerService playerService;
 

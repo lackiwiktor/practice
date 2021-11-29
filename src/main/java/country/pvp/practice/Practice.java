@@ -10,10 +10,15 @@ import country.pvp.practice.arena.command.provider.ArenaProvider;
 import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
+import country.pvp.practice.duel.DuelRequestInvalidateTask;
+import country.pvp.practice.duel.DuelService;
+import country.pvp.practice.duel.command.DuelCommand;
 import country.pvp.practice.itembar.ItemBarListener;
 import country.pvp.practice.kit.PlayerKitListener;
-import country.pvp.practice.kit.editor.KitChooseProvider;
+import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.kit.editor.KitEditorListener;
+import country.pvp.practice.kit.editor.KitEditorMenuProvider;
+import country.pvp.practice.kit.editor.KitEditorService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
@@ -21,10 +26,12 @@ import country.pvp.practice.ladder.command.LadderCommands;
 import country.pvp.practice.ladder.command.provider.LadderProvider;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.MatchPlayerListener;
+import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.command.MatchCommand;
 import country.pvp.practice.match.command.SpectateCommand;
+import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
+import country.pvp.practice.match.snapshot.command.ViewInventoryCommand;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
@@ -34,7 +41,6 @@ import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
-import country.pvp.practice.match.snapshot.command.ViewInventoryCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.vaperion.blade.Blade;
@@ -65,8 +71,11 @@ public class Practice {
     private final QueueMenuProvider queueMenuProvider;
     private final PracticeSettings practiceSettings;
     private final PracticeSettingsService practiceSettingsService;
-    private final KitChooseProvider kitChooseProvider;
+    private final KitChooseMenuProvider kitChooseMenuProvider;
     private final MatchManager matchManager;
+    private final KitEditorMenuProvider kitEditorMenuProvider;
+    private final KitEditorService kitEditorService;
+    private final DuelService duelService;
 
     private Blade blade;
 
@@ -74,11 +83,23 @@ public class Practice {
         return instance.queueMenuProvider;
     }
 
-    public static KitChooseProvider getKitChooseProvider() {
-        return instance.kitChooseProvider;
+    public static KitChooseMenuProvider getKitChooseMenuProvider() {
+        return instance.kitChooseMenuProvider;
     }
 
-    public void onEnable() {
+    public static KitEditorMenuProvider getKitEditorProvider() {
+        return instance.kitEditorMenuProvider;
+    }
+
+    public static KitEditorService getKitEditorService() {
+        return instance.kitEditorService;
+    }
+
+    public static DuelService getDuelService() {
+        return instance.duelService;
+    }
+
+    void onEnable() {
         instance = this;
 
         register(ItemBarListener.class);
@@ -91,10 +112,12 @@ public class Practice {
         register(QueueRemovePlayerListener.class);
         register(KitEditorListener.class);
 
-        schedule(QueueTask.class, 1L, TimeUnit.SECONDS, false);
-        schedule(BoardTask.class, 100L, TimeUnit.MILLISECONDS, true);
+        schedule(QueueTask.class, 1000L, TimeUnit.MILLISECONDS, true);
+        schedule(BoardTask.class, 500L, TimeUnit.MILLISECONDS, true);
         schedule(PlayerSaveTask.class, 1L, TimeUnit.MINUTES, true);
         schedule(PearlCooldownTask.class, 100L, TimeUnit.MILLISECONDS, true);
+        schedule(InventorySnapshotInvalidateTask.class, 2L, TimeUnit.SECONDS, true);
+        schedule(DuelRequestInvalidateTask.class, 2L, TimeUnit.SECONDS, true);
 
         loadSettings();
         loadArenas();
@@ -108,11 +131,12 @@ public class Practice {
         registerCommand(SpectateCommand.class);
         registerCommand(MatchCommand.class);
         registerCommand(ViewInventoryCommand.class);
+        registerCommand(DuelCommand.class);
 
         loadOnlinePlayers();
     }
 
-    public void onDisable() {
+    void onDisable() {
         for (Match match : matchManager.getAll()) {
             match.cancel("Server is restarting");
         }
@@ -122,7 +146,7 @@ public class Practice {
         }
     }
 
-    public void loadOnlinePlayers() {
+    private void loadOnlinePlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             try {
                 PracticePlayer practicePlayer = new PracticePlayer(player);
@@ -176,7 +200,7 @@ public class Practice {
         arenaManager.addAll(arenaService.loadAll());
     }
 
-    public void loadSettings() {
+    private void loadSettings() {
         practiceSettingsService.load(practiceSettings);
     }
 }

@@ -1,7 +1,9 @@
 package country.pvp.practice.player;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import country.pvp.practice.data.DataObject;
+import country.pvp.practice.duel.DuelRequest;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.message.Recipient;
@@ -26,6 +28,7 @@ public class PracticePlayer implements DataObject, Recipient {
     private final PlayerStateData stateData = new PlayerStateData();
     private final PlayerStatistics statistics = new PlayerStatistics();
     private final PlayerKits kits = new PlayerKits();
+    private final Set<DuelRequest> duelRequests = Sets.newConcurrentHashSet();
     private String name;
     private PlayerState state = PlayerState.IN_LOBBY;
     private boolean loaded;
@@ -114,7 +117,7 @@ public class PracticePlayer implements DataObject, Recipient {
         stateData.setStateData(data);
     }
 
-    public void removeStateData() {
+    public void clearSateData() {
         stateData.removeStateData();
     }
 
@@ -152,6 +155,22 @@ public class PracticePlayer implements DataObject, Recipient {
 
     public NamedKit[] getKits(Ladder ladder) {
         return kits.getKits(ladder);
+    }
+
+    public void addDuelRequest(DuelRequest request) {
+        duelRequests.add(request);
+    }
+
+    public boolean hasDuelRequest(PracticePlayer player) {
+        return duelRequests.stream().anyMatch(it -> it.getPlayer().equals(player));
+    }
+
+    public @Nullable DuelRequest getDuelRequest(PracticePlayer player) {
+        return duelRequests.stream().filter(it -> it.getPlayer().equals(player)).findFirst().orElse(null);
+    }
+
+    public void invalidateDuelRequests() {
+        duelRequests.removeIf(DuelRequest::hasExpired);
     }
 
     public void enableFlying() {
@@ -249,5 +268,9 @@ public class PracticePlayer implements DataObject, Recipient {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         player.spigot().sendMessage(components);
+    }
+
+    public void invalidateRequest(DuelRequest request) {
+        duelRequests.remove(request);
     }
 }

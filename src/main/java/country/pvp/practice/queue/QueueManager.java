@@ -8,7 +8,6 @@ import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -16,16 +15,16 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class QueueManager {
 
-    private final Map<Boolean, List<Queue>> queues = Maps.newHashMap();
+    private final Map<Boolean, List<Queue>> queues = Maps.newConcurrentMap();
 
     private final ItemBarManager itemBarManager;
     private final ArenaManager arenaManager;
     private final MatchProvider matchProvider;
 
-    public void initQueue( Ladder ladder) {
-        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(ladder, false, itemBarManager, arenaManager, matchProvider));
+    public void initQueue(Ladder ladder) {
+        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(itemBarManager, arenaManager, matchProvider, ladder, false));
         if (ladder.isRanked())
-            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(ladder, true, itemBarManager, arenaManager, matchProvider));
+            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(itemBarManager, arenaManager, matchProvider,  ladder, true));
     }
 
     public List<Queue> getQueues(boolean ranked) {

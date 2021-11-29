@@ -1,16 +1,15 @@
-package country.pvp.practice.kit.editor;
+package country.pvp.practice.kit;
 
 import com.google.common.collect.Maps;
+import country.pvp.practice.data.Callback;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.menu.Button;
 import country.pvp.practice.menu.Menu;
-import country.pvp.practice.player.PracticePlayer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -18,9 +17,8 @@ import java.util.Map;
 public class KitChooseMenu extends Menu {
 
     private final LadderManager ladderManager;
-    private final KitEditorService kitEditorService;
 
-    private final PracticePlayer practicePlayer;
+    private final Callback<Ladder> callback;
 
     @Override
     public String getTitle(Player player) {
@@ -32,7 +30,7 @@ public class KitChooseMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Ladder ladder : ladderManager.getAll()) {
-            buttons.put(buttons.size(), new KitChoiceButton(kitEditorService, practicePlayer, ladder));
+            buttons.put(buttons.size(), new KitChoiceButton(callback, ladder));
         }
 
         return buttons;
@@ -41,9 +39,7 @@ public class KitChooseMenu extends Menu {
     @RequiredArgsConstructor
     public static class KitChoiceButton extends Button {
 
-        private final KitEditorService kitEditorService;
-
-        private final PracticePlayer practicePlayer;
+        private final Callback<Ladder> callback;
         private final Ladder ladder;
 
         @Override
@@ -54,7 +50,7 @@ public class KitChooseMenu extends Menu {
         @Override
         public void clicked(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
-                kitEditorService.moveToEditor(practicePlayer, ladder);
+                callback.call(ladder);
             }
         }
     }

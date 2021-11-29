@@ -1,5 +1,6 @@
 package country.pvp.practice.match;
 
+import country.pvp.practice.Expiring;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PracticePlayer;
@@ -50,18 +51,19 @@ public class PlayerMatchData implements PlayerData {
         pearlCooldown.notify(player);
     }
 
-    static class PearlCooldown {
+    static class PearlCooldown implements Expiring {
 
         private long lastUsage;
         private boolean notify;
 
+        @Override
+        public boolean hasExpired() {
+            return getPassed() > 16_000L;
+        }
+
         public void reset() {
             lastUsage = System.currentTimeMillis();
             notify = true;
-        }
-
-        public boolean hasExpired() {
-            return getPassed() > 16_000L;
         }
 
         public long getRemaining() {

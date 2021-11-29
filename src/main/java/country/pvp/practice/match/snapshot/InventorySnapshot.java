@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,12 +27,13 @@ public class InventorySnapshot {
     private final int hunger;
     private final Collection<PotionEffect> effects;
     private final PlayerMatchStatistics statistics;
+    private final long timeStamp = System.currentTimeMillis();
     private UUID opponent;
 
     public static InventorySnapshot create(PracticePlayer player) {
-
         Player bukkitPlayer = player.getPlayer();
         Preconditions.checkNotNull(bukkitPlayer, "player");
+
         PlayerInventory playerInventory = bukkitPlayer.getInventory();
         PlayerMatchData matchData = player.getStateData();
         Preconditions.checkNotNull(matchData, "matchData");
@@ -57,5 +59,9 @@ public class InventorySnapshot {
 
     public ItemStack[] getInventory() {
         return Arrays.stream(inventory).map(it -> it == null ? new ItemStack(Material.AIR) : it).toArray((n) -> new ItemStack[n]);
+    }
+
+    public boolean hasExpired() {
+        return TimeUtil.elapsed(timeStamp) > 45_000L;
     }
 }
