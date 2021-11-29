@@ -23,11 +23,11 @@ public class MatchManager {
     }
 
     public int getPlayersInFightCount(Ladder ladder, boolean ranked) {
-        return matches.stream().filter(it -> it.getLadder().equals(ladder) && it.isRanked() == ranked).mapToInt(Match::getPlayersCount).sum();
+        return matches.stream().filter(it -> !it.duel && it.getLadder().equals(ladder) && it.isRanked() == ranked).mapToInt(Match::getPlayersCount).sum();
     }
 
     public int getPlayersInFightCount() {
-        return matches.stream().mapToInt(Match::getPlayersCount).sum();
+        return matches.stream().filter(it -> !it.isDuel()).mapToInt(Match::getPlayersCount).sum();
     }
 
 }

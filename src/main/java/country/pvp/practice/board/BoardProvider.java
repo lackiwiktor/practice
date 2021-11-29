@@ -2,10 +2,11 @@ package country.pvp.practice.board;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import country.pvp.practice.message.Bars;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.match.team.Team;
+import country.pvp.practice.message.Bars;
 import country.pvp.practice.message.MessageUtil;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.queue.PlayerQueueData;
@@ -34,7 +35,7 @@ public class BoardProvider {
             lines.add("  Ladder: " + MessageUtil.color(queueData.getLadderDisplayName()));
         } else if (player.isInMatch()) {
             PlayerMatchData matchData = player.getStateData();
-            Match match = matchData.getMatch();
+            Match<Team> match = matchData.getMatch();
 
             switch (match.getState()) {
                 case COUNTDOWN:

@@ -10,6 +10,7 @@ import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.Location;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -88,13 +89,13 @@ public abstract class Team implements Recipient {
         return getAlivePlayers().size() == 0;
     }
 
-    public Set<PracticePlayer> getOnlinePlayers() {
-        return getPlayers().stream().filter(it -> !hasDisconnected(it)).collect(Collectors.toSet());
+    public List<PracticePlayer> getOnlinePlayers() {
+        return getPlayers().stream().filter(it -> !hasDisconnected(it)).collect(Collectors.toList());
     }
 
     public abstract String getName();
 
-    public abstract Set<PracticePlayer> getPlayers();
+    public abstract List<PracticePlayer> getPlayers();
 
     public abstract int getPing();
 

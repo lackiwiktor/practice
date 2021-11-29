@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.arena.ArenaService;
 import country.pvp.practice.board.PracticeBoard;
+import country.pvp.practice.duel.DuelService;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
@@ -49,5 +50,6 @@ public class PracticeModule extends AbstractModule {
         bind(MatchMenuProvider.class).asEagerSingleton();
         bind(InventorySnapshotManager.class).asEagerSingleton();
         bind(InventorySnapshotMenuProvider.class).asEagerSingleton();
+        bind(DuelService.class).asEagerSingleton();
     }
 }

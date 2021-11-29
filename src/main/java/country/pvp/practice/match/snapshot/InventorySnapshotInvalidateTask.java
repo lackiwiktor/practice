@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class SnapshotExpiryTask implements Runnable {
+public class InventorySnapshotInvalidateTask implements Runnable {
 
     private final InventorySnapshotManager snapshotManager;
 
     @Override
     public void run() {
-        snapshotManager.cleanup();
+        snapshotManager.invalidate();
     }
 }

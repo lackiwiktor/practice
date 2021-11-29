@@ -18,7 +18,7 @@ public class InventorySnapshotManager {
         return Optional.ofNullable(snapshots.get(id));
     }
 
-    void cleanup() {
+    void invalidate() {
         snapshots.entrySet().removeIf(entry -> entry.getValue().hasExpired());
     }
 }

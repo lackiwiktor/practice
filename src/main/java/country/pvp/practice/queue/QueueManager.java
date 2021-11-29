@@ -21,10 +21,10 @@ public class QueueManager {
     private final ArenaManager arenaManager;
     private final MatchProvider matchProvider;
 
-    public void initQueue( Ladder ladder) {
-        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(ladder, false, itemBarManager, arenaManager, matchProvider));
+    public void initQueue(Ladder ladder) {
+        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(itemBarManager, arenaManager, matchProvider, ladder, false));
         if (ladder.isRanked())
-            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(ladder, true, itemBarManager, arenaManager, matchProvider));
+            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(itemBarManager, arenaManager, matchProvider,  ladder, true));
     }
 
     public List<Queue> getQueues(boolean ranked) {

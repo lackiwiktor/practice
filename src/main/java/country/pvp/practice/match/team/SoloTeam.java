@@ -2,21 +2,25 @@ package country.pvp.practice.match.team;
 
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.player.PracticePlayer;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-@RequiredArgsConstructor
+@Data
 public class SoloTeam extends Team {
 
     private final PracticePlayer player;
 
+    public static SoloTeam of(PracticePlayer player) {
+        return new SoloTeam(player);
+    }
+
     @Override
-    public Set<PracticePlayer> getPlayers() {
-        return Collections.singleton(player);
+    public List<PracticePlayer> getPlayers() {
+        return Collections.singletonList(player);
     }
 
     @Override
@@ -31,7 +35,7 @@ public class SoloTeam extends Team {
 
     @Override
     public void setElo(Ladder ladder, int elo) {
-         player.setElo(ladder, elo);
+        player.setElo(ladder, elo);
     }
 
     @Override
