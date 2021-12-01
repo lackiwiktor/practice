@@ -11,14 +11,13 @@ import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.duel.DuelRequestInvalidateTask;
-import country.pvp.practice.duel.DuelService;
 import country.pvp.practice.duel.command.DuelCommand;
+import country.pvp.practice.invitation.InvitationInvalidateTask;
+import country.pvp.practice.invitation.command.InvitationCommand;
 import country.pvp.practice.itembar.ItemBarListener;
 import country.pvp.practice.kit.PlayerKitListener;
-import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.kit.editor.KitEditorListener;
-import country.pvp.practice.kit.editor.KitEditorMenuProvider;
-import country.pvp.practice.kit.editor.KitEditorService;
+import country.pvp.practice.kit.editor.command.KitEditorCommand;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
@@ -33,11 +32,14 @@ import country.pvp.practice.match.command.SpectateCommand;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
 import country.pvp.practice.match.snapshot.command.ViewInventoryCommand;
 import country.pvp.practice.menu.MenuListener;
+import country.pvp.practice.party.PartyInviteRequestInvalidateTask;
+import country.pvp.practice.party.PartyRemovePlayerListener;
+import country.pvp.practice.party.command.PartyCommands;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.QueueRemovePlayerListener;
 import country.pvp.practice.queue.QueueTask;
-import country.pvp.practice.queue.menu.QueueMenuProvider;
+import country.pvp.practice.queue.command.QueueCommand;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
@@ -58,8 +60,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class Practice {
 
-    private static Practice instance;
-
     private final Injector injector;
     private final PlayerManager playerManager;
     private final PlayerService playerService;
@@ -68,40 +68,13 @@ public class Practice {
     private final ArenaManager arenaManager;
     private final ArenaService arenaService;
     private final QueueManager queueManager;
-    private final QueueMenuProvider queueMenuProvider;
     private final PracticeSettings practiceSettings;
     private final PracticeSettingsService practiceSettingsService;
-    private final KitChooseMenuProvider kitChooseMenuProvider;
     private final MatchManager matchManager;
-    private final KitEditorMenuProvider kitEditorMenuProvider;
-    private final KitEditorService kitEditorService;
-    private final DuelService duelService;
 
     private Blade blade;
 
-    public static QueueMenuProvider getQueueMenuProvider() {
-        return instance.queueMenuProvider;
-    }
-
-    public static KitChooseMenuProvider getKitChooseMenuProvider() {
-        return instance.kitChooseMenuProvider;
-    }
-
-    public static KitEditorMenuProvider getKitEditorProvider() {
-        return instance.kitEditorMenuProvider;
-    }
-
-    public static KitEditorService getKitEditorService() {
-        return instance.kitEditorService;
-    }
-
-    public static DuelService getDuelService() {
-        return instance.duelService;
-    }
-
     void onEnable() {
-        instance = this;
-
         register(ItemBarListener.class);
         register(PreparePlayerListener.class);
         register(PracticeBoard.class);
@@ -110,14 +83,17 @@ public class Practice {
         register(PlayerKitListener.class);
         register(MatchPlayerListener.class);
         register(QueueRemovePlayerListener.class);
+        register(PartyRemovePlayerListener.class);
         register(KitEditorListener.class);
 
         schedule(QueueTask.class, 1000L, TimeUnit.MILLISECONDS, true);
         schedule(BoardTask.class, 500L, TimeUnit.MILLISECONDS, true);
         schedule(PlayerSaveTask.class, 1L, TimeUnit.MINUTES, true);
         schedule(PearlCooldownTask.class, 100L, TimeUnit.MILLISECONDS, true);
-        schedule(InventorySnapshotInvalidateTask.class, 2L, TimeUnit.SECONDS, true);
-        schedule(DuelRequestInvalidateTask.class, 2L, TimeUnit.SECONDS, true);
+        schedule(InventorySnapshotInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
+        schedule(DuelRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
+        schedule(InvitationInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
+        schedule(PartyInviteRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
 
         loadSettings();
         loadArenas();
@@ -132,12 +108,16 @@ public class Practice {
         registerCommand(MatchCommand.class);
         registerCommand(ViewInventoryCommand.class);
         registerCommand(DuelCommand.class);
+        registerCommand(QueueCommand.class);
+        registerCommand(KitEditorCommand.class);
+        registerCommand(PartyCommands.class);
+        registerCommand(InvitationCommand.class);
 
         loadOnlinePlayers();
     }
 
     void onDisable() {
-        for (Match match : matchManager.getAll()) {
+        for (Match<?> match : matchManager.getAll()) {
             match.cancel("Server is restarting");
         }
 

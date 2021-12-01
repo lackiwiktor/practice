@@ -1,10 +1,11 @@
 package country.pvp.practice.lobby;
 
-import country.pvp.practice.duel.RematchData;
+import country.pvp.practice.match.RematchData;
 import country.pvp.practice.player.data.PlayerData;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 public class PlayerLobbyData implements PlayerData {
-    private final RematchData rematchData;
+    private @Nullable final RematchData rematchData;
 }

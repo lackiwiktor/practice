@@ -1,5 +1,6 @@
 package country.pvp.practice.player;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.command.argument.BladeProvider;
@@ -15,8 +16,8 @@ public class PracticePlayerProvider implements BladeProvider<PracticePlayer> {
     private final PlayerManager playerManager;
 
     @Override
-    public @Nullable PracticePlayer provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
-        if(input == null) return null;
+    public @Nullable PracticePlayer provide(BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+        if(Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
 
         return playerManager.get(input).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Player not found."));
     }

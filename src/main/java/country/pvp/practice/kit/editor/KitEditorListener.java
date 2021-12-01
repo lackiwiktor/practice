@@ -32,8 +32,7 @@ public class KitEditorListener extends PlayerListener {
 
         if (!practicePlayer.isInEditor()) return;
 
-        PlayerEditingData kitEditingData = practicePlayer.getStateData();
-        Ladder ladder = kitEditingData.getLadder();
+        Ladder ladder = practicePlayer.getCurrentlyEditingKit();
 
         switch (event.getClickedBlock().getType()) {
             case CHEST:

@@ -142,11 +142,10 @@ public class Match<T extends Team> implements Recipient {
 
     public void handleDeath(PracticePlayer player) {
         createInventorySnapshot(player);
-        PlayerMatchData matchData = player.getStateData();
-        matchData.setDead(true);
+        player.setDead(true);
 
-        if (matchData.getLastAttacker() != null) {
-            PracticePlayer killer = matchData.getLastAttacker();
+        if (player.hasLastAttacker()) {
+            PracticePlayer killer = player.getLastAttacker();
 
             broadcast(teamA,
                     Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
@@ -172,7 +171,7 @@ public class Match<T extends Team> implements Recipient {
     }
 
     void handleRespawn(PracticePlayer player) {
-        country.pvp.practice.match.team.Team team = getTeam(player);
+        Team team = getTeam(player);
 
         if (team.isDead()) {
             end(getOpponent(team));
@@ -186,12 +185,7 @@ public class Match<T extends Team> implements Recipient {
         createInventorySnapshot(player);
         broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
         broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
-
-        PlayerMatchData matchData = player.getStateData();
-
-        matchData.setDead(true);
-        matchData.setDisconnected(true);
-
+        player.handleDisconnectInMatch();
         country.pvp.practice.match.team.Team team = getTeam(player);
 
         if (team.isDead() && state != MatchState.END) {

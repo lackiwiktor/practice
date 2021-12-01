@@ -1,7 +1,6 @@
 package country.pvp.practice.match.snapshot;
 
 import com.google.common.base.Preconditions;
-import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.time.TimeUtil;
@@ -33,12 +32,8 @@ public class InventorySnapshot {
     public static InventorySnapshot create(PracticePlayer player) {
         Player bukkitPlayer = player.getPlayer();
         Preconditions.checkNotNull(bukkitPlayer, "player");
-
         PlayerInventory playerInventory = bukkitPlayer.getInventory();
-        PlayerMatchData matchData = player.getStateData();
-        Preconditions.checkNotNull(matchData, "matchData");
-
-        return new InventorySnapshot(player, playerInventory.getContents(), playerInventory.getArmorContents(), bukkitPlayer.getHealth(), bukkitPlayer.getFoodLevel(), bukkitPlayer.getActivePotionEffects(), matchData.getStatistics());
+        return new InventorySnapshot(player, playerInventory.getContents(), playerInventory.getArmorContents(), bukkitPlayer.getHealth(), bukkitPlayer.getFoodLevel(), bukkitPlayer.getActivePotionEffects(), player.getMatchStatistics());
     }
 
     public String getName() {
@@ -54,11 +49,11 @@ public class InventorySnapshot {
     }
 
     public ItemStack[] getArmor() {
-        return Arrays.stream(armor).map(it -> it == null ? new ItemStack(Material.AIR) : it).toArray((n) -> new ItemStack[n]);
+        return Arrays.stream(armor).map(it -> it == null ? new ItemStack(Material.AIR) : it).toArray(ItemStack[]::new);
     }
 
     public ItemStack[] getInventory() {
-        return Arrays.stream(inventory).map(it -> it == null ? new ItemStack(Material.AIR) : it).toArray((n) -> new ItemStack[n]);
+        return Arrays.stream(inventory).map(it -> it == null ? new ItemStack(Material.AIR) : it).toArray(ItemStack[]::new);
     }
 
     public boolean hasExpired() {

@@ -11,7 +11,7 @@ public class VisibilityUpdater {
     private final PlayerManager playerManager;
     private final VisibilityProvider visibilityProvider;
 
-    public void update( PracticePlayer player) {
+    public void update(PracticePlayer player) {
         for (PracticePlayer other : playerManager.getAll()) {
             if (!other.isOnline()) continue;
 
@@ -20,7 +20,7 @@ public class VisibilityUpdater {
         }
     }
 
-    public void update( PracticePlayer observer, PracticePlayer observable) {
+    public void update(PracticePlayer observer, PracticePlayer observable) {
         Visibility visibility = visibilityProvider.provide(observer, observable);
         visibility.apply(observer, observable);
     }

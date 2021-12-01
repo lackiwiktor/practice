@@ -2,7 +2,6 @@ package country.pvp.practice.match.command;
 
 import com.google.inject.Inject;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.PlayerMatchData;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PracticePlayer;
@@ -11,7 +10,6 @@ import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
 import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class SpectateCommand {
@@ -32,8 +30,7 @@ public class SpectateCommand {
             return;
         }
 
-        PlayerMatchData matchData = player.getStateData();
-        Match match = matchData.getMatch();
+        Match match = player.getCurrentMatch();
         match.startSpectating(practicePlayer, player);
     }
 }
