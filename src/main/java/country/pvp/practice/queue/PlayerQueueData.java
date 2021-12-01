@@ -6,7 +6,6 @@ import country.pvp.practice.player.PracticePlayer;
 import country.pvp.practice.player.data.PlayerData;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -64,5 +63,9 @@ public class PlayerQueueData implements Comparable<PlayerQueueData>, PlayerData,
 
     public String getName() {
         return player.getName();
+    }
+
+    public void removeFromQueue(boolean leftQueue) {
+        queue.removePlayer(player, leftQueue);
     }
 }

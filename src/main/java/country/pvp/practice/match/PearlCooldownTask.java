@@ -16,15 +16,13 @@ public class PearlCooldownTask implements Runnable {
         for (PracticePlayer practicePlayer : playerManager.getAll()) {
             if (!practicePlayer.isLoaded() || !practicePlayer.isOnline() || !practicePlayer.isInMatch()) continue;
 
-            PlayerMatchData matchData = practicePlayer.getStateData();
-
-            if (matchData.hasPearlCooldownExpired()) {
-                matchData.notifyAboutPearlCooldownExpiration(practicePlayer);
+            if (practicePlayer.hasPearlCooldownExpired()) {
+                practicePlayer.notifyAboutPearlCooldownExpiration(practicePlayer);
             } else {
-                int seconds = Math.round(matchData.getPearlCooldownRemaining()) / 1_000;
+                int seconds = Math.round(practicePlayer.getRemainingPearlCooldown()) / 1_000;
                 Player player = practicePlayer.getPlayer();
                 player.setLevel(seconds);
-                player.setExp(matchData.getPearlCooldownRemaining() / 16_000.0F);
+                player.setExp(practicePlayer.getRemainingPearlCooldown() / 16_000.0F);
             }
         }
     }

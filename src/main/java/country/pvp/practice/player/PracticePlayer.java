@@ -4,10 +4,19 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import country.pvp.practice.data.DataObject;
 import country.pvp.practice.duel.DuelRequest;
+import country.pvp.practice.duel.PlayerDuelRequest;
 import country.pvp.practice.kit.NamedKit;
+import country.pvp.practice.kit.editor.PlayerEditingData;
 import country.pvp.practice.ladder.Ladder;
+import country.pvp.practice.lobby.PlayerLobbyData;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.match.PlayerMatchStatistics;
+import country.pvp.practice.match.RematchData;
 import country.pvp.practice.message.Recipient;
+import country.pvp.practice.party.Party;
 import country.pvp.practice.player.data.*;
+import country.pvp.practice.queue.PlayerQueueData;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bson.Document;
@@ -28,7 +37,8 @@ public class PracticePlayer implements DataObject, Recipient {
     private final PlayerStateData stateData = new PlayerStateData();
     private final PlayerStatistics statistics = new PlayerStatistics();
     private final PlayerKits kits = new PlayerKits();
-    private final Set<DuelRequest> duelRequests = Sets.newConcurrentHashSet();
+    private final Set<PlayerDuelRequest> duelRequests = Sets.newConcurrentHashSet();
+    private Party party;
     private String name;
     private PlayerState state = PlayerState.IN_LOBBY;
     private boolean loaded;
@@ -88,18 +98,22 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public boolean isInLobby() {
+        Preconditions.checkNotNull(stateData, "data");
         return state == PlayerState.IN_LOBBY;
     }
 
     public boolean isInQueue() {
+        Preconditions.checkNotNull(stateData, "data");
         return state == PlayerState.QUEUING && hasStateData();
     }
 
     public boolean isInMatch() {
+        Preconditions.checkNotNull(stateData, "data");
         return state == PlayerState.IN_MATCH && hasStateData();
     }
 
     public boolean isInEditor() {
+        Preconditions.checkNotNull(stateData, "data");
         return state == PlayerState.EDITING_KIT && hasStateData();
     }
 
@@ -115,10 +129,6 @@ public class PracticePlayer implements DataObject, Recipient {
     public <V extends PlayerData> void setState(PlayerState state, PlayerData data) {
         this.state = state;
         stateData.setStateData(data);
-    }
-
-    public void clearSateData() {
-        stateData.removeStateData();
     }
 
     public <V extends PlayerData> @Nullable V getStateData() {
@@ -157,20 +167,37 @@ public class PracticePlayer implements DataObject, Recipient {
         return kits.getKits(ladder);
     }
 
-    public void addDuelRequest(DuelRequest request) {
+    public void addDuelRequest(PlayerDuelRequest request) {
         duelRequests.add(request);
     }
 
-    public boolean hasDuelRequest(PracticePlayer player) {
-        return duelRequests.stream().anyMatch(it -> it.getPlayer().equals(player));
+    public boolean hasDuelRequest(PracticePlayer inviter) {
+        return duelRequests.stream().anyMatch(it -> it.getInviter().equals(inviter));
     }
 
-    public @Nullable DuelRequest getDuelRequest(PracticePlayer player) {
-        return duelRequests.stream().filter(it -> it.getPlayer().equals(player)).findFirst().orElse(null);
+    public @Nullable PlayerDuelRequest getDuelRequest(PracticePlayer inviter) {
+        return duelRequests.stream().filter(it -> it.getInviter().equals(inviter)).findFirst().orElse(null);
+    }
+
+    public void clearDuelRequests(PracticePlayer inviter) {
+        duelRequests.removeIf(it -> it.getInviter().equals(inviter));
     }
 
     public void invalidateDuelRequests() {
         duelRequests.removeIf(DuelRequest::hasExpired);
+    }
+
+    public boolean hasParty() {
+        return party != null;
+    }
+
+    public boolean isPartyLeader() {
+        Preconditions.checkNotNull(party, "party");
+        return party.getLeader().equals(this);
+    }
+
+    public void addToParty(Party party) {
+        this.party = party;
     }
 
     public void enableFlying() {
@@ -192,6 +219,28 @@ public class PracticePlayer implements DataObject, Recipient {
         Preconditions.checkNotNull(player, "player");
 
         return player.hasPermission(permission);
+    }
+
+    public boolean hasRematchData() {
+        PlayerLobbyData lobbyData = getStateData();
+        Preconditions.checkNotNull(lobbyData, "data");
+        return lobbyData.getRematchData() != null;
+    }
+
+    public PracticePlayer getRematchPlayer() {
+        PlayerLobbyData lobbyData = getStateData();
+        Preconditions.checkNotNull(lobbyData, "data");
+        RematchData rematchData = lobbyData.getRematchData();
+        Preconditions.checkNotNull(rematchData, "rematch data");
+        return rematchData.getPlayer();
+    }
+
+    public Ladder getRematchLadder() {
+        PlayerLobbyData lobbyData = getStateData();
+        Preconditions.checkNotNull(lobbyData, "data");
+        RematchData rematchData = lobbyData.getRematchData();
+        Preconditions.checkNotNull(rematchData, "rematch data");
+        return rematchData.getLadder();
     }
 
     public void teleport(Location location) {
@@ -221,6 +270,18 @@ public class PracticePlayer implements DataObject, Recipient {
         if (kits.hasKits(ladder)) {
             Arrays.stream(getKits(ladder)).filter(Objects::nonNull).forEach(it -> playerInventory.addItem(it.getIcon()));
         }
+    }
+
+    public Match<?> getCurrentMatch() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        return matchData.getMatch();
+    }
+
+    public void handleBeingHit(PracticePlayer attacker) {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.handleBeingHit(attacker);
     }
 
     public void respawn() {
@@ -270,7 +331,110 @@ public class PracticePlayer implements DataObject, Recipient {
         player.spigot().sendMessage(components);
     }
 
-    public void invalidateRequest(DuelRequest request) {
-        duelRequests.remove(request);
+    public void removeFromParty() {
+        this.party = null;
+    }
+
+    public void chat(String message) {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        player.chat(message);
+    }
+
+    public void removeFromQueue(boolean left) {
+        PlayerQueueData queueData = getStateData();
+        Preconditions.checkNotNull(queueData, "data");
+        queueData.removeFromQueue(left);
+    }
+
+    public void removeFromQueue() {
+        removeFromQueue(false);
+    }
+
+    public void setDead(boolean dead) {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.setDead(dead);
+    }
+
+    public boolean hasLastAttacker() {
+        return getLastAttacker() != null;
+    }
+
+    public PracticePlayer getLastAttacker() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        return matchData.getLastAttacker();
+    }
+
+    public void handleDisconnectInParty() {
+        party.handleDisconnect(this);
+    }
+
+    public void handleDisconnectInMatch() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.setDisconnected(true);
+    }
+
+    public void stopSpectating(boolean broadcast) {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        Match<?> match = matchData.getMatch();
+        match.stopSpectating(this, broadcast);
+    }
+
+    public PlayerMatchStatistics getMatchStatistics() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        return matchData.getStatistics();
+    }
+
+    public void handleHit() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.handleHit();
+    }
+
+    public boolean hasPearlCooldownExpired() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        return matchData.hasPearlCooldownExpired();
+    }
+
+    public long getRemainingPearlCooldown() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        return matchData.getPearlCooldownRemaining();
+    }
+
+    public void increaseThrownPots() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.increaseThrownPotions();
+    }
+
+    public void increaseMissedPots() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.increaseMissedPotions();
+    }
+
+    public void resetPearlCooldown() {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.resetPearlCooldown();
+    }
+
+    public void notifyAboutPearlCooldownExpiration(PracticePlayer practicePlayer) {
+        PlayerMatchData matchData = getStateData();
+        Preconditions.checkNotNull(matchData, "data");
+        matchData.notifyAboutPearlCooldownExpiration(practicePlayer);
+    }
+
+    public Ladder getCurrentlyEditingKit() {
+        PlayerEditingData editingData = getStateData();
+        Preconditions.checkNotNull(editingData, "data");
+        return editingData.getLadder();
     }
 }

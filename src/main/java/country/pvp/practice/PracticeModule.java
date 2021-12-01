@@ -6,21 +6,25 @@ import com.mongodb.client.MongoDatabase;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.arena.ArenaService;
 import country.pvp.practice.board.PracticeBoard;
-import country.pvp.practice.duel.DuelService;
+import country.pvp.practice.duel.PlayerDuelService;
+import country.pvp.practice.invitation.InvitationManager;
+import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
-import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchMenuProvider;
 import country.pvp.practice.match.MatchProvider;
+import country.pvp.practice.match.snapshot.InventorySnapshotManager;
+import country.pvp.practice.match.snapshot.InventorySnapshotMenuProvider;
+import country.pvp.practice.party.PartyManager;
+import country.pvp.practice.party.PartyService;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsService;
-import country.pvp.practice.match.snapshot.InventorySnapshotMenuProvider;
 import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
@@ -31,6 +35,8 @@ public class PracticeModule extends AbstractModule {
         bind(MongoDatabase.class).toInstance(
                 MongoClients.create("mongodb+srv://ponktacology:yHzd9Qcg7u1f3Q3H@cluster0.zch1g.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
                         .getDatabase("practice"));
+        bind(InvitationManager.class).asEagerSingleton();
+        bind(InvitationService.class).asEagerSingleton();
         bind(ItemBarManager.class).asEagerSingleton();
         bind(PlayerManager.class).asEagerSingleton();
         bind(PlayerService.class).asEagerSingleton();
@@ -50,6 +56,8 @@ public class PracticeModule extends AbstractModule {
         bind(MatchMenuProvider.class).asEagerSingleton();
         bind(InventorySnapshotManager.class).asEagerSingleton();
         bind(InventorySnapshotMenuProvider.class).asEagerSingleton();
-        bind(DuelService.class).asEagerSingleton();
+        bind(PartyManager.class).asEagerSingleton();
+        bind(PartyService.class).asEagerSingleton();
+        bind(PlayerDuelService.class).asEagerSingleton();
     }
 }

@@ -1,10 +1,8 @@
 package country.pvp.practice.visibility;
 
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.PlayerMatchData;
-import country.pvp.practice.match.PlayerSpectatingData;
+import country.pvp.practice.party.Party;
 import country.pvp.practice.player.PracticePlayer;
-import org.jetbrains.annotations.NotNull;
 
 public class VisibilityProvider {
 
@@ -17,18 +15,24 @@ public class VisibilityProvider {
      */
     public Visibility provide( PracticePlayer observer, PracticePlayer observable) {
         switch (observer.getState()) {
+            case QUEUING:
+            case IN_LOBBY:
+                if (observer.hasParty() && observable.hasParty()) {
+                    Party party = observer.getParty();
+
+                    return party.hasPlayer(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
+                }
+                return Visibility.HIDDEN;
             case IN_MATCH:
                 if (observable.isInMatch()) {
-                    PlayerMatchData matchData = observable.getStateData();
-                    Match match = matchData.getMatch();
+                    Match match = observable.getCurrentMatch();
                     return match.isInMatch(observer) && match.isAlive(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
                 }
                 return Visibility.HIDDEN;
             case SPECTATING:
                 if (observable.isInMatch()) {
-                    PlayerSpectatingData spectatingData = observer.getStateData();
-
-                    return spectatingData.getMatch().isInMatch(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
+                    Match match = observer.getCurrentMatch();
+                    return match.isInMatch(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
                 }
                 return Visibility.HIDDEN;
             default:

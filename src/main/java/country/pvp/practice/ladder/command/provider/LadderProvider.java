@@ -1,5 +1,6 @@
 package country.pvp.practice.ladder.command.provider;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
@@ -9,7 +10,6 @@ import me.vaperion.blade.command.container.BladeParameter;
 import me.vaperion.blade.command.context.BladeContext;
 import me.vaperion.blade.command.exception.BladeExitMessage;
 import org.bukkit.ChatColor;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -21,7 +21,8 @@ public class LadderProvider implements BladeProvider<Ladder> {
 
     @Override
     public @Nullable Ladder provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
-        if (input == null) return null;
+        System.out.println(input);
+        if (Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
 
         return Optional.ofNullable(ladderManager.get(input)).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Wrong ladder"));
     }

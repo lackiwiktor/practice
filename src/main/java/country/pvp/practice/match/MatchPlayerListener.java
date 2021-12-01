@@ -41,8 +41,7 @@ public class MatchPlayerListener extends PlayerListener {
 
         if (!damagedPlayer.isInMatch()) return;
 
-        PlayerMatchData matchData = damagedPlayer.getStateData();
-        Match match = matchData.getMatch();
+        Match match = damagedPlayer.getCurrentMatch();
 
         if (match.getState() != MatchState.FIGHT) {
             event.setCancelled(true);
@@ -56,8 +55,7 @@ public class MatchPlayerListener extends PlayerListener {
         PracticePlayer damagedPlayer = get((Player) event.getEntity());
         if (!damagedPlayer.isInMatch()) return;
 
-        PlayerMatchData matchData = damagedPlayer.getStateData();
-        Match match = matchData.getMatch();
+        Match match = damagedPlayer.getCurrentMatch();
 
         if (match.getState() != MatchState.FIGHT) {
             event.setCancelled(true);
@@ -83,10 +81,8 @@ public class MatchPlayerListener extends PlayerListener {
             return;
         }
 
-        PlayerMatchData damagerMatchData = damagerPlayer.getStateData();
-
-        damagerMatchData.handleHit();
-        matchData.handleBeingHit(damagerPlayer);
+        damagerPlayer.handleHit();
+        damagedPlayer.handleBeingHit(damagerPlayer);
     }
 
     @EventHandler
@@ -94,9 +90,7 @@ public class MatchPlayerListener extends PlayerListener {
         event.setDeathMessage(null);
         PracticePlayer player = get(event.getEntity());
         if (!player.isInMatch()) return;
-
-        PlayerMatchData matchData = player.getStateData();
-        Match match = matchData.getMatch();
+        Match match = player.getCurrentMatch();
         match.handleDeath(player);
     }
 
@@ -110,8 +104,7 @@ public class MatchPlayerListener extends PlayerListener {
 
         event.setRespawnLocation(event.getPlayer().getLocation());
 
-        PlayerMatchData matchData = player.getStateData();
-        Match match = matchData.getMatch();
+ Match match = practicePlayer.getCurrentMatch();
         match.handleRespawn(player);
 
         System.out.println("NOT HANDLED??2");
@@ -123,8 +116,7 @@ public class MatchPlayerListener extends PlayerListener {
         PracticePlayer practicePlayer = get(event.getPlayer());
 
         if (practicePlayer.isInMatch()) {
-            PlayerMatchData matchData = practicePlayer.getStateData();
-            Match match = matchData.getMatch();
+            Match match = practicePlayer.getCurrentMatch();
 
             event.setCancelled(match.getState() != MatchState.FIGHT || !match.isBuild());
         }
@@ -135,8 +127,7 @@ public class MatchPlayerListener extends PlayerListener {
         PracticePlayer practicePlayer = get(event.getPlayer());
 
         if (practicePlayer.isInMatch()) {
-            PlayerMatchData matchData = practicePlayer.getStateData();
-            Match match = matchData.getMatch();
+            Match match = practicePlayer.getCurrentMatch();
 
             event.setCancelled(match.getState() != MatchState.FIGHT || !match.isBuild());
         }
@@ -148,8 +139,7 @@ public class MatchPlayerListener extends PlayerListener {
         PracticePlayer player = get(event);
         if (!player.isInMatch()) return;
 
-        PlayerMatchData matchData = player.getStateData();
-        Match match = matchData.getMatch();
+        Match match = player.getCurrentMatch();
         match.handleDisconnect(player);
     }
 
@@ -161,14 +151,13 @@ public class MatchPlayerListener extends PlayerListener {
 
             if (!player.isInMatch()) return;
 
-            PlayerMatchData matchData = player.getStateData();
-            matchData.increaseThrownPotions();
+            player.increaseThrownPots();
 
             if (event.getIntensity(shooter) <= 0.5D) {
-                matchData.increaseMissedPotions();
+                player.increaseMissedPots();
             }
 
-            Match match = matchData.getMatch();
+            Match match = player.getCurrentMatch();
             for (LivingEntity entity : event.getAffectedEntities()) {
                 if (entity instanceof Player) {
                     PracticePlayer affectedPlayer = playerManager.get((Player) entity);
@@ -205,21 +194,20 @@ public class MatchPlayerListener extends PlayerListener {
         ItemStack item = event.getItem();
 
         if (item.getType() == Material.ENDER_PEARL) {
-            PlayerMatchData matchData = practicePlayer.getStateData();
-            Match match = matchData.getMatch();
+            Match match = practicePlayer.getCurrentMatch();
 
             if (match.getState() != MatchState.FIGHT) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (!matchData.hasPearlCooldownExpired()) {
-                String time = TimeUtil.millisToSeconds(matchData.getPearlCooldownRemaining());
+            if (!practicePlayer.hasPearlCooldownExpired()) {
+                String time = TimeUtil.millisToSeconds(practicePlayer.getRemainingPearlCooldown());
                 Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
                         time + (time.equalsIgnoreCase("1.0") ? "" : "s")));
                 event.setCancelled(true);
             } else {
-                matchData.resetPearlCooldown();
+                practicePlayer.resetPearlCooldown();
             }
         }
     }

@@ -1,4 +1,4 @@
-package country.pvp.practice.duel;
+package country.pvp.practice.match;
 
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.player.PracticePlayer;

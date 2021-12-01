@@ -1,4 +1,4 @@
-package country.pvp.practice.queue;
+package country.pvp.practice.party;
 
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
@@ -7,19 +7,19 @@ import country.pvp.practice.player.PracticePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class QueueRemovePlayerListener extends PlayerListener {
+public class PartyRemovePlayerListener extends PlayerListener {
 
     @Inject
-    public QueueRemovePlayerListener(PlayerManager playerManager) {
+    public PartyRemovePlayerListener(PlayerManager playerManager) {
         super(playerManager);
     }
 
     @EventHandler
-    public void playerQuit( PlayerQuitEvent event) {
+    public void playerQuit(PlayerQuitEvent event) {
         PracticePlayer practicePlayer = get(event);
 
-        if (practicePlayer.isInQueue()) {
-            practicePlayer.removeFromQueue();
+        if (practicePlayer.hasParty()) {
+            practicePlayer.handleDisconnectInParty();
         }
     }
 }
