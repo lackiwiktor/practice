@@ -1,7 +1,7 @@
 package country.pvp.practice.match.team;
 
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.Objects;
 
 @Data
-public class SoloTeam extends Team {
+public class SoloTeam extends Team implements Ranked {
 
-    private final PracticePlayer player;
+    private final PlayerSession player;
 
-    public static SoloTeam of(PracticePlayer player) {
+    public static SoloTeam of(PlayerSession player) {
         return new SoloTeam(player);
     }
 
     @Override
-    public List<PracticePlayer> getPlayers() {
+    public List<PlayerSession> getPlayers() {
         return Collections.singletonList(player);
     }
 

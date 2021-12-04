@@ -3,7 +3,7 @@ package country.pvp.practice.kit;
 import com.google.common.base.Preconditions;
 import country.pvp.practice.data.SerializableObject;
 import country.pvp.practice.itembar.ItemBuilder;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.serialization.ItemStackAdapter;
 import lombok.Data;
 import org.bson.Document;
@@ -39,7 +39,7 @@ public class Kit implements SerializableObject {
         armor = (ItemStack[]) document.get("armor", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
     }
 
-    public void apply( PracticePlayer player) {
+    public void apply( PlayerSession player) {
         Player bukkitPlayer = player.getPlayer();
         Preconditions.checkNotNull(bukkitPlayer, "player");
         PlayerInventory playerInventory = bukkitPlayer.getInventory();

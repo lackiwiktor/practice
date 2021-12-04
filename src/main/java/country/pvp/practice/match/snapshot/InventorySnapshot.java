@@ -2,7 +2,7 @@ package country.pvp.practice.match.snapshot;
 
 import com.google.common.base.Preconditions;
 import country.pvp.practice.match.PlayerMatchStatistics;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 import org.bukkit.Material;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @Data
 public class InventorySnapshot {
 
-    private final PracticePlayer player;
+    private final PlayerSession player;
     private final ItemStack[] inventory;
     private final ItemStack[] armor;
     private final double health;
@@ -29,7 +29,7 @@ public class InventorySnapshot {
     private final long timeStamp = System.currentTimeMillis();
     private UUID opponent;
 
-    public static InventorySnapshot create(PracticePlayer player) {
+    public static InventorySnapshot create(PlayerSession player) {
         Player bukkitPlayer = player.getPlayer();
         Preconditions.checkNotNull(bukkitPlayer, "player");
         PlayerInventory playerInventory = bukkitPlayer.getInventory();

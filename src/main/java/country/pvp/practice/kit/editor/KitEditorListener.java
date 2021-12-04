@@ -6,7 +6,7 @@ import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerService;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -28,23 +28,23 @@ public class KitEditorListener extends PlayerListener {
     public void interactEvent(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        PracticePlayer practicePlayer = get(event);
+        PlayerSession playerSession = get(event);
 
-        if (!practicePlayer.isInEditor()) return;
+        if (!playerSession.isInEditor()) return;
 
-        Ladder ladder = practicePlayer.getCurrentlyEditingKit();
+        Ladder ladder = playerSession.getCurrentlyEditingKit();
 
         switch (event.getClickedBlock().getType()) {
             case CHEST:
                 new KitEditorChest(ladder).openMenu(event.getPlayer());
                 break;
             case ANVIL:
-                new KitEditorMenu(playerService, practicePlayer, ladder).openMenu(event.getPlayer());
+                new KitEditorMenu(playerService, playerSession, ladder).openMenu(event.getPlayer());
                 break;
             case WOODEN_DOOR:
             case WOOD_DOOR:
             case SIGN_POST:
-                lobbyService.moveToLobby(practicePlayer);
+                lobbyService.moveToLobby(playerSession);
                 break;
         }
 
@@ -53,9 +53,9 @@ public class KitEditorListener extends PlayerListener {
 
     @EventHandler(ignoreCancelled = true)
     public void dropItem(PlayerDropItemEvent event) {
-        PracticePlayer practicePlayer = get(event);
+        PlayerSession playerSession = get(event);
 
-        if (practicePlayer.isInEditor()) {
+        if (playerSession.isInEditor()) {
             event.getItemDrop().remove();
         }
     }

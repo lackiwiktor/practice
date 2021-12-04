@@ -2,7 +2,7 @@ package country.pvp.practice.visibility;
 
 import country.pvp.practice.match.Match;
 import country.pvp.practice.party.Party;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 
 public class VisibilityProvider {
 
@@ -13,7 +13,7 @@ public class VisibilityProvider {
      * @param observable player who is looked on
      * @return visibility
      */
-    public Visibility provide( PracticePlayer observer, PracticePlayer observable) {
+    public Visibility provide(PlayerSession observer, PlayerSession observable) {
         switch (observer.getState()) {
             case QUEUING:
             case IN_LOBBY:

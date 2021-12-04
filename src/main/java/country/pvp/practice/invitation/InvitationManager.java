@@ -22,7 +22,6 @@ public class InvitationManager {
         invitations.remove(invitation.getId());
     }
 
-
     public void invalidate() {
         invitations.entrySet().removeIf(entry -> entry.getValue().hasExpired());
     }

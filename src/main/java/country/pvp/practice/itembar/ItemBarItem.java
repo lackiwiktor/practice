@@ -1,9 +1,8 @@
 package country.pvp.practice.itembar;
 
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
 
@@ -11,9 +10,9 @@ import java.util.function.BiConsumer;
 public class ItemBarItem {
 
   private final ItemStack item;
-  private final BiConsumer<PracticePlayer, BarInteract> click;
+  private final BiConsumer<PlayerSession, BarInteract> click;
 
-  public void click(PracticePlayer player, BarInteract interact) {
+  public void click(PlayerSession player, BarInteract interact) {
     click.accept(player, interact);
   }
 

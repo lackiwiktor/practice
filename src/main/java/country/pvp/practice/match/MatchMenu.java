@@ -5,13 +5,12 @@ import com.google.common.collect.Maps;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.menu.Button;
 import country.pvp.practice.menu.Menu;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -62,7 +61,7 @@ public class MatchMenu extends Menu {
                     .build();
         }
 
-        private String formatLore( PracticePlayer player) {
+        private String formatLore( PlayerSession player) {
             String lore;
             if (match.isAlive(player)) {
                 lore = ChatColor.WHITE.toString()

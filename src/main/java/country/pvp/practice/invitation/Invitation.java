@@ -1,7 +1,7 @@
 package country.pvp.practice.invitation;
 
 import country.pvp.practice.Expiring;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 
@@ -13,7 +13,7 @@ public abstract class Invitation implements Expiring {
     private final UUID id = UUID.randomUUID();
     private final long timeStamp = System.currentTimeMillis();
     private final String message;
-    private final PracticePlayer inviter;
+    private final PlayerSession inviter;
 
     public void accept() {
         onAccept();

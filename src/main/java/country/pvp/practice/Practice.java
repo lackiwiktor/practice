@@ -44,11 +44,9 @@ import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import me.vaperion.blade.Blade;
 import me.vaperion.blade.command.bindings.impl.BukkitBindings;
 import me.vaperion.blade.command.container.impl.BukkitCommandContainer;
-import me.vaperion.blade.completer.impl.DefaultTabCompleter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -56,7 +54,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class Practice {
 
@@ -121,17 +118,17 @@ public class Practice {
             match.cancel("Server is restarting");
         }
 
-        for (PracticePlayer practicePlayer : playerManager.getAll()) {
-            playerService.save(practicePlayer);
+        for (PlayerSession playerSession : playerManager.getAll()) {
+            playerService.save(playerSession);
         }
     }
 
     private void loadOnlinePlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             try {
-                PracticePlayer practicePlayer = new PracticePlayer(player);
-                playerService.loadAsync(practicePlayer);
-                playerManager.add(practicePlayer);
+                PlayerSession playerSession = new PlayerSession(player);
+                playerService.loadAsync(playerSession);
+                playerManager.add(playerSession);
             } catch (Exception e) {
                 player.kickPlayer("Server is restarting...");
             }
@@ -154,11 +151,10 @@ public class Practice {
                 .overrideCommands(true)
                 .bind(Arena.class, injector.getInstance(ArenaProvider.class))
                 .bind(Ladder.class, injector.getInstance(LadderProvider.class))
-                .bind(PracticePlayer.class, injector.getInstance(PracticePlayerProvider.class))
+                .bind(PlayerSession.class, injector.getInstance(PracticePlayerProvider.class))
                 .containerCreator(BukkitCommandContainer.CREATOR)
                 .binding(new BukkitBindings())
                 .helpGenerator(new PracticeHelpGenerator())
-                .tabCompleter(new DefaultTabCompleter())
                 .build();
     }
 

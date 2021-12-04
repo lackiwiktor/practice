@@ -6,7 +6,7 @@ import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -32,27 +32,27 @@ public class PlayerKitListener extends PlayerListener {
         Action action = event.getAction();
         if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
-        PracticePlayer practicePlayer = get(event);
-        if (!practicePlayer.isInMatch()) return;
+        PlayerSession playerSession = get(event);
+        if (!playerSession.isInMatch()) return;
 
-        Match match = practicePlayer.getCurrentMatch();
+        Match match = playerSession.getCurrentMatch();
 
-        practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> {
-            Messager.message(practicePlayer, Messages.MATCH_PLAYER_EQUIP_KIT.match("{kit}", it.getName()));
-            it.apply(practicePlayer);
+        playerSession.getMatchingKit(match.getLadder(), item).ifPresent(it -> {
+            Messager.message(playerSession, Messages.MATCH_PLAYER_EQUIP_KIT.match("{kit}", it.getName()));
+            it.apply(playerSession);
         });
     }
 
     @EventHandler(ignoreCancelled = true)
     public void dropItem(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
-        PracticePlayer practicePlayer = get(event);
+        PlayerSession playerSession = get(event);
 
-        if (!practicePlayer.isInMatch()) return;
+        if (!playerSession.isInMatch()) return;
 
-        Match match = practicePlayer.getCurrentMatch();
+        Match match = playerSession.getCurrentMatch();
 
-        practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
+        playerSession.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -60,21 +60,21 @@ public class PlayerKitListener extends PlayerListener {
         ItemStack item = event.getCurrentItem();
         if (item == null) return;
 
-        PracticePlayer practicePlayer = get((Player) event.getWhoClicked());
-        if (!practicePlayer.isInMatch()) return;
+        PlayerSession playerSession = get((Player) event.getWhoClicked());
+        if (!playerSession.isInMatch()) return;
 
-        Match match = practicePlayer.getCurrentMatch();
+        Match match = playerSession.getCurrentMatch();
 
-        practicePlayer.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
+        playerSession.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
     }
 
     @EventHandler
     public void deathEvent(PlayerDeathEvent event) {
-        PracticePlayer practicePlayer = get(event.getEntity());
-        if (!practicePlayer.isInMatch()) return;
+        PlayerSession playerSession = get(event.getEntity());
+        if (!playerSession.isInMatch()) return;
 
-        Match match = practicePlayer.getCurrentMatch();
+        Match match = playerSession.getCurrentMatch();
 
-        event.getDrops().removeIf(it -> practicePlayer.getMatchingKit(match.getLadder(), it).isPresent());
+        event.getDrops().removeIf(it -> playerSession.getMatchingKit(match.getLadder(), it).isPresent());
     }
 }

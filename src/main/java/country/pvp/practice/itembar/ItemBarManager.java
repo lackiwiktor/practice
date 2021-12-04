@@ -1,13 +1,13 @@
 package country.pvp.practice.itembar;
 
 import country.pvp.practice.player.PlayerUtil;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemBarManager {
 
-    public ItemBar get(PracticePlayer player) {
+    public ItemBar get(PlayerSession player) {
         ItemBarItem[] items = new ItemBarItem[9];
         switch (player.getState()) {
             case IN_LOBBY:
@@ -15,8 +15,8 @@ public class ItemBarManager {
                         ((practicePlayer, interact) -> practicePlayer.chat("/unranked")));
                 items[1] = new ItemBarItem(new ItemBuilder(Material.DIAMOND_SWORD).name("&6Ranked").unbreakable().build(),
                         ((practicePlayer, interact) -> practicePlayer.chat("/ranked")));
-                items[2] = player.hasRematchData() ? null : new ItemBarItem(new ItemBuilder(Material.BLAZE_ROD).name("&eRematch").unbreakable().build(),
-                        ((practicePlayer, interact) -> practicePlayer.chat("/duel " + practicePlayer.getRematchPlayer().getName() + " " + practicePlayer.getRematchLadder().getName())));
+                items[2] = player.hasRematchData() ? new ItemBarItem(new ItemBuilder(Material.BLAZE_ROD).name("&eRematch").unbreakable().build(),
+                        ((practicePlayer, interact) -> practicePlayer.chat("/duel " + practicePlayer.getRematchPlayer().getName() + " " + practicePlayer.getRematchLadder().getName()))) : null;
                 items[4] = new ItemBarItem(new ItemBuilder(Material.ANVIL).name("&eKit Editor").unbreakable().build(),
                         ((practicePlayer, interact) -> practicePlayer.chat("/kiteditor")));
                 items[5] = player.hasParty() ? new ItemBarItem(new ItemBuilder(Material.IRON_AXE).build(), ((practicePlayer, interact) -> {
@@ -36,7 +36,7 @@ public class ItemBarManager {
         return null;
     }
 
-    public boolean click(PracticePlayer player, ItemStack item, BarInteract interact) {
+    public boolean click(PlayerSession player, ItemStack item, BarInteract interact) {
         for (ItemBarItem itemBarItem : get(player).getItems()) {
             if (itemBarItem == null || itemBarItem.getItem().getType() == Material.AIR) continue;
 
@@ -49,7 +49,7 @@ public class ItemBarManager {
         return false;
     }
 
-    public void apply(PracticePlayer player) {
+    public void apply(PlayerSession player) {
         PlayerUtil.resetPlayer(player.getPlayer());
         get(player).apply(player);
     }

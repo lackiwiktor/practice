@@ -6,6 +6,7 @@ import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
+import country.pvp.practice.match.team.PartyTeam;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,10 @@ public class MatchProvider {
 
     public Match<?> provide(Ladder ladder, boolean ranked, boolean duel, SoloTeam teamA, SoloTeam teamB) {
         return new SoloMatch(visibilityUpdater, lobbyService, matchManager, itemBarManager, snapshotManager, ladder, arenaManager.getRandom(), teamA, teamB, ranked, duel);
+    }
+
+    public Match<?> provide(Ladder ladder, PartyTeam teamA, PartyTeam teamB) {
+        return new PartyMatch(visibilityUpdater, lobbyService, matchManager, itemBarManager, snapshotManager, ladder, arenaManager.getRandom(), teamA, teamB);
     }
 
 }

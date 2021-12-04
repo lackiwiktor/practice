@@ -10,11 +10,11 @@ public class PlayerListener implements Listener {
 
     protected final PlayerManager playerManager;
 
-    public PracticePlayer get(Player player) {
+    public PlayerSession get(Player player) {
         return playerManager.get(player);
     }
 
-    public PracticePlayer get(PlayerEvent event) {
+    public PlayerSession get(PlayerEvent event) {
         return get(event.getPlayer());
     }
 }

@@ -1,20 +1,25 @@
 package country.pvp.practice.queue;
 
-import com.mongodb.assertions.Assertions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarManager;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.lobby.PlayerLobbyData;
+import country.pvp.practice.lobby.SessionLobbyData;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.PlayerState;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Set;
 
 @Data
 public class Queue {
@@ -24,13 +29,13 @@ public class Queue {
     private final ArenaManager arenaManager;
     private final MatchProvider matchProvider;
 
-    private final java.util.Queue<PlayerQueueData> entries = new NonDuplicatePriorityQueue<>();
+    private final List<SessionQueueData> entries = Lists.newCopyOnWriteArrayList();
 
     private final Ladder ladder;
     private final boolean ranked;
 
-    public void addPlayer(PracticePlayer player) {
-        PlayerQueueData entry = new PlayerQueueData(player, this);
+    public void addPlayer(PlayerSession player) {
+        SessionQueueData entry = new SessionQueueData(player, this);
         entries.add(entry);
         player.setState(PlayerState.QUEUING, entry);
         itemBarManager.apply(player);
@@ -39,12 +44,12 @@ public class Queue {
                 new MessagePattern("{ranked}", ranked ? "&branked" : "&dunranked")));
     }
 
-    public void removePlayer(PracticePlayer player, boolean leftQueue) {
+    public void removePlayer(PlayerSession player, boolean leftQueue) {
         entries.removeIf(it -> it.getPlayer().equals(player));
 
         if (leftQueue) {
             Messager.message(player, Messages.PLAYER_LEFT_QUEUE);
-            player.setState(PlayerState.IN_LOBBY, new PlayerLobbyData(null));
+            player.setState(PlayerState.IN_LOBBY, new SessionLobbyData(null));
             itemBarManager.apply(player);
         }
     }
@@ -52,26 +57,29 @@ public class Queue {
     public void tick() {
         if (entries.size() < 2) return;
 
-        PlayerQueueData queueData1 = entries.poll();
-        PlayerQueueData queueData2 = entries.poll();
+        Set<SessionQueueData> toRemove = Sets.newHashSet();
+        for (SessionQueueData entry : entries) {
+            for (SessionQueueData other : entries) {
+                if (entry.equals(other) || toRemove.contains(entry) || toRemove.contains(other)) continue;
+                if (ranked && !entry.isWithinEloRange(other)) continue;
 
-        removePlayer(queueData1.getPlayer(), false);
-        removePlayer(queueData2.getPlayer(), false);
+                Messager.messageSuccess(entry, Messages.QUEUE_FOUND_OPPONENT.match("{player}", other.getName()));
+                Messager.messageSuccess(other, Messages.QUEUE_FOUND_OPPONENT.match("{player}", entry.getName()));
 
-        Assertions.assertFalse(entries.contains(queueData1));
-        Assertions.assertFalse(entries.contains(queueData2));
+                TaskDispatcher.sync(() -> createMatch(entry, other).start());
+                toRemove.addAll(ImmutableList.of(entry, other));
+                break;
+            }
+        }
 
-        Messager.messageSuccess(queueData1, Messages.QUEUE_FOUND_OPPONENT.match("{player}", queueData2.getName()));
-        Messager.messageSuccess(queueData2, Messages.QUEUE_FOUND_OPPONENT.match("{player}", queueData1.getName()));
-
-        TaskDispatcher.sync(() -> createMatch(queueData1, queueData2).start());
+        entries.removeAll(toRemove);
     }
 
     public int size() {
         return entries.size();
     }
 
-    private Match createMatch(PlayerQueueData queueData1, PlayerQueueData queueData2) {
+    private Match createMatch(SessionQueueData queueData1, SessionQueueData queueData2) {
         return matchProvider.provide(ladder, ranked, false, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
 }

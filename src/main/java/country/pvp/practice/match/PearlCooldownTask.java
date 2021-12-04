@@ -2,7 +2,7 @@ package country.pvp.practice.match;
 
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
@@ -13,16 +13,16 @@ public class PearlCooldownTask implements Runnable {
 
     @Override
     public void run() {
-        for (PracticePlayer practicePlayer : playerManager.getAll()) {
-            if (!practicePlayer.isLoaded() || !practicePlayer.isOnline() || !practicePlayer.isInMatch()) continue;
+        for (PlayerSession playerSession : playerManager.getAll()) {
+            if (!playerSession.isLoaded() || !playerSession.isOnline() || !playerSession.isInMatch()) continue;
 
-            if (practicePlayer.hasPearlCooldownExpired()) {
-                practicePlayer.notifyAboutPearlCooldownExpiration(practicePlayer);
+            if (playerSession.hasPearlCooldownExpired()) {
+                playerSession.notifyAboutPearlCooldownExpiration(playerSession);
             } else {
-                int seconds = Math.round(practicePlayer.getRemainingPearlCooldown()) / 1_000;
-                Player player = practicePlayer.getPlayer();
+                int seconds = Math.round(playerSession.getRemainingPearlCooldown()) / 1_000;
+                Player player = playerSession.getPlayer();
                 player.setLevel(seconds);
-                player.setExp(practicePlayer.getRemainingPearlCooldown() / 16_000.0F);
+                player.setExp(playerSession.getRemainingPearlCooldown() / 16_000.0F);
             }
         }
     }

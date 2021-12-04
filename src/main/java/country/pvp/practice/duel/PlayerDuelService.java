@@ -7,7 +7,7 @@ import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.message.Messager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
@@ -16,7 +16,7 @@ public class PlayerDuelService {
     private final InvitationService invitationService;
     private final MatchProvider matchProvider;
 
-    public void inviteForDuel(PracticePlayer inviter, PracticePlayer invitee, Ladder ladder) {
+    public void inviteForDuel(PlayerSession inviter, PlayerSession invitee, Ladder ladder) {
         if (!inviter.isInLobby()) {
             Messager.messageError(inviter, "You must be in lobby in order to duel someone.");
             return;
@@ -57,11 +57,11 @@ public class PlayerDuelService {
         invitationService.invite(invitee, invitation);
     }
 
-    public void acceptInvite(PracticePlayer invitee, PlayerDuelRequest request) {
+    public void acceptInvite(PlayerSession invitee, PlayerDuelRequest request) {
         acceptInvite(request.getInviter(), invitee, request.getLadder());
     }
 
-    public void acceptInvite0(PracticePlayer inviter, PracticePlayer invitee, Ladder ladder) {
+    public void acceptInvite0(PlayerSession inviter, PlayerSession invitee, Ladder ladder) {
         if (!invitee.isInLobby()) {
             Messager.messageError(invitee, "You must be in lobby in order to duel someone.");
             return;
@@ -76,7 +76,7 @@ public class PlayerDuelService {
         matchProvider.provide(ladder, false, true, SoloTeam.of(inviter), SoloTeam.of(invitee)).start();
     }
 
-    public void acceptInvite(PracticePlayer inviter, PracticePlayer invitee, Ladder ladder) {
+    public void acceptInvite(PlayerSession inviter, PlayerSession invitee, Ladder ladder) {
         if (!invitee.hasDuelRequest(inviter)) {
             Messager.messageError(invitee, "You have not received a duel request from this player.");
             return;

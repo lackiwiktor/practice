@@ -7,7 +7,7 @@ import country.pvp.practice.party.Party;
 import country.pvp.practice.party.PartyManager;
 import country.pvp.practice.party.PartyService;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
 import me.vaperion.blade.command.annotation.Optional;
@@ -28,14 +28,14 @@ public class PartyCommands extends PlayerCommand {
 
     @Command("party create")
     public void create(@Sender Player sender) {
-        PracticePlayer senderPlayer = get(sender);
+        PlayerSession senderPlayer = get(sender);
 
         partyService.createParty(senderPlayer);
     }
 
     @Command("party disband")
     public void disband(@Sender Player sender) {
-        PracticePlayer senderPlayer = get(sender);
+        PlayerSession senderPlayer = get(sender);
 
         if (!senderPlayer.isInLobby()) {
             Messager.messageError(senderPlayer, "You must be in the lobby in order to disband your party.");
@@ -51,8 +51,8 @@ public class PartyCommands extends PlayerCommand {
     }
 
     @Command("party invite")
-    public void invite(@Sender Player sender, @Name("player") PracticePlayer invitee) {
-        PracticePlayer inviter = get(sender);
+    public void invite(@Sender Player sender, @Name("player") PlayerSession invitee) {
+        PlayerSession inviter = get(sender);
 
         if (inviter.equals(invitee)) {
             Messager.messageError(inviter, "You can't invite yourself to a party.");
@@ -74,14 +74,14 @@ public class PartyCommands extends PlayerCommand {
     }
 
     @Command("party info")
-    public void info(@Sender Player sender, @Optional @Name("player") PracticePlayer player) {
+    public void info(@Sender Player sender, @Optional @Name("player") PlayerSession player) {
         if (player != null) {
             if (!player.hasParty()) {
                 Messager.messageError(sender, "This player is not in a party.");
                 return;
             }
         } else {
-            PracticePlayer senderPlayer = get(sender);
+            PlayerSession senderPlayer = get(sender);
 
             if (!senderPlayer.hasParty()) {
                 Messager.messageError(sender, "You are not in a party.");

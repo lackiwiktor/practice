@@ -4,20 +4,19 @@ import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.menu.Button;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.queue.Queue;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class QueueButton extends Button {
 
     private final MatchManager matchManager;
-    private final PracticePlayer practicePlayer;
+    private final PlayerSession playerSession;
     private final Queue queue;
 
     @Override
@@ -34,7 +33,7 @@ public class QueueButton extends Button {
 
     @Override
     public void clicked( Player player, ClickType clickType) {
-        queue.addPlayer(practicePlayer);
+        queue.addPlayer(playerSession);
         player.getOpenInventory().close();
     }
 }

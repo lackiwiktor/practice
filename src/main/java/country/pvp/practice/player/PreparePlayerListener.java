@@ -1,7 +1,6 @@
 package country.pvp.practice.player;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +11,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 
-@Slf4j
 public class PreparePlayerListener extends PlayerListener {
 
     private final PlayerService playerService;
@@ -30,16 +28,15 @@ public class PreparePlayerListener extends PlayerListener {
             return;
         }
 
-        PracticePlayer practicePlayer = new PracticePlayer(event.getUniqueId(), event.getName());
+        PlayerSession playerSession = new PlayerSession(event.getUniqueId(), event.getName());
 
         try {
-            playerService.load(practicePlayer);
-            playerManager.add(practicePlayer);
-            practicePlayer.setLoaded(true);
+            playerService.load(playerSession);
+            playerManager.add(playerSession);
+            playerSession.setLoaded(true);
         } catch (Exception e) {
             e.printStackTrace();
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Error");
-            log.error("Player not initialized successfully, player= {}", event.getName());
         }
     }
 

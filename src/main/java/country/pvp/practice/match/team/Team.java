@@ -1,12 +1,11 @@
 package country.pvp.practice.match.team;
 
-import com.mongodb.assertions.Assertions;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.match.SessionMatchData;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.player.PlayerUtil;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.Location;
 
@@ -20,66 +19,64 @@ public abstract class Team implements Recipient {
         return getPlayers().size();
     }
 
-    public PlayerMatchData getMatchData( PracticePlayer player) {
+    public SessionMatchData getMatchData(PlayerSession player) {
         return player.getStateData();
     }
 
-    public boolean hasPlayer(PracticePlayer player) {
+    public boolean hasPlayer(PlayerSession player) {
         return getPlayers().contains(player);
     }
 
     public void setPlayersState(PlayerState state) {
-        for (PracticePlayer player : getOnlinePlayers()) {
+        for (PlayerSession player : getOnlinePlayers()) {
             player.setState(state);
         }
     }
 
     public void teleport(Location location) {
-        for (PracticePlayer player : getOnlinePlayers()) {
+        for (PlayerSession player : getOnlinePlayers()) {
             player.teleport(location);
         }
     }
 
     public void giveKits( Ladder ladder) {
-        for (PracticePlayer player : getOnlinePlayers()) {
+        for (PlayerSession player : getOnlinePlayers()) {
             player.giveKits(ladder);
         }
     }
 
     public void resetPlayers() {
-        for (PracticePlayer player : getOnlinePlayers()) {
+        for (PlayerSession player : getOnlinePlayers()) {
             PlayerUtil.resetPlayer(player.getPlayer());
         }
     }
 
     public void setMatchData(Match match) {
-        for (PracticePlayer player : getPlayers()) {
-            player.setState(PlayerState.IN_MATCH, new PlayerMatchData(match));
+        for (PlayerSession player : getPlayers()) {
+            player.setState(PlayerState.IN_MATCH, new SessionMatchData(match));
         }
     }
 
     @Override
     public void receive(String message) {
-        for (PracticePlayer player : getOnlinePlayers()) {
+        for (PlayerSession player : getOnlinePlayers()) {
             player.receive(message);
         }
     }
 
-    public boolean isAlive( PracticePlayer player) {
-        PlayerMatchData matchData = getMatchData(player);
+    public boolean isAlive( PlayerSession player) {
+        SessionMatchData matchData = getMatchData(player);
 
         return !matchData.isDead();
     }
 
-    public boolean hasDisconnected( PracticePlayer player) {
-        PlayerMatchData matchData = getMatchData(player);
-
-        Assertions.assertFalse(matchData == null);
+    public boolean hasDisconnected( PlayerSession player) {
+        SessionMatchData matchData = getMatchData(player);
 
         return matchData.isDisconnected();
     }
 
-    public Set<PracticePlayer> getAlivePlayers() {
+    public Set<PlayerSession> getAlivePlayers() {
         return getPlayers().stream()
                 .filter(this::isAlive)
                 .collect(Collectors.toSet());
@@ -89,17 +86,13 @@ public abstract class Team implements Recipient {
         return getAlivePlayers().size() == 0;
     }
 
-    public List<PracticePlayer> getOnlinePlayers() {
+    public List<PlayerSession> getOnlinePlayers() {
         return getPlayers().stream().filter(it -> !hasDisconnected(it)).collect(Collectors.toList());
     }
 
     public abstract String getName();
 
-    public abstract List<PracticePlayer> getPlayers();
+    public abstract List<PlayerSession> getPlayers();
 
     public abstract int getPing();
-
-    public abstract int getElo(Ladder ladder);
-
-    public abstract void setElo(Ladder ladder, int elo);
 }

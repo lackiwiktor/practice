@@ -1,6 +1,6 @@
 package country.pvp.practice.itembar;
 
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.Data;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +16,7 @@ public class ItemBar {
         this.items = items;
     }
 
-    public void apply( PracticePlayer player) {
+    public void apply( PlayerSession player) {
         player.setBar(bar());
     }
 

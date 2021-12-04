@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import country.pvp.practice.data.SerializableObject;
 import country.pvp.practice.ladder.Ladder;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -12,7 +11,7 @@ public class PlayerStatistics implements SerializableObject {
 
     private final Map<String, Integer> ratings = Maps.newHashMap();
 
-    public int getElo( Ladder ladder) {
+    public int getElo(Ladder ladder) {
         return ratings.getOrDefault(ladder.getName(), 1000);
     }
 
@@ -21,7 +20,7 @@ public class PlayerStatistics implements SerializableObject {
         ratings.put(ladder, rank);
     }
 
-    public void setElo( Ladder ladder, int rank) {
+    public void setElo(Ladder ladder, int rank) {
         setElo(ladder.getName(), rank);
     }
 

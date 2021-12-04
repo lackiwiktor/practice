@@ -6,17 +6,17 @@ import country.pvp.practice.data.DataObject;
 import country.pvp.practice.duel.DuelRequest;
 import country.pvp.practice.duel.PlayerDuelRequest;
 import country.pvp.practice.kit.NamedKit;
-import country.pvp.practice.kit.editor.PlayerEditingData;
+import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.lobby.PlayerLobbyData;
+import country.pvp.practice.lobby.SessionLobbyData;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.match.SessionMatchData;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.match.RematchData;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.player.data.*;
-import country.pvp.practice.queue.PlayerQueueData;
+import country.pvp.practice.queue.SessionQueueData;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bson.Document;
@@ -31,29 +31,29 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Data
-public class PracticePlayer implements DataObject, Recipient {
+public class PlayerSession implements DataObject, Recipient {
 
     private final UUID uuid;
-    private final PlayerStateData stateData = new PlayerStateData();
+    private String name;
+    private Party party;
+    private PlayerState state = PlayerState.IN_LOBBY;
+    private SessionData data = new SessionLobbyData(null);
+    private boolean loaded;
     private final PlayerStatistics statistics = new PlayerStatistics();
     private final PlayerKits kits = new PlayerKits();
     private final Set<PlayerDuelRequest> duelRequests = Sets.newConcurrentHashSet();
-    private Party party;
-    private String name;
-    private PlayerState state = PlayerState.IN_LOBBY;
-    private boolean loaded;
 
-    public PracticePlayer(Player player) {
+    public PlayerSession(Player player) {
         this(player.getUniqueId());
         this.name = player.getName();
     }
 
-    public PracticePlayer(UUID uuid, String name) {
+    public PlayerSession(UUID uuid, String name) {
         this(uuid);
         this.name = name;
     }
 
-    public PracticePlayer(UUID uuid) {
+    public PlayerSession(UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -98,22 +98,22 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public boolean isInLobby() {
-        Preconditions.checkNotNull(stateData, "data");
+        Preconditions.checkNotNull(data, "data");
         return state == PlayerState.IN_LOBBY;
     }
 
     public boolean isInQueue() {
-        Preconditions.checkNotNull(stateData, "data");
+        Preconditions.checkNotNull(data, "data");
         return state == PlayerState.QUEUING && hasStateData();
     }
 
     public boolean isInMatch() {
-        Preconditions.checkNotNull(stateData, "data");
+        Preconditions.checkNotNull(data, "data");
         return state == PlayerState.IN_MATCH && hasStateData();
     }
 
     public boolean isInEditor() {
-        Preconditions.checkNotNull(stateData, "data");
+        Preconditions.checkNotNull(data, "data");
         return state == PlayerState.EDITING_KIT && hasStateData();
     }
 
@@ -126,17 +126,17 @@ public class PracticePlayer implements DataObject, Recipient {
         }
     }
 
-    public <V extends PlayerData> void setState(PlayerState state, PlayerData data) {
+    public <V extends SessionData> void setState(PlayerState state, SessionData data) {
         this.state = state;
-        stateData.setStateData(data);
+        this.data = data;
     }
 
-    public <V extends PlayerData> @Nullable V getStateData() {
-        return stateData.get();
+    public <V extends SessionData> @Nullable V getStateData() {
+        return (V) data;
     }
 
-    public boolean hasStateData() {
-        return stateData.hasStateData();
+    private boolean hasStateData() {
+        return data != null;
     }
 
     public void setElo(Ladder ladder, int elo) {
@@ -159,10 +159,6 @@ public class PracticePlayer implements DataObject, Recipient {
         return kits.getKit(ladder, index);
     }
 
-    public boolean hasKits(Ladder ladder) {
-        return kits.hasKits(ladder);
-    }
-
     public NamedKit[] getKits(Ladder ladder) {
         return kits.getKits(ladder);
     }
@@ -171,15 +167,15 @@ public class PracticePlayer implements DataObject, Recipient {
         duelRequests.add(request);
     }
 
-    public boolean hasDuelRequest(PracticePlayer inviter) {
+    public boolean hasDuelRequest(PlayerSession inviter) {
         return duelRequests.stream().anyMatch(it -> it.getInviter().equals(inviter));
     }
 
-    public @Nullable PlayerDuelRequest getDuelRequest(PracticePlayer inviter) {
+    public @Nullable PlayerDuelRequest getDuelRequest(PlayerSession inviter) {
         return duelRequests.stream().filter(it -> it.getInviter().equals(inviter)).findFirst().orElse(null);
     }
 
-    public void clearDuelRequests(PracticePlayer inviter) {
+    public void clearDuelRequests(PlayerSession inviter) {
         duelRequests.removeIf(it -> it.getInviter().equals(inviter));
     }
 
@@ -222,13 +218,13 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public boolean hasRematchData() {
-        PlayerLobbyData lobbyData = getStateData();
+        SessionLobbyData lobbyData = getStateData();
         Preconditions.checkNotNull(lobbyData, "data");
         return lobbyData.getRematchData() != null;
     }
 
-    public PracticePlayer getRematchPlayer() {
-        PlayerLobbyData lobbyData = getStateData();
+    public PlayerSession getRematchPlayer() {
+        SessionLobbyData lobbyData = getStateData();
         Preconditions.checkNotNull(lobbyData, "data");
         RematchData rematchData = lobbyData.getRematchData();
         Preconditions.checkNotNull(rematchData, "rematch data");
@@ -236,7 +232,7 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public Ladder getRematchLadder() {
-        PlayerLobbyData lobbyData = getStateData();
+        SessionLobbyData lobbyData = getStateData();
         Preconditions.checkNotNull(lobbyData, "data");
         RematchData rematchData = lobbyData.getRematchData();
         Preconditions.checkNotNull(rematchData, "rematch data");
@@ -273,13 +269,13 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public Match<?> getCurrentMatch() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         return matchData.getMatch();
     }
 
-    public void handleBeingHit(PracticePlayer attacker) {
-        PlayerMatchData matchData = getStateData();
+    public void handleBeingHit(PlayerSession attacker) {
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.handleBeingHit(attacker);
     }
@@ -306,19 +302,6 @@ public class PracticePlayer implements DataObject, Recipient {
         return getPlayer() != null;
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PracticePlayer that = (PracticePlayer) o;
-        return Objects.equals(uuid, that.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uuid);
-    }
-
     public int getPing() {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
@@ -342,7 +325,7 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public void removeFromQueue(boolean left) {
-        PlayerQueueData queueData = getStateData();
+        SessionQueueData queueData = getStateData();
         Preconditions.checkNotNull(queueData, "data");
         queueData.removeFromQueue(left);
     }
@@ -352,7 +335,7 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public void setDead(boolean dead) {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.setDead(dead);
     }
@@ -361,8 +344,8 @@ public class PracticePlayer implements DataObject, Recipient {
         return getLastAttacker() != null;
     }
 
-    public PracticePlayer getLastAttacker() {
-        PlayerMatchData matchData = getStateData();
+    public PlayerSession getLastAttacker() {
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         return matchData.getLastAttacker();
     }
@@ -372,69 +355,83 @@ public class PracticePlayer implements DataObject, Recipient {
     }
 
     public void handleDisconnectInMatch() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.setDisconnected(true);
     }
 
     public void stopSpectating(boolean broadcast) {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         Match<?> match = matchData.getMatch();
         match.stopSpectating(this, broadcast);
     }
 
     public PlayerMatchStatistics getMatchStatistics() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         return matchData.getStatistics();
     }
 
     public void handleHit() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.handleHit();
     }
 
     public boolean hasPearlCooldownExpired() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         return matchData.hasPearlCooldownExpired();
     }
 
     public long getRemainingPearlCooldown() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         return matchData.getPearlCooldownRemaining();
     }
 
     public void increaseThrownPots() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.increaseThrownPotions();
     }
 
     public void increaseMissedPots() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.increaseMissedPotions();
     }
 
     public void resetPearlCooldown() {
-        PlayerMatchData matchData = getStateData();
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.resetPearlCooldown();
     }
 
-    public void notifyAboutPearlCooldownExpiration(PracticePlayer practicePlayer) {
-        PlayerMatchData matchData = getStateData();
+    public void notifyAboutPearlCooldownExpiration(PlayerSession playerSession) {
+        SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
-        matchData.notifyAboutPearlCooldownExpiration(practicePlayer);
+        matchData.notifyAboutPearlCooldownExpiration(playerSession);
     }
 
     public Ladder getCurrentlyEditingKit() {
-        PlayerEditingData editingData = getStateData();
+        SessionEditingData editingData = getStateData();
         Preconditions.checkNotNull(editingData, "data");
         return editingData.getLadder();
+    }
+
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PlayerSession that = (PlayerSession) o;
+        return Objects.equals(uuid, that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
     }
 }
