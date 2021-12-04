@@ -3,7 +3,6 @@ package country.pvp.practice.player;
 import com.google.inject.Inject;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.player.data.PlayerState;
-import lombok.extern.slf4j.Slf4j;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -24,7 +23,6 @@ import java.util.Arrays;
 /**
  * This class sets up and handles a player who is in the lobby
  */
-@Slf4j
 public class PlayerProtectionListener extends PlayerListener {
 
     private final LobbyService lobbyService;
@@ -37,8 +35,8 @@ public class PlayerProtectionListener extends PlayerListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void playerJoin(PlayerJoinEvent event) {
-        PracticePlayer practicePlayer = get(event);
-        lobbyService.moveToLobby(practicePlayer);
+        PlayerSession playerSession = get(event);
+        lobbyService.moveToLobby(playerSession);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -92,9 +90,9 @@ public class PlayerProtectionListener extends PlayerListener {
     }
 
     private void cancelIfInState(Player player, Cancellable event, boolean permBypass, PlayerState... states) {
-        PracticePlayer practicePlayer = get(player);
+        PlayerSession playerSession = get(player);
 
-        if (Arrays.asList(states).contains(practicePlayer.getState()) && (!permBypass || !practicePlayer.hasPermission("practice.admin"))) {
+        if (Arrays.asList(states).contains(playerSession.getState()) && (!permBypass || !playerSession.hasPermission("practice.admin"))) {
             event.setCancelled(true);
         }
     }

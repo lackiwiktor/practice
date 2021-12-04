@@ -2,7 +2,7 @@ package country.pvp.practice.visibility;
 
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
@@ -11,8 +11,8 @@ public class VisibilityUpdater {
     private final PlayerManager playerManager;
     private final VisibilityProvider visibilityProvider;
 
-    public void update(PracticePlayer player) {
-        for (PracticePlayer other : playerManager.getAll()) {
+    public void update(PlayerSession player) {
+        for (PlayerSession other : playerManager.getAll()) {
             if (!other.isOnline()) continue;
 
             update(player, other);
@@ -20,7 +20,7 @@ public class VisibilityUpdater {
         }
     }
 
-    public void update(PracticePlayer observer, PracticePlayer observable) {
+    public void update(PlayerSession observer, PlayerSession observable) {
         Visibility visibility = visibilityProvider.provide(observer, observable);
         visibility.apply(observer, observable);
     }

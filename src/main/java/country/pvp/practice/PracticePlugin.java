@@ -6,11 +6,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PracticePlugin extends JavaPlugin {
 
-    private final Injector injector = Guice.createInjector(new PracticeModule());
-    private final Practice practice = injector.getInstance(Practice.class);
+    private Practice practice;
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+        Configuration configuration = new Configuration(getConfig());
+        Injector injector = Guice.createInjector(new PracticeModule(configuration));
+        practice = injector.getInstance(Practice.class);
         practice.onEnable();
     }
 

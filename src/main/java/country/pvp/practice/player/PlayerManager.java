@@ -2,31 +2,30 @@ package country.pvp.practice.player;
 
 import com.google.common.collect.Maps;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class PlayerManager {
 
-    private final Map<UUID, PracticePlayer> players = Maps.newConcurrentMap();
+    private final Map<UUID, PlayerSession> players = Maps.newConcurrentMap();
 
-    public PracticePlayer get( Player player) {
+    public PlayerSession get(Player player) {
         return players.get(player.getUniqueId());
     }
 
-    public Optional<PracticePlayer> get(String name) {
+    public Optional<PlayerSession> get(String name) {
         return players.values().stream().filter(it -> it.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    public void add( PracticePlayer player) {
+    public void add(PlayerSession player) {
         players.put(player.getUuid(), player);
     }
 
-    public PracticePlayer remove( Player player) {
+    public PlayerSession remove(Player player) {
         return players.remove(player.getUniqueId());
     }
 
-    public Set<PracticePlayer> getAll() {
+    public Set<PlayerSession> getAll() {
         return Collections.unmodifiableSet(new HashSet<>(players.values()));
     }
 

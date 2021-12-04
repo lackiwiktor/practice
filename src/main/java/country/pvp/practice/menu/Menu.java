@@ -2,14 +2,19 @@ package country.pvp.practice.menu;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutOpenWindow;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +30,18 @@ public abstract class Menu {
 	private boolean closedByMenu = false;
 	private boolean placeholder = false;
 	private Button placeholderButton = Button.placeholder(Material.STAINED_GLASS_PANE, (byte) 15, " ");
+	private static final Field CONTAINER_COUNTER_FIELD;
+
+	static {
+		Field field = null;
+		try {
+			field = EntityPlayer.class.getDeclaredField("containerCounter");
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		}
+		if (!field.isAccessible()) field.setAccessible(true);
+		CONTAINER_COUNTER_FIELD = field;
+	}
 
 	private ItemStack createItemStack(Player player, Button button) {
 		ItemStack item = button.getButtonItem(player);
@@ -61,8 +78,11 @@ public abstract class Menu {
 			} else {
 				int previousSize = player.getOpenInventory().getTopInventory().getSize();
 
-				if (previousSize == size && player.getOpenInventory().getTopInventory().getTitle().equals(title)) {
+				if (previousSize == size) {
 					inventory = player.getOpenInventory().getTopInventory();
+
+					if (!title.equals(previousMenu.getTitle(player)))
+						updateTitle(player, title, size);
 					update = true;
 				} else {
 					previousMenu.setClosedByMenu(true);
@@ -130,6 +150,22 @@ public abstract class Menu {
 	}
 
 	public void onClose(Player player) {
+	}
+
+	@SneakyThrows
+	private void updateTitle(Player player, String title, int size) {
+		CraftPlayer craftPlayer = (CraftPlayer) player;
+		EntityPlayer entityPlayer = craftPlayer.getHandle();
+		Integer containerCounter = CONTAINER_COUNTER_FIELD.getInt(entityPlayer);
+
+		if (containerCounter != null) {
+			PacketPlayOutOpenWindow packetPlayOutOpenWindow = new PacketPlayOutOpenWindow(
+					containerCounter,
+					"minecraft:container",
+					new ChatComponentText(title),
+					size);
+			entityPlayer.playerConnection.sendPacket(packetPlayOutOpenWindow);
+		}
 	}
 
 }

@@ -27,13 +27,17 @@ import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsService;
 import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class PracticeModule extends AbstractModule {
+
+    private final Configuration configuration;
 
     @Override
     protected void configure() {
         bind(MongoDatabase.class).toInstance(
-                MongoClients.create("mongodb+srv://ponktacology:yHzd9Qcg7u1f3Q3H@cluster0.zch1g.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+                MongoClients.create(configuration.getMongoString())
                         .getDatabase("practice"));
         bind(InvitationManager.class).asEagerSingleton();
         bind(InvitationService.class).asEagerSingleton();

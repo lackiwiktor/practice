@@ -4,9 +4,8 @@ import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import country.pvp.practice.data.mongo.MongoRepository;
-import org.jetbrains.annotations.NotNull;
 
-public class PlayerService extends MongoRepository<PracticePlayer> {
+public class PlayerService extends MongoRepository<PlayerSession> {
 
     @Inject
     public PlayerService(MongoDatabase database) {
@@ -14,7 +13,7 @@ public class PlayerService extends MongoRepository<PracticePlayer> {
     }
 
     @Override
-    public void load( PracticePlayer entity) {
+    public void load( PlayerSession entity) {
         org.bson.Document document = database.getCollection(entity.getCollection()).find(Filters.eq("_id", entity.getId())).first();
 
         if (document == null) {

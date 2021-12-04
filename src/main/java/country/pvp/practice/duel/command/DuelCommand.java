@@ -8,7 +8,7 @@ import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
 import me.vaperion.blade.command.annotation.Optional;
@@ -28,8 +28,8 @@ public class DuelCommand extends PlayerCommand {
     }
 
     @Command("duel")
-    public void duel(@Sender Player sender, @Name("player") PracticePlayer invitee, @Optional @Name("ladder") Ladder ladder) {
-        PracticePlayer inviter = get(sender);
+    public void duel(@Sender Player sender, @Name("player") PlayerSession invitee, @Optional @Name("ladder") Ladder ladder) {
+        PlayerSession inviter = get(sender);
 
         if (inviter.equals(invitee)) {
             Messager.messageError(inviter, "You can't invite yourself for a duel.");
@@ -46,8 +46,8 @@ public class DuelCommand extends PlayerCommand {
     }
 
     @Command("accept")
-    public void accept(@Sender Player sender, @Name("player") PracticePlayer player) {
-        PracticePlayer invitee = get(sender);
+    public void accept(@Sender Player sender, @Name("player") PlayerSession player) {
+        PlayerSession invitee = get(sender);
 
         if (!invitee.hasDuelRequest(player)) {
             Messager.messageError(sender, "You have not received duel request from this player.");

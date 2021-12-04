@@ -4,12 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.match.PlayerMatchData;
+import country.pvp.practice.match.SessionMatchData;
 import country.pvp.practice.match.team.Team;
 import country.pvp.practice.message.Bars;
 import country.pvp.practice.message.MessageUtil;
-import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.queue.PlayerQueueData;
+import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.queue.SessionQueueData;
 import country.pvp.practice.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -22,11 +22,11 @@ public class BoardProvider {
 
     private final MatchManager matchManager;
 
-    public List<String> provide( PracticePlayer player) {
+    public List<String> provide( PlayerSession player) {
         List<String> lines = Lists.newArrayList();
 
         if (player.isInQueue()) {
-            PlayerQueueData queueData = player.getStateData();
+            SessionQueueData queueData = player.getStateData();
             lines.add("  Time: " + TimeUtil.formatTimeMillisToClock(TimeUtil.elapsed(queueData.getJoinTimeStamp())));
             if (queueData.isRanked()) {
                 int baseElo = player.getElo(queueData.getLadder());
@@ -34,7 +34,7 @@ public class BoardProvider {
             }
             lines.add("  Ladder: " + MessageUtil.color(queueData.getLadderDisplayName()));
         } else if (player.isInMatch()) {
-            PlayerMatchData matchData = player.getStateData();
+            SessionMatchData matchData = player.getStateData();
             Match<Team> match = matchData.getMatch();
 
             switch (match.getState()) {

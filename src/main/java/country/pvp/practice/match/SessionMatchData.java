@@ -3,26 +3,26 @@ package country.pvp.practice.match;
 import country.pvp.practice.Expiring;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
-import country.pvp.practice.player.PracticePlayer;
-import country.pvp.practice.player.data.PlayerData;
+import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.player.data.SessionData;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;
 
 @Data
-public class PlayerMatchData implements PlayerData {
+public class SessionMatchData implements SessionData {
 
     private final Match match;
     private final PlayerMatchStatistics statistics = new PlayerMatchStatistics();
     private final PearlCooldown pearlCooldown = new PearlCooldown();
     private boolean dead;
     private boolean disconnected;
-    private PracticePlayer lastAttacker;
+    private PlayerSession lastAttacker;
 
     public void handleHit() {
         statistics.handleHit();
     }
 
-    public void handleBeingHit(PracticePlayer player) {
+    public void handleBeingHit(PlayerSession player) {
         statistics.handleBeingHit();
         lastAttacker = player;
     }
@@ -47,7 +47,7 @@ public class PlayerMatchData implements PlayerData {
         pearlCooldown.reset();
     }
 
-    public void notifyAboutPearlCooldownExpiration(PracticePlayer player) {
+    public void notifyAboutPearlCooldownExpiration(PlayerSession player) {
         pearlCooldown.notify(player);
     }
 
@@ -74,7 +74,7 @@ public class PlayerMatchData implements PlayerData {
             return TimeUtil.elapsed(lastUsage);
         }
 
-        public void notify(PracticePlayer player) {
+        public void notify(PlayerSession player) {
             if (notify) {
                 Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN_EXPIRED);
                 notify = false;

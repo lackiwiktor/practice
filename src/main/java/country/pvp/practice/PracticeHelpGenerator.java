@@ -27,7 +27,7 @@ public class PracticeHelpGenerator implements me.vaperion.blade.command.help.Hel
         return help;
     }
 
-    private String getUsage( BladeCommand command, String alias) {
+    private String getUsage(BladeCommand command, String alias) {
         boolean hasDesc =
                 command.getDescription() != null && !command.getDescription().trim().isEmpty();
 

@@ -6,7 +6,7 @@ import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.kit.editor.KitEditorService;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class KitEditorCommand extends PlayerCommand {
 
     @Command("kiteditor")
     public void kitEditor(@Sender Player sender) {
-        PracticePlayer senderPlayer = get(sender);
+        PlayerSession senderPlayer = get(sender);
 
         if (!senderPlayer.isInLobby()) {
             Messager.messageError(senderPlayer, "You can enter the kit editor only in the lobby.");

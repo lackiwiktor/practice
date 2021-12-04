@@ -3,7 +3,7 @@ package country.pvp.practice.party;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -16,10 +16,10 @@ public class PartyRemovePlayerListener extends PlayerListener {
 
     @EventHandler
     public void playerQuit(PlayerQuitEvent event) {
-        PracticePlayer practicePlayer = get(event);
+        PlayerSession playerSession = get(event);
 
-        if (practicePlayer.hasParty()) {
-            practicePlayer.handleDisconnectInParty();
+        if (playerSession.hasParty()) {
+            playerSession.handleDisconnectInParty();
         }
     }
 }

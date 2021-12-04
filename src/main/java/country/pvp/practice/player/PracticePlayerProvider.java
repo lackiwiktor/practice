@@ -11,12 +11,12 @@ import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class PracticePlayerProvider implements BladeProvider<PracticePlayer> {
+public class PracticePlayerProvider implements BladeProvider<PlayerSession> {
 
     private final PlayerManager playerManager;
 
     @Override
-    public @Nullable PracticePlayer provide(BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+    public @Nullable PlayerSession provide(BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
         if(Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
 
         return playerManager.get(input).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Player not found."));

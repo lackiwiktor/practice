@@ -1,4 +1,4 @@
 package country.pvp.practice.player.data;
 
-public interface PlayerData {
+public interface SessionData {
 }

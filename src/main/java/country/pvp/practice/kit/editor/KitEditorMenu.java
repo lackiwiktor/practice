@@ -7,7 +7,7 @@ import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.menu.Button;
 import country.pvp.practice.menu.Menu;
 import country.pvp.practice.player.PlayerService;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,7 +21,7 @@ public class KitEditorMenu extends Menu {
 
     private final PlayerService playerService;
 
-    private final PracticePlayer practicePlayer;
+    private final PlayerSession playerSession;
     private final Ladder ladder;
 
     @Override
@@ -34,11 +34,11 @@ public class KitEditorMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (int i = 0; i < 7; i++) {
-            buttons.put(i + 1, new SaveKitButton(playerService, practicePlayer, ladder, i));
+            buttons.put(i + 1, new SaveKitButton(playerService, playerSession, ladder, i));
 
-            if (practicePlayer.getKit(ladder, i) != null) {
-                buttons.put(i + 10, new LoadKitButton(practicePlayer, ladder, i));
-                buttons.put(i + 19, new RemoveKitButton(practicePlayer, ladder, i));
+            if (playerSession.getKit(ladder, i) != null) {
+                buttons.put(i + 10, new LoadKitButton(playerSession, ladder, i));
+                buttons.put(i + 19, new RemoveKitButton(playerSession, ladder, i));
             }
         }
 
@@ -55,14 +55,14 @@ public class KitEditorMenu extends Menu {
 
         private final PlayerService playerService;
 
-        private final PracticePlayer practicePlayer;
+        private final PlayerSession playerSession;
         private final Ladder ladder;
         private final int index;
         private final int slot;
 
-        public SaveKitButton(PlayerService playerService, PracticePlayer practicePlayer, Ladder ladder, int index) {
+        public SaveKitButton(PlayerService playerService, PlayerSession playerSession, Ladder ladder, int index) {
             this.playerService = playerService;
-            this.practicePlayer = practicePlayer;
+            this.playerSession = playerSession;
             this.ladder = ladder;
             this.index = index;
             this.slot = index + 1;
@@ -76,19 +76,19 @@ public class KitEditorMenu extends Menu {
         @Override
         public boolean shouldUpdate( Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
-                NamedKit newKit = practicePlayer.getKit(ladder, index);
+                NamedKit newKit = playerSession.getKit(ladder, index);
 
                 if (newKit == null) {
                     newKit = new NamedKit(ladder.getName() + " #" + slot);
                     newKit.setArmor(ladder.getKit().getArmor());
                     newKit.setInventory(ladder.getKit().getInventory());
-                    practicePlayer.setKit(ladder, newKit, index);
+                    playerSession.setKit(ladder, newKit, index);
                 }
 
                 newKit.setArmor(player.getInventory().getArmorContents());
                 newKit.setInventory(player.getInventory().getContents());
 
-                playerService.saveAsync(practicePlayer);
+                playerService.saveAsync(playerSession);
                 return true;
             }
 
@@ -98,13 +98,13 @@ public class KitEditorMenu extends Menu {
 
     private static class LoadKitButton extends Button {
 
-        private final PracticePlayer practicePlayer;
+        private final PlayerSession playerSession;
         private final Ladder ladder;
         private final int index;
         private final int slot;
 
-        public LoadKitButton(PracticePlayer practicePlayer, Ladder ladder, int index) {
-            this.practicePlayer = practicePlayer;
+        public LoadKitButton(PlayerSession playerSession, Ladder ladder, int index) {
+            this.playerSession = playerSession;
             this.ladder = ladder;
             this.index = index;
             this.slot = index + 1;
@@ -118,8 +118,8 @@ public class KitEditorMenu extends Menu {
         @Override
         public void clicked( Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
-                NamedKit kit = practicePlayer.getKit(ladder, index);
-                kit.apply(practicePlayer);
+                NamedKit kit = playerSession.getKit(ladder, index);
+                kit.apply(playerSession);
                 player.getOpenInventory().close();
             }
         }
@@ -127,13 +127,13 @@ public class KitEditorMenu extends Menu {
 
     private static class RemoveKitButton extends Button {
 
-        private final PracticePlayer practicePlayer;
+        private final PlayerSession playerSession;
         private final Ladder ladder;
         private final int index;
         private final int slot;
 
-        public RemoveKitButton(PracticePlayer practicePlayer, Ladder ladder, int index) {
-            this.practicePlayer = practicePlayer;
+        public RemoveKitButton(PlayerSession playerSession, Ladder ladder, int index) {
+            this.playerSession = playerSession;
             this.ladder = ladder;
             this.index = index;
             this.slot = index + 1;
@@ -147,7 +147,7 @@ public class KitEditorMenu extends Menu {
         @Override
         public boolean shouldUpdate(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
-                practicePlayer.removeKit(ladder, index);
+                playerSession.removeKit(ladder, index);
                 return true;
             }
 

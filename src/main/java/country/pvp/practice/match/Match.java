@@ -11,12 +11,13 @@ import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
+import country.pvp.practice.match.team.Ranked;
 import country.pvp.practice.match.team.Team;
 import country.pvp.practice.message.*;
 import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.message.component.ChatHelper;
 import country.pvp.practice.player.PlayerUtil;
-import country.pvp.practice.player.PracticePlayer;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
@@ -46,8 +47,8 @@ public class Match<T extends Team> implements Recipient {
     final T teamB;
     final boolean ranked;
     final boolean duel;
-    final Set<PracticePlayer> spectators = Sets.newHashSet();
-    final Map<PracticePlayer, InventorySnapshot> snapshots = Maps.newHashMap();
+    final Set<PlayerSession> spectators = Sets.newHashSet();
+    final Map<PlayerSession, InventorySnapshot> snapshots = Maps.newHashMap();
 
     private @Nullable T winner;
 
@@ -75,8 +76,8 @@ public class Match<T extends Team> implements Recipient {
     }
 
     void updateVisibility() {
-        for (PracticePlayer playerA : getAllOnlinePlayers()) {
-            for (PracticePlayer playerB : getAllOnlinePlayers()) {
+        for (PlayerSession playerA : getAllOnlinePlayers()) {
+            for (PlayerSession playerB : getAllOnlinePlayers()) {
                 visibilityUpdater.update(playerA, playerB);
                 visibilityUpdater.update(playerB, playerA);
             }
@@ -124,28 +125,28 @@ public class Match<T extends Team> implements Recipient {
         return team.equals(teamA) ? teamB : teamA;
     }
 
-    public T getOpponent(PracticePlayer player) {
+    public T getOpponent(PlayerSession player) {
         return teamA.hasPlayer(player) ? teamB : teamA;
     }
 
-    public T getTeam(PracticePlayer player) {
+    public T getTeam(PlayerSession player) {
         return teamA.hasPlayer(player) ? teamA : teamB;
     }
 
-    public boolean isInMatch(PracticePlayer player) {
+    public boolean isInMatch(PlayerSession player) {
         return teamA.hasPlayer(player) || teamB.hasPlayer(player);
     }
 
-    public boolean isAlive(PracticePlayer player) {
+    public boolean isAlive(PlayerSession player) {
         return getTeam(player).isAlive(player);
     }
 
-    public void handleDeath(PracticePlayer player) {
+    public void handleDeath(PlayerSession player) {
         createInventorySnapshot(player);
         player.setDead(true);
 
         if (player.hasLastAttacker()) {
-            PracticePlayer killer = player.getLastAttacker();
+            PlayerSession killer = player.getLastAttacker();
 
             broadcast(teamA,
                     Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
@@ -170,7 +171,7 @@ public class Match<T extends Team> implements Recipient {
         handleRespawn(player);
     }
 
-    void handleRespawn(PracticePlayer player) {
+    void handleRespawn(PlayerSession player) {
         Team team = getTeam(player);
 
         if (team.isDead()) {
@@ -181,7 +182,7 @@ public class Match<T extends Team> implements Recipient {
         setupSpectator(player);
     }
 
-    public void handleDisconnect(PracticePlayer player) {
+    public void handleDisconnect(PlayerSession player) {
         createInventorySnapshot(player);
         broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
         broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
@@ -193,7 +194,7 @@ public class Match<T extends Team> implements Recipient {
         }
     }
 
-    void setupSpectator(PracticePlayer player) {
+    void setupSpectator(PlayerSession player) {
         player.enableFlying();
     }
 
@@ -202,24 +203,26 @@ public class Match<T extends Team> implements Recipient {
         this.winner = winner;
         cancelCountDown();
 
-        for (PracticePlayer player : getAllAlivePlayers()) {
+        for (PlayerSession player : getAllAlivePlayers()) {
             createInventorySnapshot(player);
         }
 
         if (winner != null) {
             T loser = getOpponent(winner);
 
-            if (ranked) {
-                int winnerNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), true);
-                int loserNewRating = EloUtil.getNewRating(loser.getElo(ladder), winner.getElo(ladder), false);
+            if (ranked && loser instanceof Ranked && winner instanceof Ranked) {
+                Ranked loserTeam = (Ranked) loser;
+                Ranked winnerTeam = (Ranked) winner;
+                int winnerNewRating = EloUtil.getNewRating(winnerTeam.getElo(ladder), loserTeam.getElo(ladder), true);
+                int loserNewRating = EloUtil.getNewRating(loserTeam.getElo(ladder), winnerTeam.getElo(ladder), false);
 
-                loser.setElo(ladder, loserNewRating);
-                winner.setElo(ladder, winnerNewRating);
+                loserTeam.setElo(ladder, loserNewRating);
+                winnerTeam.setElo(ladder, winnerNewRating);
             }
 
             BaseComponent[] components = createFinalComponent(winner, loser);
 
-            for (PracticePlayer player : getAllOnlinePlayersIncludingSpectators()) {
+            for (PlayerSession player : getAllOnlinePlayersIncludingSpectators()) {
                 player.sendComponent(components);
             }
         }
@@ -233,11 +236,11 @@ public class Match<T extends Team> implements Recipient {
     }
 
     void movePlayersToLobby() {
-        for (PracticePlayer player : getAllOnlinePlayers()) {
+        for (PlayerSession player : getAllOnlinePlayers()) {
             lobbyService.moveToLobby(player);
         }
 
-        for (PracticePlayer spectator : spectators) {
+        for (PlayerSession spectator : spectators) {
             stopSpectating(spectator, false);
         }
     }
@@ -247,42 +250,42 @@ public class Match<T extends Team> implements Recipient {
         end(null);
     }
 
-    public String getFormattedDisplayName(PracticePlayer player, country.pvp.practice.match.team.Team team) {
+    public String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
         return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
     }
 
-    public String getFormattedDisplayName(PracticePlayer player, PracticePlayer other) {
+    public String getFormattedDisplayName(PlayerSession player, PlayerSession other) {
         return getFormattedDisplayName(player, getTeam(other));
     }
 
-    public void startSpectating(PracticePlayer spectator, PracticePlayer player) {
-        spectator.setState(PlayerState.SPECTATING, new PlayerSpectatingData(this));
+    public void startSpectating(PlayerSession spectator, PlayerSession player) {
+        spectator.setState(PlayerState.SPECTATING, new SessionSpectatingData(this));
         spectators.add(spectator);
         itemBarManager.apply(spectator);
         broadcast(Messages.MATCH_PLAYER_STARTED_SPECTATING.match("{player}", spectator.getName()));
         spectator.teleport(player.getLocation());
         setupSpectator(spectator);
 
-        for (PracticePlayer matchPlayer : getAllOnlinePlayersIncludingSpectators()) {
+        for (PlayerSession matchPlayer : getAllOnlinePlayersIncludingSpectators()) {
             visibilityUpdater.update(spectator, matchPlayer);
             visibilityUpdater.update(matchPlayer, spectator);
         }
     }
 
-    void createInventorySnapshot(PracticePlayer player) {
+    void createInventorySnapshot(PlayerSession player) {
         InventorySnapshot snapshot = InventorySnapshot.create(player);
 
         country.pvp.practice.match.team.Team team = getTeam(player);
         if (team.size() == 1) {
             country.pvp.practice.match.team.Team opponent = getOpponent(team);
-            PracticePlayer opponentPlayer = opponent.getPlayers().stream().findAny().orElse(null);
+            PlayerSession opponentPlayer = opponent.getPlayers().stream().findAny().orElse(null);
             snapshot.setOpponent(opponentPlayer == null ? null : opponentPlayer.getUuid());
         }
 
         snapshotManager.add(snapshot);
     }
 
-    public void stopSpectating(PracticePlayer spectator, boolean broadcast) {
+    public void stopSpectating(PlayerSession spectator, boolean broadcast) {
         if (broadcast) broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
         spectators.remove(spectator);
         lobbyService.moveToLobby(spectator);
@@ -310,20 +313,20 @@ public class Match<T extends Team> implements Recipient {
         return Optional.ofNullable(winner);
     }
 
-    public Set<PracticePlayer> getAllOnlinePlayers() {
-        Set<PracticePlayer> players = new HashSet<>(teamA.getOnlinePlayers());
+    public Set<PlayerSession> getAllOnlinePlayers() {
+        Set<PlayerSession> players = new HashSet<>(teamA.getOnlinePlayers());
         players.addAll(teamB.getOnlinePlayers());
         return players;
     }
 
-    public Set<PracticePlayer> getAllAlivePlayers() {
-        Set<PracticePlayer> players = new HashSet<>(teamA.getAlivePlayers());
+    public Set<PlayerSession> getAllAlivePlayers() {
+        Set<PlayerSession> players = new HashSet<>(teamA.getAlivePlayers());
         players.addAll(teamB.getAlivePlayers());
         return players;
     }
 
-    public Set<PracticePlayer> getAllPlayers() {
-        Set<PracticePlayer> players = new HashSet<>(teamA.getPlayers());
+    public Set<PlayerSession> getAllPlayers() {
+        Set<PlayerSession> players = new HashSet<>(teamA.getPlayers());
         players.addAll(teamB.getPlayers());
         return players;
     }
@@ -362,14 +365,14 @@ public class Match<T extends Team> implements Recipient {
     public BaseComponent[] createComponent(T team, boolean winner) {
         ChatComponentBuilder builder = new ChatComponentBuilder(winner ? ChatColor.GREEN + "Winner: " : ChatColor.RED + "Loser: ");
 
-        for (PracticePlayer player : team.getPlayers()) {
+        for (PlayerSession player : team.getPlayers()) {
             builder.append(createComponent(player));
         }
 
         return builder.create();
     }
 
-    public BaseComponent[] createComponent(PracticePlayer player) {
+    public BaseComponent[] createComponent(PlayerSession player) {
         return new ChatComponentBuilder(ChatColor.YELLOW + player.getName())
                 .attachToEachPart(
                         ChatHelper.hover(ChatColor.GREEN.toString().concat("Click to view inventory of ").concat(ChatColor.GOLD.toString()).concat(player.getName())))
@@ -378,8 +381,8 @@ public class Match<T extends Team> implements Recipient {
                 .create();
     }
 
-    public Set<PracticePlayer> getAllOnlinePlayersIncludingSpectators() {
-        Set<PracticePlayer> players = getAllOnlinePlayers();
+    public Set<PlayerSession> getAllOnlinePlayersIncludingSpectators() {
+        Set<PlayerSession> players = getAllOnlinePlayers();
         players.addAll(spectators);
         return players;
     }
