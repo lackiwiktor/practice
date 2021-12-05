@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import country.pvp.practice.arena.ArenaManager;
-import country.pvp.practice.itembar.ItemBarManager;
+import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +17,14 @@ public class QueueManager {
 
     private final Map<Boolean, List<Queue>> queues = Maps.newConcurrentMap();
 
-    private final ItemBarManager itemBarManager;
+    private final ItemBarService itemBarService;
     private final ArenaManager arenaManager;
     private final MatchProvider matchProvider;
 
     public void initQueue(Ladder ladder) {
-        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(itemBarManager, arenaManager, matchProvider, ladder, false));
+        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(itemBarService, arenaManager, matchProvider, ladder, false));
         if (ladder.isRanked())
-            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(itemBarManager, arenaManager, matchProvider,  ladder, true));
+            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(itemBarService, arenaManager, matchProvider,  ladder, true));
     }
 
     public List<Queue> getQueues(boolean ranked) {

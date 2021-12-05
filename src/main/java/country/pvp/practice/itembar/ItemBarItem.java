@@ -4,23 +4,23 @@ import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class ItemBarItem {
 
   private final ItemStack item;
-  private final BiConsumer<PlayerSession, BarInteract> click;
+  private final Consumer<PlayerSession> click;
 
-  public void click(PlayerSession player, BarInteract interact) {
-    click.accept(player, interact);
+  void click(PlayerSession player) {
+    click.accept(player);
   }
 
-  public ItemStack getItem() {
+  ItemStack getItem() {
     return item.clone();
   }
 
-  public boolean isSimilar(ItemStack item) {
+  boolean isSimilar(ItemStack item) {
     return this.item.isSimilar(item);
   }
 }

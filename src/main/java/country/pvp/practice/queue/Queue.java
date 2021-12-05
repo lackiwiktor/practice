@@ -4,10 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import country.pvp.practice.arena.ArenaManager;
-import country.pvp.practice.concurrent.TaskDispatcher;
-import country.pvp.practice.itembar.ItemBarManager;
+import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.lobby.SessionLobbyData;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.SoloTeam;
@@ -24,8 +22,7 @@ import java.util.Set;
 @Data
 public class Queue {
 
-
-    private final ItemBarManager itemBarManager;
+    private final ItemBarService itemBarService;
     private final ArenaManager arenaManager;
     private final MatchProvider matchProvider;
 
@@ -38,7 +35,7 @@ public class Queue {
         SessionQueueData entry = new SessionQueueData(player, this);
         entries.add(entry);
         player.setState(PlayerState.QUEUING, entry);
-        itemBarManager.apply(player);
+        itemBarService.apply(player);
         Messager.message(player, Messages.PLAYER_JOINED_QUEUE.match(
                 new MessagePattern("{queue}", ladder.getDisplayName()),
                 new MessagePattern("{ranked}", ranked ? "&branked" : "&dunranked")));
@@ -49,8 +46,8 @@ public class Queue {
 
         if (leftQueue) {
             Messager.message(player, Messages.PLAYER_LEFT_QUEUE);
-            player.setState(PlayerState.IN_LOBBY, new SessionLobbyData(null));
-            itemBarManager.apply(player);
+            player.setState(PlayerState.IN_LOBBY);
+            itemBarService.apply(player);
         }
     }
 
@@ -66,7 +63,7 @@ public class Queue {
                 Messager.messageSuccess(entry, Messages.QUEUE_FOUND_OPPONENT.match("{player}", other.getName()));
                 Messager.messageSuccess(other, Messages.QUEUE_FOUND_OPPONENT.match("{player}", entry.getName()));
 
-                TaskDispatcher.sync(() -> createMatch(entry, other).start());
+                createMatch(entry, other).init();
                 toRemove.addAll(ImmutableList.of(entry, other));
                 break;
             }
@@ -79,7 +76,7 @@ public class Queue {
         return entries.size();
     }
 
-    private Match createMatch(SessionQueueData queueData1, SessionQueueData queueData2) {
+    private Match<?> createMatch(SessionQueueData queueData1, SessionQueueData queueData2) {
         return matchProvider.provide(ladder, ranked, false, new SoloTeam(queueData1.getPlayer()), new SoloTeam(queueData2.getPlayer()));
     }
 }

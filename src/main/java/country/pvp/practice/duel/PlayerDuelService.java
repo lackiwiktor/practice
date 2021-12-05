@@ -35,7 +35,7 @@ public class PlayerDuelService {
         if (inviter.hasDuelRequest(invitee)) {
             DuelRequest duelRequest = inviter.getDuelRequest(invitee);
 
-            if (duelRequest.getLadder().equals(ladder)) {
+            if (ladder.equals(duelRequest.getLadder())) {
                 acceptInvite0(inviter, invitee, ladder);
                 return;
             }
@@ -73,7 +73,7 @@ public class PlayerDuelService {
         }
 
         invitee.clearDuelRequests(inviter);
-        matchProvider.provide(ladder, false, true, SoloTeam.of(inviter), SoloTeam.of(invitee)).start();
+        matchProvider.provide(ladder, false, true, SoloTeam.of(inviter), SoloTeam.of(invitee)).init();
     }
 
     public void acceptInvite(PlayerSession inviter, PlayerSession invitee, Ladder ladder) {

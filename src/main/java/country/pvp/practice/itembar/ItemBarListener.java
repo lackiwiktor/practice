@@ -13,15 +13,15 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemBarListener extends PlayerListener {
 
-    private final ItemBarManager itemBarManager;
+    private final ItemBarService itemBarService;
 
     @Inject
-    public ItemBarListener(PlayerManager playerManager, ItemBarManager itemBarManager) {
+    public ItemBarListener(PlayerManager playerManager, ItemBarService itemBarService) {
         super(playerManager);
-        this.itemBarManager = itemBarManager;
+        this.itemBarService = itemBarService;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void clickEvent(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;
@@ -31,6 +31,6 @@ public class ItemBarListener extends PlayerListener {
 
         PlayerSession playerSession = get(event);
         if (!(playerSession.isInMatch() || playerSession.isInEditor()))
-            event.setCancelled(itemBarManager.click(playerSession, item, BarInteract.RIGHT_CLICK));
+            event.setCancelled(itemBarService.handleInteract(playerSession, item));
     }
 }

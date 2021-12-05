@@ -6,12 +6,16 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerUtil {
 
-    public static void resetPlayer( Player player) {
+    public static void clearInventory(Player player) {
         player.getOpenInventory().close();
         player.getInventory().setArmorContents(new ItemStack[4]);
         player.getInventory().setContents(new ItemStack[36]);
         player.getInventory().setHeldItemSlot(0);
         player.updateInventory();
+    }
+
+    public static void resetPlayer(Player player) {
+        clearInventory(player);
         player.setHealth(20.0D);
         player.setSaturation(20.0F);
         player.setFallDistance(0.0F);
