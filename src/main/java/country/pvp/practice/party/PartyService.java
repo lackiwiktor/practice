@@ -3,7 +3,7 @@ package country.pvp.practice.party;
 import com.google.inject.Inject;
 import country.pvp.practice.invitation.Invitation;
 import country.pvp.practice.invitation.InvitationService;
-import country.pvp.practice.itembar.ItemBarManager;
+import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class PartyService {
 
     private final VisibilityUpdater visibilityUpdater;
-    private final ItemBarManager itemBarManager;
+    private final ItemBarService itemBarService;
     private final InvitationService invitationService;
     private final PartyManager partyManager;
 
@@ -41,7 +41,7 @@ public class PartyService {
         party.disband();
 
         for (PlayerSession player : party.getMembers()) {
-            itemBarManager.apply(player);
+            itemBarService.apply(player);
             for (PlayerSession other : party.getMembers()) {
                 visibilityUpdater.update(player, other);
                 visibilityUpdater.update(other, player);
@@ -124,6 +124,6 @@ public class PartyService {
             visibilityUpdater.update(partyMember, player);
         }
 
-        itemBarManager.apply(player);
+        itemBarService.apply(player);
     }
 }

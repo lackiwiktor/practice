@@ -1,37 +1,95 @@
 package country.pvp.practice.match;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import country.pvp.practice.arena.Arena;
-import country.pvp.practice.itembar.ItemBarManager;
+import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
+import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
+import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.ChatColor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class SoloMatch extends Match<SoloTeam> {
 
-    SoloMatch(VisibilityUpdater visibilityUpdater, LobbyService lobbyService, MatchManager matchManager, ItemBarManager itemBarManager, InventorySnapshotManager snapshotManager, Ladder ladder, Arena arena, SoloTeam teamA, SoloTeam teamB, boolean ranked, boolean duel) {
-        super(visibilityUpdater, lobbyService, matchManager, itemBarManager, snapshotManager, ladder, arena, teamA, teamB, ranked, duel);
+    SoloMatch(VisibilityUpdater visibilityUpdater, LobbyService lobbyService, MatchManager matchManager, ItemBarService itemBarService, InventorySnapshotManager snapshotManager, Ladder ladder, Arena arena, SoloTeam teamA, SoloTeam teamB, boolean ranked, boolean duel) {
+        super(visibilityUpdater, lobbyService, matchManager, itemBarService, snapshotManager, ladder, arena, teamA, teamB, ranked, duel);
     }
 
     public PlayerSession getPlayerOpponent(PlayerSession player) {
-        return getOpponent(player).getPlayer();
+        return super.getOpponent(player).getPlayerSession();
     }
 
     @Override
     void movePlayersToLobby() {
-        for (PlayerSession player : getAllOnlinePlayers()) {
-            lobbyService.moveToLobby(player, this);
+        PlayerSession playerSession = teamA.getPlayerSession();
+        if (!teamA.hasDisconnected(playerSession)) {
+            lobbyService.moveToLobby(playerSession);
+            System.out.println("NIGGER2");
         }
 
-        for (PlayerSession spectator : spectators) {
-            stopSpectating(spectator, false);
+        PlayerSession opponentSession = teamB.getPlayerSession();
+        if (!teamB.hasDisconnected(opponentSession)) {
+            lobbyService.moveToLobby(opponentSession);
+            System.out.println("NIGGER1");
         }
+    }
+
+    @Override
+    void createInventorySnapshots() {
+        PlayerSession playerSession = teamA.getPlayerSession();
+        if (teamA.isAlive(playerSession))
+            createInventorySnapshot(playerSession);
+
+        PlayerSession opponentSession = teamB.getPlayerSession();
+        if (teamB.isAlive(playerSession))
+            createInventorySnapshot(opponentSession);
+    }
+
+    @Override
+    public BaseComponent[] createComponent(SoloTeam team, boolean winner) {
+        ChatComponentBuilder builder = new ChatComponentBuilder(winner ? ChatColor.GREEN + "Winner: " : ChatColor.RED + "Loser: ");
+
+        builder.append(createComponent(team.getPlayerSession()));
+
+        return builder.create();
+    }
+
+    @Override
+    void updateTeamVisibility() {
+        PlayerSession playerSession = teamA.getPlayerSession();
+        PlayerSession opponentSession = teamB.getPlayerSession();
+
+        visibilityUpdater.update(playerSession, opponentSession);
+        visibilityUpdater.update(opponentSession, playerSession);
+    }
+
+
+    @Override
+    void onPreEnd() {
+        if (ranked && winner != null) {
+            SoloTeam loser = getOpponent(winner);
+            int winnerNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), true);
+            int loserNewRating = EloUtil.getNewRating(loser.getElo(ladder), winner.getElo(ladder), false);
+
+            loser.setElo(ladder, loserNewRating);
+            winner.setElo(ladder, winnerNewRating);
+        }
+
+        PlayerSession playerSession = teamA.getPlayerSession();
+        PlayerSession opponentSession = teamB.getPlayerSession();
+
+        playerSession.setRematchData(new RematchData(opponentSession, ladder));
+        opponentSession.setRematchData(new RematchData(playerSession, ladder));
     }
 
     @Override
@@ -58,4 +116,13 @@ public class SoloMatch extends Match<SoloTeam> {
 
         return lines;
     }
+
+    @Override
+    Set<PlayerSession> getOnlinePlayers() {
+        Set<PlayerSession> onlinePlayers = Sets.newHashSet(spectators);
+        onlinePlayers.add(teamA.getPlayerSession());
+        onlinePlayers.add(teamB.getPlayerSession());
+        return onlinePlayers;
+    }
+
 }

@@ -8,7 +8,6 @@ import country.pvp.practice.duel.PlayerDuelRequest;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.lobby.SessionLobbyData;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.match.RematchData;
@@ -39,17 +38,17 @@ public class PlayerSession implements DataObject, Recipient {
 
     private final UUID uuid;
     private String name;
-    private Party party;
+    private @Nullable Party party;
     private PlayerState state = PlayerState.IN_LOBBY;
-    private SessionData data = new SessionLobbyData(null);
+    private @Nullable RematchData rematchData;
+    private @Nullable SessionData sessionData;
     private boolean loaded;
     private final PlayerStatistics statistics = new PlayerStatistics();
     private final PlayerKits kits = new PlayerKits();
     private final Set<PlayerDuelRequest> duelRequests = Sets.newConcurrentHashSet();
 
     public PlayerSession(Player player) {
-        this(player.getUniqueId());
-        this.name = player.getName();
+        this(player.getUniqueId(), player.getName());
     }
 
     public PlayerSession(UUID uuid, String name) {
@@ -59,6 +58,11 @@ public class PlayerSession implements DataObject, Recipient {
 
     public PlayerSession(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public void setState(PlayerState state) {
+        this.state = state;
+        if (state == PlayerState.IN_LOBBY) sessionData = null;
     }
 
     @Override
@@ -102,23 +106,19 @@ public class PlayerSession implements DataObject, Recipient {
     }
 
     public boolean isInLobby() {
-        Preconditions.checkNotNull(data, "data");
         return state == PlayerState.IN_LOBBY;
     }
 
     public boolean isInQueue() {
-        Preconditions.checkNotNull(data, "data");
-        return state == PlayerState.QUEUING && hasStateData();
+        return state == PlayerState.QUEUING && sessionData != null;
     }
 
     public boolean isInMatch() {
-        Preconditions.checkNotNull(data, "data");
-        return state == PlayerState.IN_MATCH && hasStateData();
+        return state == PlayerState.IN_MATCH && sessionData != null;
     }
 
     public boolean isInEditor() {
-        Preconditions.checkNotNull(data, "data");
-        return state == PlayerState.EDITING_KIT && hasStateData();
+        return state == PlayerState.EDITING_KIT && sessionData != null;
     }
 
     public void setBar(ItemStack[] bar) {
@@ -130,17 +130,17 @@ public class PlayerSession implements DataObject, Recipient {
         }
     }
 
-    public <V extends SessionData> void setState(PlayerState state, SessionData data) {
+    public boolean hasRematch() {
+        return rematchData != null;
+    }
+
+    public <V extends SessionData> void setState(PlayerState state, V data) {
         this.state = state;
-        this.data = data;
+        this.sessionData = data;
     }
 
     public <V extends SessionData> @Nullable V getStateData() {
-        return (V) data;
-    }
-
-    private boolean hasStateData() {
-        return data != null;
+        return (V) sessionData;
     }
 
     public void setElo(Ladder ladder, int elo) {
@@ -221,24 +221,12 @@ public class PlayerSession implements DataObject, Recipient {
         return player.hasPermission(permission);
     }
 
-    public boolean hasRematchData() {
-        SessionLobbyData lobbyData = getStateData();
-        Preconditions.checkNotNull(lobbyData, "data");
-        return lobbyData.getRematchData() != null;
-    }
-
     public PlayerSession getRematchPlayer() {
-        SessionLobbyData lobbyData = getStateData();
-        Preconditions.checkNotNull(lobbyData, "data");
-        RematchData rematchData = lobbyData.getRematchData();
         Preconditions.checkNotNull(rematchData, "rematch data");
         return rematchData.getPlayer();
     }
 
     public Ladder getRematchLadder() {
-        SessionLobbyData lobbyData = getStateData();
-        Preconditions.checkNotNull(lobbyData, "data");
-        RematchData rematchData = lobbyData.getRematchData();
         Preconditions.checkNotNull(rematchData, "rematch data");
         return rematchData.getLadder();
     }
@@ -270,6 +258,8 @@ public class PlayerSession implements DataObject, Recipient {
         if (kits.hasKits(ladder)) {
             Arrays.stream(getKits(ladder)).filter(Objects::nonNull).forEach(it -> playerInventory.addItem(it.getIcon()));
         }
+
+        player.updateInventory();
     }
 
     public Match<?> getCurrentMatch() {
@@ -282,12 +272,6 @@ public class PlayerSession implements DataObject, Recipient {
         SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         matchData.handleBeingHit(attacker);
-    }
-
-    public void respawn() {
-        Player player = getPlayer();
-        Preconditions.checkNotNull(player, "player");
-        player.spigot().respawn();
     }
 
     public void setVelocity(Vector vector) {
@@ -355,6 +339,7 @@ public class PlayerSession implements DataObject, Recipient {
     }
 
     public void handleDisconnectInParty() {
+        Preconditions.checkNotNull(party);
         party.handleDisconnect(this);
     }
 
