@@ -16,8 +16,8 @@ import country.pvp.practice.match.team.Team;
 import country.pvp.practice.message.*;
 import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.message.component.ChatHelper;
-import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
@@ -57,7 +57,7 @@ public class Match<T extends Team> implements Recipient {
 
     public void start() {
         matchManager.add(this);
-        prepareTeams();
+        TaskDispatcher.runLater(() -> prepareTeams(), 1L, TimeUnit.SECONDS);
     }
 
     void prepareTeams() {

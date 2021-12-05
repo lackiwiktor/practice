@@ -21,7 +21,7 @@ public class ItemBarListener extends PlayerListener {
         this.itemBarManager = itemBarManager;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGH)
     public void clickEvent(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         if (item == null) return;

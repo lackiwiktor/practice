@@ -58,7 +58,7 @@ public class SessionMatchData implements SessionData {
 
         @Override
         public boolean hasExpired() {
-            return getPassed() > 16_000L;
+            return getPassed() >= 16_000L;
         }
 
         public void reset() {
@@ -70,7 +70,7 @@ public class SessionMatchData implements SessionData {
             return 16_000L - getPassed();
         }
 
-        long getPassed() {
+        private long getPassed() {
             return TimeUtil.elapsed(lastUsage);
         }
 

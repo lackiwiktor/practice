@@ -21,7 +21,7 @@ public enum Messages {
     MATCH_PLAYER_STARTED_SPECTATING("MATCH_PLAYER_STARTED_SPECTATING", "&f{player}&e started spectating this match."),
     MATCH_PLAYER_STOPPED_SPECTATING("MATCH_PLAYER_STOPPED_SPECTATING", "&f{player}&e is no longer spectating this match."),
     MATCH_PLAYER_KILLED_BY_UNKNOWN("MATCH_PLAYER_KILLED_BY_UNKNOWN", "&e{player} &ehas died!"),
-    MATCH_PLAYER_KILLED_BY_PLAYER("MATCH_PLAYER_KILLED_BY_PLAYER", "{player} &ekilled {killer}&e!");
+    MATCH_PLAYER_KILLED_BY_PLAYER("MATCH_PLAYER_KILLED_BY_PLAYER", "{killer} &ekilled {player}&e!");
 
     private final String name;
     private final String value;

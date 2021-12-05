@@ -24,7 +24,7 @@ public class KitEditorListener extends PlayerListener {
         this.lobbyService = lobbyService;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void interactEvent(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 

@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
 import java.util.Arrays;
@@ -86,6 +87,18 @@ public class PlayerProtectionListener extends PlayerListener {
 
         if (event.isCancelled()) {
             event.setFoodLevel(20);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void playerMove(PlayerMoveEvent event) {
+        if (event.getTo().getY() <= 40) {
+            cancelIfInState(event.getPlayer(), event, false, PlayerState.IN_LOBBY, PlayerState.QUEUING);
+
+            if (event.isCancelled()) {
+                event.setCancelled(false);
+                lobbyService.moveToLobby(get(event));
+            }
         }
     }
 
