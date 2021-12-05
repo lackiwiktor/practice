@@ -64,13 +64,13 @@ public abstract class Match<T extends Team> implements Recipient {
         startCountDown();
     }
 
-    void prepareTeams() {
+    private void prepareTeams() {
         prepareTeam(teamA, arena.getSpawnLocation1());
         prepareTeam(teamB, arena.getSpawnLocation2());
         updateTeamVisibility();
     }
 
-    void prepareTeam(Team team, Location spawnLocation) {
+    private void prepareTeam(Team team, Location spawnLocation) {
         team.createMatchSession(this);
         team.reset();
         team.giveKits(ladder);
@@ -78,8 +78,7 @@ public abstract class Match<T extends Team> implements Recipient {
         team.clearRematchData();
     }
 
-
-    void startCountDown() {
+    private void startCountDown() {
         AtomicInteger count = new AtomicInteger(6);
         (countDownRunnable = new BukkitRunnable() {
             @Override
@@ -95,24 +94,24 @@ public abstract class Match<T extends Team> implements Recipient {
         }).runTaskTimer(PracticePlugin.getPlugin(PracticePlugin.class), 20L, 20L);
     }
 
-    void broadcast(String message) {
+    private void broadcast(String message) {
         Messager.message(this, message);
     }
 
-    void broadcast(Messages message) {
+    private void broadcast(Messages message) {
         Messager.message(this, message);
     }
 
-    void broadcast(country.pvp.practice.match.team.Team team, String message) {
+    private void broadcast(country.pvp.practice.match.team.Team team, String message) {
         Messager.message(team, message);
     }
 
-    void cancelCountDown() {
+    private void cancelCountDown() {
         if (countDownRunnable == null) return;
         countDownRunnable.cancel();
     }
 
-    public T getOpponent(country.pvp.practice.match.team.Team team) {
+    public T getOpponent(Team team) {
         return team.equals(teamA) ? teamB : teamA;
     }
 
@@ -132,7 +131,7 @@ public abstract class Match<T extends Team> implements Recipient {
         return getTeam(player).isAlive(player);
     }
 
-    public void handleDeath(PlayerSession player) {
+    void handleDeath(PlayerSession player) {
         createInventorySnapshot(player);
         player.setDead(true);
 
@@ -173,7 +172,7 @@ public abstract class Match<T extends Team> implements Recipient {
         setupSpectator(player);
     }
 
-    public void handleDisconnect(PlayerSession player) {
+    void handleDisconnect(PlayerSession player) {
         createInventorySnapshot(player);
         broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
         broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
@@ -185,7 +184,7 @@ public abstract class Match<T extends Team> implements Recipient {
         }
     }
 
-    void setupSpectator(PlayerSession player) {
+    private void setupSpectator(PlayerSession player) {
         player.enableFlying();
     }
 
@@ -194,12 +193,13 @@ public abstract class Match<T extends Team> implements Recipient {
         this.winner = winner;
         cancelCountDown();
 
+        onPreEnd();
+
         createInventorySnapshots();
 
         if (winner != null) {
             T loser = getOpponent(winner);
             BaseComponent[] components = createFinalComponent(winner, loser);
-
 
             for (PlayerSession player : getOnlinePlayers()) {
                 player.sendComponent(components);
@@ -220,7 +220,7 @@ public abstract class Match<T extends Team> implements Recipient {
         end(null);
     }
 
-    public String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
+    private String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
         return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
     }
 
@@ -238,7 +238,7 @@ public abstract class Match<T extends Team> implements Recipient {
         }
     }
 
-    void createInventorySnapshot(PlayerSession player) {
+    protected void createInventorySnapshot(PlayerSession player) {
         InventorySnapshot snapshot = InventorySnapshot.create(player);
 
         Team team = getTeam(player);
@@ -269,19 +269,11 @@ public abstract class Match<T extends Team> implements Recipient {
         return teamA.size() + teamB.size();
     }
 
-    public String getTeamADisplayName() {
-        return teamA.getName();
-    }
-
-    public String getTeamBDisplayName() {
-        return teamB.getName();
-    }
-
     public Optional<T> getWinner() {
         return Optional.ofNullable(winner);
     }
 
-    public BaseComponent[] createFinalComponent(T winner, T loser) {
+    private BaseComponent[] createFinalComponent(T winner, T loser) {
         BaseComponent[] winnerComponent = createComponent(winner, true);
         BaseComponent[] loserComponent = createComponent(loser, false);
 
@@ -300,7 +292,7 @@ public abstract class Match<T extends Team> implements Recipient {
     }
 
 
-    public BaseComponent[] createComponent(PlayerSession player) {
+    protected BaseComponent[] createComponent(PlayerSession player) {
         return new ChatComponentBuilder(ChatColor.YELLOW + player.getName())
                 .attachToEachPart(
                         ChatHelper.hover(ChatColor.GREEN.toString().concat("Click to view inventory of ").concat(ChatColor.GOLD.toString()).concat(player.getName())))
@@ -309,17 +301,17 @@ public abstract class Match<T extends Team> implements Recipient {
                 .create();
     }
 
-    public boolean isBuild() {
+    boolean isBuild() {
         return ladder.isBuild();
     }
 
-    void moveSpectatorsToLobby() {
+    private void moveSpectatorsToLobby() {
         for (PlayerSession spectator : spectators) {
             stopSpectating(spectator, false);
         }
     }
 
-    void clear() {
+    private void clear() {
         matchManager.remove(this);
     }
 
@@ -347,4 +339,6 @@ public abstract class Match<T extends Team> implements Recipient {
     abstract void createInventorySnapshots();
 
     abstract void updateTeamVisibility();
+
+    abstract void onPreEnd();
 }

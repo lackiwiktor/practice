@@ -24,11 +24,6 @@ public class LobbyService {
 
     public void moveToLobby(PlayerSession player) {
         player.setState(PlayerState.IN_LOBBY);
-        itemBarService.apply(player);
-        moveToLobby0(player);
-    }
-
-    private void moveToLobby0(PlayerSession player) {
         PlayerUtil.resetPlayer(player.getPlayer());
         player.disableFlying();
         itemBarService.apply(player);

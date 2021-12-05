@@ -72,6 +72,7 @@ public class PlayerDuelService {
             return;
         }
 
+        inviter.clearDuelRequests(invitee);
         invitee.clearDuelRequests(inviter);
         matchProvider.provide(ladder, false, true, SoloTeam.of(inviter), SoloTeam.of(invitee)).init();
     }

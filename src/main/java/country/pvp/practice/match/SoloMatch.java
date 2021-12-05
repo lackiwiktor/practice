@@ -14,7 +14,6 @@ import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,18 +26,22 @@ public class SoloMatch extends Match<SoloTeam> {
     }
 
     public PlayerSession getPlayerOpponent(PlayerSession player) {
-        return getOpponent(player).getPlayerSession();
+        return super.getOpponent(player).getPlayerSession();
     }
 
     @Override
     void movePlayersToLobby() {
         PlayerSession playerSession = teamA.getPlayerSession();
-        if (!teamA.hasDisconnected(playerSession))
+        if (!teamA.hasDisconnected(playerSession)) {
             lobbyService.moveToLobby(playerSession);
+            System.out.println("NIGGER2");
+        }
 
         PlayerSession opponentSession = teamB.getPlayerSession();
-        if (!teamB.hasDisconnected(playerSession))
+        if (!teamB.hasDisconnected(opponentSession)) {
             lobbyService.moveToLobby(opponentSession);
+            System.out.println("NIGGER1");
+        }
     }
 
     @Override
@@ -56,8 +59,7 @@ public class SoloMatch extends Match<SoloTeam> {
     public BaseComponent[] createComponent(SoloTeam team, boolean winner) {
         ChatComponentBuilder builder = new ChatComponentBuilder(winner ? ChatColor.GREEN + "Winner: " : ChatColor.RED + "Loser: ");
 
-        builder.append(createComponent(teamA.getPlayerSession()));
-        builder.append(createComponent(teamB.getPlayerSession()));
+        builder.append(createComponent(team.getPlayerSession()));
 
         return builder.create();
     }
@@ -73,7 +75,7 @@ public class SoloMatch extends Match<SoloTeam> {
 
 
     @Override
-    void end(@Nullable SoloTeam winner) {
+    void onPreEnd() {
         if (ranked && winner != null) {
             SoloTeam loser = getOpponent(winner);
             int winnerNewRating = EloUtil.getNewRating(winner.getElo(ladder), loser.getElo(ladder), true);
@@ -88,8 +90,6 @@ public class SoloMatch extends Match<SoloTeam> {
 
         playerSession.setRematchData(new RematchData(opponentSession, ladder));
         opponentSession.setRematchData(new RematchData(playerSession, ladder));
-
-        super.end(winner);
     }
 
     @Override

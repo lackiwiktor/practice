@@ -73,8 +73,7 @@ public class SoloTeam extends Team implements Ranked {
 
     @Override
     public void createMatchSession(Match<?> match) {
-        SessionMatchData matchData = new SessionMatchData(match);
-        playerSession.setState(PlayerState.IN_MATCH, matchData);
+        playerSession.setState(PlayerState.IN_MATCH, new SessionMatchData(match));
     }
 
     @Override

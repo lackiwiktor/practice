@@ -61,6 +61,7 @@ public class PlayerSession implements DataObject, Recipient {
     }
 
     public void setState(PlayerState state) {
+        this.state = state;
         if (state == PlayerState.IN_LOBBY) sessionData = null;
     }
 
@@ -105,23 +106,19 @@ public class PlayerSession implements DataObject, Recipient {
     }
 
     public boolean isInLobby() {
-        Preconditions.checkNotNull(sessionData, "data");
         return state == PlayerState.IN_LOBBY;
     }
 
     public boolean isInQueue() {
-        Preconditions.checkNotNull(sessionData, "data");
-        return state == PlayerState.QUEUING;
+        return state == PlayerState.QUEUING && sessionData != null;
     }
 
     public boolean isInMatch() {
-        Preconditions.checkNotNull(sessionData, "data");
-        return state == PlayerState.IN_MATCH;
+        return state == PlayerState.IN_MATCH && sessionData != null;
     }
 
     public boolean isInEditor() {
-        Preconditions.checkNotNull(sessionData, "data");
-        return state == PlayerState.EDITING_KIT;
+        return state == PlayerState.EDITING_KIT && sessionData != null;
     }
 
     public void setBar(ItemStack[] bar) {

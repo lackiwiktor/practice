@@ -13,6 +13,7 @@ import country.pvp.practice.visibility.VisibilityUpdater;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +75,10 @@ public class MultiMatch extends Match<PartyTeam> {
     }
 
     @Override
+    void onPreEnd() { }
+
+    @Override
     public List<String> getBoard(PlayerSession session) {
-        return null;
+        return Collections.emptyList();
     }
 }
