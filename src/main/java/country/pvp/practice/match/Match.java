@@ -16,8 +16,8 @@ import country.pvp.practice.match.team.Team;
 import country.pvp.practice.message.*;
 import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.message.component.ChatHelper;
-import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
@@ -33,31 +33,31 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
-public class Match<T extends Team> implements Recipient {
+public abstract class Match<T extends Team> implements Recipient {
 
-    final VisibilityUpdater visibilityUpdater;
+    private final VisibilityUpdater visibilityUpdater;
     final LobbyService lobbyService;
-    final MatchManager matchManager;
-    final ItemBarManager itemBarManager;
-    final InventorySnapshotManager snapshotManager;
-    final UUID id = UUID.randomUUID(); //match-id
-    final Ladder ladder;
-    final Arena arena;
-    final T teamA;
-    final T teamB;
-    final boolean ranked;
+    private final MatchManager matchManager;
+    private final ItemBarManager itemBarManager;
+    private final InventorySnapshotManager snapshotManager;
+    private final UUID id = UUID.randomUUID(); //match-id
+    private final Ladder ladder;
+    private final Arena arena;
+    private final T teamA;
+    private final T teamB;
+    private final boolean ranked;
     final boolean duel;
     final Set<PlayerSession> spectators = Sets.newHashSet();
-    final Map<PlayerSession, InventorySnapshot> snapshots = Maps.newHashMap();
+    private final Map<PlayerSession, InventorySnapshot> snapshots = Maps.newHashMap();
 
     private @Nullable T winner;
 
-    private MatchState state = MatchState.COUNTDOWN;
+    MatchState state = MatchState.COUNTDOWN;
     private BukkitRunnable countDownRunnable;
 
     public void start() {
         matchManager.add(this);
-        prepareTeams();
+        TaskDispatcher.runLater(() -> prepareTeams(), 1L, TimeUnit.MILLISECONDS);
     }
 
     void prepareTeams() {
@@ -232,7 +232,7 @@ public class Match<T extends Team> implements Recipient {
             matchManager.remove(this);
         };
 
-        TaskDispatcher.runLater(runnable, 5L, TimeUnit.SECONDS);
+        TaskDispatcher.runLater(runnable, 3500L, TimeUnit.MILLISECONDS);
     }
 
     void movePlayersToLobby() {
@@ -390,4 +390,6 @@ public class Match<T extends Team> implements Recipient {
     public boolean isBuild() {
         return ladder.isBuild();
     }
+
+    public abstract List<String> getBoard(PlayerSession session);
 }

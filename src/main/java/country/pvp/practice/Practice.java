@@ -154,7 +154,7 @@ public class Practice {
                 .bind(PlayerSession.class, injector.getInstance(PracticePlayerProvider.class))
                 .containerCreator(BukkitCommandContainer.CREATOR)
                 .binding(new BukkitBindings())
-                .helpGenerator(new PracticeHelpGenerator())
+                .helpGenerator(new HelpGenerator())
                 .build();
     }
 

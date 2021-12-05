@@ -30,7 +30,7 @@ import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PracticeModule extends AbstractModule {
+public class Bindings extends AbstractModule {
 
     private final Configuration configuration;
 

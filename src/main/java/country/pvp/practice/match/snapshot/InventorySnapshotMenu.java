@@ -44,17 +44,17 @@ public class InventorySnapshotMenu extends Menu {
             buttons.put(36 + i, new PlaceholderButton(item));
         }
 
-        buttons.put(47, new HealthButton(snapshot.getHealth()));
-        buttons.put(48, new HungerButton(snapshot.getHunger()));
-        buttons.put(50, new PotionEffectsButton(snapshot.getEffects()));
-        buttons.put(51, new StatisticsButton(snapshot.getStatistics(), snapshot.getInventory()));
+        buttons.put(45, new HealthButton(snapshot.getHealth()));
+        buttons.put(46, new HungerButton(snapshot.getHunger()));
+        buttons.put(47, new PotionEffectsButton(snapshot.getEffects()));
+        buttons.put(48, new StatisticsButton(snapshot.getStatistics(), snapshot.getInventory()));
 
         Optional<UUID> opponentOptional = snapshot.getOpponent();
 
         if (opponentOptional.isPresent()) {
             Optional<InventorySnapshot> snapshotOptional = snapshotManager.get(opponentOptional.get());
 
-            snapshotOptional.ifPresent(playerInventorySnapshot -> buttons.put(49, new OpponentSnapshotButton(snapshotManager, playerInventorySnapshot)));
+            snapshotOptional.ifPresent(playerInventorySnapshot -> buttons.put(53, new OpponentSnapshotButton(snapshotManager, playerInventorySnapshot)));
         }
 
         return buttons;
@@ -140,11 +140,11 @@ public class InventorySnapshotMenu extends Menu {
                 return "Weakness";
             } else if (type.getName().equalsIgnoreCase("slowness")) {
                 return "Slowness";
-            } else if (type.getName().equals("regeneration")) {
+            } else if (type.getName().equalsIgnoreCase("regeneration")) {
                 return "Regeneration";
-            } else if (type.getName().equals("resistance")) {
+            } else if (type.getName().equalsIgnoreCase("damage_resistance")) {
                 return "Resistance";
-            } else if (type.getName().equals("absorption")) {
+            } else if (type.getName().equalsIgnoreCase("absorption")) {
                 return "Absorption";
             } else return "Unknown";
         }
@@ -158,8 +158,7 @@ public class InventorySnapshotMenu extends Menu {
 
         @Override
         public ItemStack getButtonItem(Player player) {
-            return new ItemBuilder(Material.SKULL_ITEM)
-                    .skull(snapshot.getName())
+            return new ItemBuilder(Material.LEVER)
                     .name(ChatColor.GREEN + "View ".concat(snapshot.getName()).concat(" inventory."))
                     .build();
         }

@@ -10,18 +10,22 @@ import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.SessionLobbyData;
 import country.pvp.practice.match.Match;
-import country.pvp.practice.match.SessionMatchData;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.match.RematchData;
+import country.pvp.practice.match.SessionMatchData;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.Party;
-import country.pvp.practice.player.data.*;
+import country.pvp.practice.player.data.PlayerKits;
+import country.pvp.practice.player.data.PlayerState;
+import country.pvp.practice.player.data.PlayerStatistics;
+import country.pvp.practice.player.data.SessionData;
 import country.pvp.practice.queue.SessionQueueData;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -305,7 +309,7 @@ public class PlayerSession implements DataObject, Recipient {
     public int getPing() {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
-        return -1;
+        return ((CraftPlayer) player).getHandle().ping;
     }
 
     public void sendComponent(BaseComponent[] components) {
