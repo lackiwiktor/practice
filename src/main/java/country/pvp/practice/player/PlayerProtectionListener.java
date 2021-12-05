@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -96,8 +97,9 @@ public class PlayerProtectionListener extends PlayerListener {
             cancelIfInState(event.getPlayer(), event, false, PlayerState.IN_LOBBY, PlayerState.QUEUING);
 
             if (event.isCancelled()) {
+                event.getPlayer().teleport(lobbyService.getSpawnLocation());
+                event.getPlayer().setVelocity(new Vector());
                 event.setCancelled(false);
-                lobbyService.moveToLobby(get(event));
             }
         }
     }

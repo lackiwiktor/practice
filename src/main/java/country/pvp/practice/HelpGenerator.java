@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class PracticeHelpGenerator implements me.vaperion.blade.command.help.HelpGenerator {
+public class HelpGenerator implements me.vaperion.blade.command.help.HelpGenerator {
 
     @Override
     public List<String> generate(
