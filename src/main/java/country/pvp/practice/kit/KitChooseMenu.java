@@ -17,7 +17,6 @@ import java.util.Map;
 public class KitChooseMenu extends Menu {
 
     private final LadderManager ladderManager;
-
     private final Callback<Ladder> callback;
 
     @Override
@@ -30,16 +29,15 @@ public class KitChooseMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (Ladder ladder : ladderManager.getAll()) {
-            buttons.put(buttons.size(), new KitChoiceButton(callback, ladder));
+            buttons.put(buttons.size(), new KitChoiceButton(ladder));
         }
 
         return buttons;
     }
 
     @RequiredArgsConstructor
-    public static class KitChoiceButton extends Button {
+    private class KitChoiceButton extends Button {
 
-        private final Callback<Ladder> callback;
         private final Ladder ladder;
 
         @Override

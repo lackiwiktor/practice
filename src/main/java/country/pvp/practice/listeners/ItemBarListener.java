@@ -1,6 +1,7 @@
-package country.pvp.practice.itembar;
+package country.pvp.practice.listeners;
 
 import com.google.inject.Inject;
+import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;

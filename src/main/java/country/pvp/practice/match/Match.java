@@ -3,8 +3,8 @@ package country.pvp.practice.match;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import country.pvp.practice.PracticePlugin;
-import country.pvp.practice.arena.Arena;
 import country.pvp.practice.concurrent.TaskDispatcher;
+import country.pvp.practice.arena.Arena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
@@ -131,7 +131,7 @@ public abstract class Match<T extends Team> implements Recipient {
         return getTeam(player).isAlive(player);
     }
 
-    void handleDeath(PlayerSession player) {
+    public void handleDeath(PlayerSession player) {
         createInventorySnapshot(player);
         player.setDead(true);
 
@@ -172,10 +172,10 @@ public abstract class Match<T extends Team> implements Recipient {
         setupSpectator(player);
     }
 
-    void handleDisconnect(PlayerSession player) {
+    public void handleDisconnect(PlayerSession player) {
         createInventorySnapshot(player);
-        broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamA)));
-        broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECT.match("{player}", getFormattedDisplayName(player, teamB)));
+        broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, teamA)));
+        broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, teamB)));
         player.handleDisconnectInMatch();
         country.pvp.practice.match.team.Team team = getTeam(player);
 
@@ -189,12 +189,11 @@ public abstract class Match<T extends Team> implements Recipient {
     }
 
     void end(@Nullable T winner) {
-        state = MatchState.END;
+        this.state = MatchState.END;
         this.winner = winner;
+        
         cancelCountDown();
-
         onPreEnd();
-
         createInventorySnapshots();
 
         if (winner != null) {
@@ -301,7 +300,7 @@ public abstract class Match<T extends Team> implements Recipient {
                 .create();
     }
 
-    boolean isBuild() {
+    public boolean isBuild() {
         return ladder.isBuild();
     }
 

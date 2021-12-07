@@ -1,6 +1,6 @@
 package country.pvp.practice.invitation;
 
-import country.pvp.practice.Expiring;
+import country.pvp.practice.expiring.Expiring;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.time.TimeUtil;
 import lombok.Data;

@@ -52,16 +52,6 @@ public class PartyService {
     }
 
     public void inviteToParty(PlayerSession inviter, PlayerSession invitee, Party party) {
-        if (party.isPlayerInvited(invitee)) {
-            Messager.messageError(inviter, "This player has already been invited to the party.");
-            return;
-        }
-
-        if (invitee.hasParty()) {
-            Messager.messageError(inviter, "This player already has a party.");
-            return;
-        }
-
         Invitation invitation = new Invitation("You have been invited to " + party.getName() + " party.", invitee) {
             @Override
             protected void onAccept() {
@@ -112,10 +102,11 @@ public class PartyService {
         addToParty0(party, player);
     }
 
-    public void removeFromParty(Party party, PlayerSession player) {
-        party.removePlayer(player);
-        player.removeFromParty();
-        update(player, party);
+    public void kickFromParty(Party party, PlayerSession session) {
+        party.removePlayer(session, Party.RemoveReason.KICKED);
+
+        if (session.isInLobby())
+            update(session, party);
     }
 
     private void update(PlayerSession player, Party party) {

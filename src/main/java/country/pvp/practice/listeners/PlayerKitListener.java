@@ -1,4 +1,4 @@
-package country.pvp.practice.kit;
+package country.pvp.practice.listeners;
 
 import com.google.inject.Inject;
 import country.pvp.practice.match.Match;

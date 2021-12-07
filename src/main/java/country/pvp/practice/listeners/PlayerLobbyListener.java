@@ -1,7 +1,10 @@
-package country.pvp.practice.player;
+package country.pvp.practice.listeners;
 
 import com.google.inject.Inject;
 import country.pvp.practice.lobby.LobbyService;
+import country.pvp.practice.player.PlayerListener;
+import country.pvp.practice.player.PlayerManager;
+import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -25,12 +28,12 @@ import java.util.Arrays;
 /**
  * This class sets up and handles a player who is in the lobby
  */
-public class PlayerProtectionListener extends PlayerListener {
+public class PlayerLobbyListener extends PlayerListener {
 
     private final LobbyService lobbyService;
 
     @Inject
-    public PlayerProtectionListener(PlayerManager playerManager, LobbyService lobbyService) {
+    public PlayerLobbyListener(PlayerManager playerManager, LobbyService lobbyService) {
         super(playerManager);
         this.lobbyService = lobbyService;
     }

@@ -1,6 +1,6 @@
 package country.pvp.practice.duel;
 
-import country.pvp.practice.Expiring;
+import country.pvp.practice.expiring.Expiring;
 import country.pvp.practice.time.TimeUtil;
 
 public abstract class Request implements Expiring {

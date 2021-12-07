@@ -1,7 +1,6 @@
-package country.pvp.practice.kit.editor.command;
+package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
-import country.pvp.practice.command.PlayerCommand;
 import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.kit.editor.KitEditorService;
 import country.pvp.practice.message.Messager;
@@ -11,13 +10,13 @@ import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
 
-public class KitEditorCommand extends PlayerCommand {
+public class KitEditorCommands extends PlayerCommands {
 
     private final KitEditorService kitEditorService;
     private final KitChooseMenuProvider kitChooseMenuProvider;
 
     @Inject
-    public KitEditorCommand(PlayerManager playerManager, KitEditorService kitEditorService, KitChooseMenuProvider kitChooseMenuProvider) {
+    public KitEditorCommands(PlayerManager playerManager, KitEditorService kitEditorService, KitChooseMenuProvider kitChooseMenuProvider) {
         super(playerManager);
         this.kitEditorService = kitEditorService;
         this.kitChooseMenuProvider = kitChooseMenuProvider;

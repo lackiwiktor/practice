@@ -12,6 +12,7 @@ import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
+import country.pvp.practice.leaderboards.LeaderBoardsService;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
@@ -29,7 +30,7 @@ import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class Bindings extends AbstractModule {
+public class PracticeModule extends AbstractModule {
 
     private final Configuration configuration;
 
@@ -61,5 +62,6 @@ public class Bindings extends AbstractModule {
         bind(PartyManager.class).asEagerSingleton();
         bind(PartyService.class).asEagerSingleton();
         bind(PlayerDuelService.class).asEagerSingleton();
+        bind(LeaderBoardsService.class).asEagerSingleton();
     }
 }

@@ -3,9 +3,12 @@ package country.pvp.practice.party;
 import com.google.common.collect.Sets;
 import country.pvp.practice.duel.Request;
 import country.pvp.practice.message.Messager;
+import country.pvp.practice.message.Messages;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.player.PlayerSession;
 import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 
 import java.util.Objects;
@@ -23,14 +26,18 @@ public class Party implements Recipient {
         this.leader = leader;
     }
 
+    public boolean isLeader(PlayerSession session) {
+        return leader.equals(session);
+    }
+
     public void addPlayer(PlayerSession player) {
-        broadcast("Player " + player.getName() + " has joined the party.");
+        broadcast(Messages.PARTY_PLAYER_JOINED.match("{player}", player.getName()));
         members.add(player);
     }
 
-    public void removePlayer(PlayerSession player) {
+    public void removePlayer(PlayerSession player, RemoveReason reason) {
         members.remove(player);
-        broadcast("Player " + player.getName() + " has left the party.");
+        broadcast(reason.message.match("{player}", player.getName()));
     }
 
     public boolean hasPlayer(PlayerSession player) {
@@ -79,7 +86,7 @@ public class Party implements Recipient {
     }
 
     public void handleDisconnect(PlayerSession member) {
-        removePlayer(member);
+        removePlayer(member, RemoveReason.DISCONNECTED);
         broadcast(ChatColor.BLUE + "Player " + member.getName() + " has disconnected.");
     }
 
@@ -90,5 +97,16 @@ public class Party implements Recipient {
     @Override
     public void receive(String message) {
         members.forEach(it -> Messager.message(it, message));
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public enum RemoveReason {
+
+        LEFT(Messages.PARTY_PLAYER_LEFT),
+        KICKED(Messages.PARTY_PLAYER_WAS_KICKED),
+        DISCONNECTED(Messages.PARTY_PLAYER_DISCONNECTED);
+
+        private final Messages message;
     }
 }

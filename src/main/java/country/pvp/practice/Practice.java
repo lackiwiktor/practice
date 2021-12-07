@@ -5,44 +5,33 @@ import com.google.inject.Injector;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.arena.ArenaService;
-import country.pvp.practice.arena.command.ArenaCommands;
-import country.pvp.practice.arena.command.provider.ArenaProvider;
+import country.pvp.practice.commands.*;
+import country.pvp.practice.commands.provider.ArenaProvider;
 import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
-import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.duel.DuelRequestInvalidateTask;
-import country.pvp.practice.duel.command.DuelCommand;
 import country.pvp.practice.invitation.InvitationInvalidateTask;
-import country.pvp.practice.invitation.command.InvitationCommand;
-import country.pvp.practice.itembar.ItemBarListener;
-import country.pvp.practice.kit.PlayerKitListener;
+import country.pvp.practice.listeners.*;
 import country.pvp.practice.kit.editor.KitEditorListener;
-import country.pvp.practice.kit.editor.command.KitEditorCommand;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
-import country.pvp.practice.ladder.command.LadderCommands;
-import country.pvp.practice.ladder.command.provider.LadderProvider;
+import country.pvp.practice.commands.provider.LadderProvider;
+import country.pvp.practice.leaderboards.LeaderBoardsFetchTask;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.match.MatchPlayerListener;
 import country.pvp.practice.match.PearlCooldownTask;
-import country.pvp.practice.match.command.MatchCommand;
-import country.pvp.practice.match.command.SpectateCommand;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
 import country.pvp.practice.match.snapshot.command.ViewInventoryCommand;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.party.PartyInviteRequestInvalidateTask;
-import country.pvp.practice.party.PartyRemovePlayerListener;
-import country.pvp.practice.party.command.PartyCommands;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
-import country.pvp.practice.queue.QueueRemovePlayerListener;
 import country.pvp.practice.queue.QueueTask;
-import country.pvp.practice.queue.command.QueueCommand;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
+import country.pvp.practice.concurrent.TaskDispatcher;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.Blade;
 import me.vaperion.blade.command.bindings.impl.BukkitBindings;
@@ -73,14 +62,14 @@ public class Practice {
 
     void onEnable() {
         register(ItemBarListener.class);
-        register(PreparePlayerListener.class);
+        register(PlayerSessionListener.class);
         register(PracticeBoard.class);
-        register(PlayerProtectionListener.class);
+        register(PlayerLobbyListener.class);
         register(MenuListener.class);
         register(PlayerKitListener.class);
         register(MatchPlayerListener.class);
-        register(QueueRemovePlayerListener.class);
-        register(PartyRemovePlayerListener.class);
+        register(PlayerQueueListener.class);
+        register(PlayerPartyListener.class);
         register(KitEditorListener.class);
 
         schedule(QueueTask.class, 1000L, TimeUnit.MILLISECONDS, true);
@@ -91,6 +80,7 @@ public class Practice {
         schedule(DuelRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(InvitationInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(PartyInviteRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
+        schedule(LeaderBoardsFetchTask.class, 15L, TimeUnit.SECONDS, true);
 
         loadSettings();
         loadArenas();
@@ -101,14 +91,12 @@ public class Practice {
         registerCommand(ArenaCommands.class);
         registerCommand(LadderCommands.class);
         registerCommand(PracticeSettingsCommand.class);
-        registerCommand(SpectateCommand.class);
-        registerCommand(MatchCommand.class);
+        registerCommand(MatchCommands.class);
         registerCommand(ViewInventoryCommand.class);
-        registerCommand(DuelCommand.class);
-        registerCommand(QueueCommand.class);
-        registerCommand(KitEditorCommand.class);
+        registerCommand(QueueCommands.class);
+        registerCommand(KitEditorCommands.class);
         registerCommand(PartyCommands.class);
-        registerCommand(InvitationCommand.class);
+        registerCommand(InvitationCommands.class);
 
         loadOnlinePlayers();
     }

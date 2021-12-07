@@ -1,7 +1,9 @@
-package country.pvp.practice.match;
+package country.pvp.practice.listeners;
 
 import com.google.inject.Inject;
 import country.pvp.practice.concurrent.TaskDispatcher;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.MatchState;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerListener;
@@ -93,23 +95,6 @@ public class MatchPlayerListener extends PlayerListener {
         Match match = player.getCurrentMatch();
         match.handleDeath(player);
     }
-
-    /*
-    @EventHandler
-    public void playerRespawn(PlayerRespawnEvent event) {
-        System.out.println("NOT HANDLED??");
-
-        PracticePlayer player = get(event);
-        if (!player.isInMatch()) return;
-
-        event.setRespawnLocation(event.getPlayer().getLocation());
-
- Match match = practicePlayer.getCurrentMatch();
-        match.handleRespawn(player);
-
-        System.out.println("NOT HANDLED??2");
-    }
-     */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void breakBlock(BlockBreakEvent event) {

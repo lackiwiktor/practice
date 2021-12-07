@@ -1,9 +1,9 @@
-package country.pvp.practice.arena.command.provider;
+package country.pvp.practice.commands.provider;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
-import country.pvp.practice.arena.Arena;
-import country.pvp.practice.arena.ArenaManager;
+import country.pvp.practice.ladder.Ladder;
+import country.pvp.practice.ladder.LadderManager;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.command.argument.BladeProvider;
 import me.vaperion.blade.command.container.BladeParameter;
@@ -15,14 +15,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class ArenaProvider implements BladeProvider<Arena> {
+public class LadderProvider implements BladeProvider<Ladder> {
 
-    private final ArenaManager arenaManager;
+    private final LadderManager ladderManager;
 
     @Override
-    public @Nullable Arena provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+    public @Nullable Ladder provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+        System.out.println(input);
         if (Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
 
-        return Optional.ofNullable(arenaManager.get(input)).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Wrong arena"));
+        return Optional.ofNullable(ladderManager.get(input)).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Wrong ladder"));
     }
 }
