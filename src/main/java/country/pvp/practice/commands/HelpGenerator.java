@@ -1,4 +1,4 @@
-package country.pvp.practice;
+package country.pvp.practice.commands;
 
 import me.vaperion.blade.command.annotation.Flag;
 import me.vaperion.blade.command.container.BladeCommand;

@@ -13,7 +13,7 @@ public class PracticePlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         Configuration configuration = new Configuration(getConfig());
-        Injector injector = Guice.createInjector(Stage.PRODUCTION, new Bindings(configuration));
+        Injector injector = Guice.createInjector(Stage.PRODUCTION, new PracticeModule(configuration));
         practice = injector.getInstance(Practice.class);
         practice.onEnable();
     }

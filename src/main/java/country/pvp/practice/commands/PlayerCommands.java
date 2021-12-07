@@ -1,4 +1,4 @@
-package country.pvp.practice.command;
+package country.pvp.practice.commands;
 
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
-public class PlayerCommand {
+public class PlayerCommands {
 
     private final PlayerManager playerManager;
 

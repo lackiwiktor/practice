@@ -6,18 +6,17 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemBarService {
 
+  public boolean handleInteract(PlayerSession player, ItemStack item) {
+      ItemBar itemBar = ItemBar.get(player);
+      if (itemBar == null) return false;
 
-    boolean handleInteract(PlayerSession player, ItemStack item) {
-        ItemBar itemBar = ItemBar.get(player);
-        if (itemBar == null) return false;
+      for (ItemBarItem itemBarItem : itemBar.getItems()) {
+          if (itemBarItem == null) continue;
 
-        for (ItemBarItem itemBarItem : itemBar.getItems()) {
-            if (itemBarItem == null) continue;
-
-            if (itemBarItem.isSimilar(item)) {
-                itemBarItem.click(player);
-                return true;
-            }
+          if (itemBarItem.isSimilar(item)) {
+              itemBarItem.click(player);
+              return true;
+          }
         }
 
         return false;

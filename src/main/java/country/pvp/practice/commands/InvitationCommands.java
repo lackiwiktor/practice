@@ -1,7 +1,6 @@
-package country.pvp.practice.invitation.command;
+package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
-import country.pvp.practice.command.PlayerCommand;
 import country.pvp.practice.invitation.Invitation;
 import country.pvp.practice.invitation.InvitationManager;
 import country.pvp.practice.invitation.InvitationService;
@@ -15,13 +14,13 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.UUID;
 
-public class InvitationCommand extends PlayerCommand {
+public class InvitationCommands extends PlayerCommands {
 
     private final InvitationManager invitationManager;
     private final InvitationService invitationService;
 
     @Inject
-    public InvitationCommand(PlayerManager playerManager, InvitationManager invitationManager, InvitationService invitationService) {
+    public InvitationCommands(PlayerManager playerManager, InvitationManager invitationManager, InvitationService invitationService) {
         super(playerManager);
         this.invitationManager = invitationManager;
         this.invitationService = invitationService;

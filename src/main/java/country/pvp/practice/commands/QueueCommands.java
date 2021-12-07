@@ -1,7 +1,6 @@
-package country.pvp.practice.queue.command;
+package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
-import country.pvp.practice.command.PlayerCommand;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
@@ -10,12 +9,12 @@ import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
 
-public class QueueCommand extends PlayerCommand {
+public class QueueCommands extends PlayerCommands {
 
     private final QueueMenuProvider queueMenuProvider;
 
     @Inject
-    public QueueCommand(PlayerManager playerManager, QueueMenuProvider queueMenuProvider) {
+    public QueueCommands(PlayerManager playerManager, QueueMenuProvider queueMenuProvider) {
         super(playerManager);
         this.queueMenuProvider = queueMenuProvider;
     }

@@ -7,6 +7,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import country.pvp.practice.data.DataObject;
 import country.pvp.practice.data.Repository;
 import lombok.RequiredArgsConstructor;
+import org.bson.conversions.Bson;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class MongoRepository<V extends DataObject> implements Repository<V> {
@@ -28,5 +29,9 @@ public class MongoRepository<V extends DataObject> implements Repository<V> {
     @Override
     public void delete(V entity) {
         database.getCollection(entity.getCollection()).deleteOne(Filters.eq("_id", entity.getId()));
+    }
+
+    public void createIndex(V entity, Bson index) {
+        database.getCollection(entity.getCollection()).createIndex(index);
     }
 }

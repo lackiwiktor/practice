@@ -10,6 +10,7 @@ import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.message.component.ChatComponentBuilder;
+import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -21,8 +22,11 @@ import java.util.Set;
 
 public class SoloMatch extends Match<SoloTeam> {
 
-    SoloMatch(VisibilityUpdater visibilityUpdater, LobbyService lobbyService, MatchManager matchManager, ItemBarService itemBarService, InventorySnapshotManager snapshotManager, Ladder ladder, Arena arena, SoloTeam teamA, SoloTeam teamB, boolean ranked, boolean duel) {
+    private final PlayerService playerService;
+
+    SoloMatch(VisibilityUpdater visibilityUpdater, LobbyService lobbyService, MatchManager matchManager, ItemBarService itemBarService, InventorySnapshotManager snapshotManager, Ladder ladder, Arena arena, SoloTeam teamA, SoloTeam teamB, boolean ranked, boolean duel, PlayerService playerService) {
         super(visibilityUpdater, lobbyService, matchManager, itemBarService, snapshotManager, ladder, arena, teamA, teamB, ranked, duel);
+        this.playerService = playerService;
     }
 
     public PlayerSession getPlayerOpponent(PlayerSession player) {
@@ -34,13 +38,11 @@ public class SoloMatch extends Match<SoloTeam> {
         PlayerSession playerSession = teamA.getPlayerSession();
         if (!teamA.hasDisconnected(playerSession)) {
             lobbyService.moveToLobby(playerSession);
-            System.out.println("NIGGER2");
         }
 
         PlayerSession opponentSession = teamB.getPlayerSession();
         if (!teamB.hasDisconnected(opponentSession)) {
             lobbyService.moveToLobby(opponentSession);
-            System.out.println("NIGGER1");
         }
     }
 
@@ -83,6 +85,9 @@ public class SoloMatch extends Match<SoloTeam> {
 
             loser.setElo(ladder, loserNewRating);
             winner.setElo(ladder, winnerNewRating);
+
+            playerService.saveAsync(winner.getPlayerSession());
+            playerService.saveAsync(loser.getPlayerSession());
         }
 
         PlayerSession playerSession = teamA.getPlayerSession();

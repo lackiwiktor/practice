@@ -1,6 +1,10 @@
-package country.pvp.practice.player;
+package country.pvp.practice.listeners;
 
 import com.google.inject.Inject;
+import country.pvp.practice.player.PlayerListener;
+import country.pvp.practice.player.PlayerManager;
+import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerSession;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,12 +15,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 
-public class PreparePlayerListener extends PlayerListener {
+public class PlayerSessionListener extends PlayerListener {
 
     private final PlayerService playerService;
 
     @Inject
-    public PreparePlayerListener(PlayerManager playerManager, PlayerService playerService) {
+    public PlayerSessionListener(PlayerManager playerManager, PlayerService playerService) {
         super(playerManager);
         this.playerService = playerService;
     }
@@ -31,8 +35,8 @@ public class PreparePlayerListener extends PlayerListener {
         PlayerSession playerSession = new PlayerSession(event.getUniqueId(), event.getName());
 
         try {
-            playerService.load(playerSession);
             playerManager.add(playerSession);
+            playerService.load(playerSession);
             playerSession.setLoaded(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,6 +47,9 @@ public class PreparePlayerListener extends PlayerListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void playerJoin(PlayerJoinEvent event) {
         event.setJoinMessage(null);
+
+        if (get(event) == null)
+            event.getPlayer().kickPlayer("Not initalized correctly.");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

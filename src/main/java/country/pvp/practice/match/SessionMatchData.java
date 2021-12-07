@@ -1,6 +1,6 @@
 package country.pvp.practice.match;
 
-import country.pvp.practice.Expiring;
+import country.pvp.practice.expiring.Expiring;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerSession;

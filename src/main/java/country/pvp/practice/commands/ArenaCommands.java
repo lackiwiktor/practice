@@ -1,4 +1,4 @@
-package country.pvp.practice.arena.command;
+package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
 import country.pvp.practice.arena.Arena;
@@ -13,7 +13,6 @@ import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ArenaCommands {
