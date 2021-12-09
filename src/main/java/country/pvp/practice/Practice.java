@@ -5,24 +5,24 @@ import com.google.inject.Injector;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.arena.ArenaService;
-import country.pvp.practice.commands.*;
-import country.pvp.practice.commands.provider.ArenaProvider;
 import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
+import country.pvp.practice.commands.*;
+import country.pvp.practice.commands.provider.ArenaProvider;
+import country.pvp.practice.commands.provider.LadderProvider;
+import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.duel.DuelRequestInvalidateTask;
 import country.pvp.practice.invitation.InvitationInvalidateTask;
-import country.pvp.practice.listeners.*;
 import country.pvp.practice.kit.editor.KitEditorListener;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
 import country.pvp.practice.ladder.LadderService;
-import country.pvp.practice.commands.provider.LadderProvider;
 import country.pvp.practice.leaderboards.LeaderBoardsFetchTask;
+import country.pvp.practice.listeners.*;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
-import country.pvp.practice.commands.SnapshotCommands;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.party.PartyInviteRequestInvalidateTask;
 import country.pvp.practice.player.*;
@@ -31,7 +31,6 @@ import country.pvp.practice.queue.QueueTask;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
-import country.pvp.practice.concurrent.TaskDispatcher;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.Blade;
 import me.vaperion.blade.command.bindings.impl.BukkitBindings;
@@ -128,9 +127,9 @@ public class Practice {
     }
 
     private void schedule(Class<? extends Runnable> runnable, long duration, TimeUnit unit, boolean async) {
-        if (async)
+        if (async) {
             TaskDispatcher.scheduleAsync(injector.getInstance(runnable), duration, unit);
-        else TaskDispatcher.scheduleSync(injector.getInstance(runnable), duration, unit);
+        } else TaskDispatcher.scheduleSync(injector.getInstance(runnable), duration, unit);
     }
 
     private void setupBlade() {

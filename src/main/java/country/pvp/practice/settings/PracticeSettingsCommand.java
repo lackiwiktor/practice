@@ -7,7 +7,6 @@ import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Permission;
 import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class PracticeSettingsCommand {

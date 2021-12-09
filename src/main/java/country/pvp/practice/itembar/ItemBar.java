@@ -28,10 +28,9 @@ public class ItemBar {
 
     @Nullable
     static ItemBar get(PlayerSession player) {
-        ItemBarItem[] items = new ItemBarItem[9];
-
         switch (player.getState()) {
             case IN_LOBBY:
+                ItemBarItem[] items = new ItemBarItem[9];
 
                 items[0] = Items.UNRANKED.get();
                 items[1] = Items.RANKED.get();
@@ -44,9 +43,9 @@ public class ItemBar {
                 return new ItemBar(Items.LEAVE_QUEUE.get());
             case SPECTATING:
                 return new ItemBar(Items.STOP_SPECTATING.get());
+            default:
+                return null;
         }
-
-        return null;
     }
 
     @RequiredArgsConstructor

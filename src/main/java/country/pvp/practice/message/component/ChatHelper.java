@@ -1,8 +1,10 @@
 package country.pvp.practice.message.component;
 
+import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 
+@UtilityClass
 public class ChatHelper {
 
     public static ClickEvent click(String command) {

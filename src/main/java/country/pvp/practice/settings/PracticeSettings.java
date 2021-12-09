@@ -5,7 +5,6 @@ import country.pvp.practice.serialization.LocationAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
 
 @Data
 public class PracticeSettings implements DataObject {

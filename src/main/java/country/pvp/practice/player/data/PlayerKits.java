@@ -6,7 +6,6 @@ import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;

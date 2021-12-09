@@ -84,10 +84,7 @@ public class PlayerKitListener extends PlayerListener {
     public void deathEvent(PlayerDeathEvent event) {
         PlayerSession playerSession = get(event.getEntity());
         if (!playerSession.isInMatch()) return;
-
         Match match = playerSession.getCurrentMatch();
-
-        System.out.println("DEATH !");
         event.getDrops().removeIf(it -> playerSession.getMatchingKit(match.getLadder(), it).isPresent());
     }
 }

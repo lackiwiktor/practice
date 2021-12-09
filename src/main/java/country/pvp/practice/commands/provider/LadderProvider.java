@@ -21,8 +21,7 @@ public class LadderProvider implements BladeProvider<Ladder> {
 
     @Override
     public @Nullable Ladder provide(BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
-        System.out.println(input);
-        if (Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
+        if (Strings.isNullOrEmpty(input)  || "null".equals(input)) return null;
 
         return Optional.ofNullable(ladderManager.get(input)).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Wrong ladder"));
     }

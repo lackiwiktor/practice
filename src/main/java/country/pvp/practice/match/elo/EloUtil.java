@@ -1,5 +1,8 @@
 package country.pvp.practice.match.elo;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class EloUtil {
 
     private static final KFactor[] K_FACTORS = {
@@ -26,11 +29,10 @@ public class EloUtil {
         double expectedScore = EloUtil.getExpectedScore(rating, opponentRating);
         int newRating = EloUtil.calculateNewRating(rating, score, expectedScore, kFactor);
 
-        if (score == 1) {
-            if (newRating == rating) {
-                newRating++;
-            }
+        if (score == 1 && newRating == rating) {
+            newRating++;
         }
+
         return newRating;
     }
 

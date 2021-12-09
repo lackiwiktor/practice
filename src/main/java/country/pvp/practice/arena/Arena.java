@@ -15,7 +15,8 @@ public class Arena implements DataObject {
     private String displayName;
     private String schematic;
     private ItemStack icon;
-    private Location spawnLocation1, spawnLocation2;
+    private Location spawnLocation1;
+    private Location spawnLocation2;
     private Location spectatorLocation;
     private Location center;
     private boolean occupied;

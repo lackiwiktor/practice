@@ -160,10 +160,8 @@ public class MatchPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         PlayerSession playerSession = get(player);
 
-        if (playerSession.isInMatch()) {
-            if (event.getItem().getType() == Material.POTION) {
-                TaskDispatcher.runLater(() -> player.setItemInHand(new ItemStack(Material.AIR)), 1L, TimeUnit.MILLISECONDS);
-            }
+        if (playerSession.isInMatch() && event.getItem().getType() == Material.POTION) {
+            TaskDispatcher.runLater(() -> player.setItemInHand(new ItemStack(Material.AIR)), 1L, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -190,7 +188,7 @@ public class MatchPlayerListener extends PlayerListener {
             if (!playerSession.hasPearlCooldownExpired()) {
                 String time = TimeUtil.millisToSeconds(playerSession.getRemainingPearlCooldown());
                 Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
-                        time + (time.equalsIgnoreCase("1.0") ? "" : "s")));
+                        time + ("1.0".equals(time) ? "" : "s")));
                 TaskDispatcher.runLater(player::updateInventory, 100L, TimeUnit.MILLISECONDS);
                 event.setCancelled(true);
             } else {

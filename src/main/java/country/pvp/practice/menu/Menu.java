@@ -1,5 +1,6 @@
 package country.pvp.practice.menu;
 
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Setter
 public abstract class Menu {
 
-	public static Map<String, Menu> currentlyOpenedMenus = new HashMap<>();
+	public static final Map<String, Menu> currentlyOpenedMenus = Maps.newConcurrentMap();
 
 	private Map<Integer, Button> buttons = new HashMap<>();
 	private boolean autoUpdate = false;

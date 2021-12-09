@@ -1,9 +1,11 @@
 package country.pvp.practice.player;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+@UtilityClass
 public class PlayerUtil {
 
     public static void clearInventory(Player player) {

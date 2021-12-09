@@ -30,7 +30,7 @@ public class MultiTeam extends Team {
 
     @Override
     public String getName() {
-        Preconditions.checkArgument(players.size() > 0);
+        Preconditions.checkArgument(!players.isEmpty());
         return players.get(0).getName();
     }
 

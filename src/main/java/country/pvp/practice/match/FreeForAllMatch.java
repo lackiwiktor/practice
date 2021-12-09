@@ -43,7 +43,7 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    void movePlayersToLobby() {
+    protected void movePlayersToLobby() {
         for (Team team : teams) {
             moveTeamToLobby(team);
         }
