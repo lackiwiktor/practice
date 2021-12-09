@@ -102,7 +102,7 @@ public class Practice {
     }
 
     void onDisable() {
-        for (Match<?> match : matchManager.getAll()) {
+        for (Match match : matchManager.getAll()) {
             match.cancel("Server is restarting");
         }
 

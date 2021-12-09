@@ -1,13 +1,14 @@
 package country.pvp.practice.match;
 
 import com.google.inject.Inject;
+import country.pvp.practice.arena.Arena;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
-import country.pvp.practice.match.team.PartyTeam;
 import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.match.team.Team;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +24,14 @@ public class MatchProvider {
     private final InventorySnapshotManager snapshotManager;
     private final PlayerService playerService;
 
-    public Match<?> provide(Ladder ladder, boolean ranked, boolean duel, SoloTeam teamA, SoloTeam teamB) {
-        return new SoloMatch(visibilityUpdater, lobbyService, matchManager, itemBarService, snapshotManager, ladder, arenaManager.getRandom(), teamA, teamB, ranked, duel, playerService);
+    public StandardMatch provide(Ladder ladder, boolean ranked, boolean duel, Team teamA, Team teamB) {
+        Arena arena = arenaManager.getRandom();
+        return new StandardMatch(matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, ranked, duel, snapshotManager, playerService, teamA, teamB);
     }
 
-    public Match<?> provide(Ladder ladder, PartyTeam teamA, PartyTeam teamB) {
-        return new MultiMatch(visibilityUpdater, lobbyService, matchManager, itemBarService, snapshotManager, ladder, arenaManager.getRandom(), teamA, teamB);
+    public FreeForAllMatch provide(Ladder ladder, SoloTeam... teams) {
+        Arena arena = arenaManager.getRandom();
+        return new FreeForAllMatch(matchManager, visibilityUpdater, lobbyService, itemBarService, snapshotManager, arena, ladder, false, teams);
     }
 
 }

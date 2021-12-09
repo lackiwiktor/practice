@@ -1,18 +1,18 @@
 package country.pvp.practice.match;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import country.pvp.practice.PracticePlugin;
-import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.arena.Arena;
+import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
-import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.match.team.Team;
-import country.pvp.practice.message.*;
+import country.pvp.practice.message.Messager;
+import country.pvp.practice.message.Messages;
+import country.pvp.practice.message.Recipient;
 import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.message.component.ChatHelper;
 import country.pvp.practice.player.PlayerSession;
@@ -32,27 +32,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
-public abstract class Match<T extends Team> implements Recipient {
+public abstract class Match implements Recipient {
 
     final VisibilityUpdater visibilityUpdater;
     final LobbyService lobbyService;
-    private final MatchManager matchManager;
     final ItemBarService itemBarService;
-    private final InventorySnapshotManager snapshotManager;
-    private final UUID id = UUID.randomUUID(); //match-id
+    final Arena arena;
     final Ladder ladder;
-    private final Arena arena;
-    final T teamA;
-    final T teamB;
     final boolean ranked;
     final boolean duel;
     final Set<PlayerSession> spectators = Sets.newHashSet();
-    private final Map<PlayerSession, InventorySnapshot> snapshots = Maps.newHashMap();
-
-    @Nullable T winner;
-
     MatchState state = MatchState.COUNTDOWN;
+    private final UUID id = UUID.randomUUID(); //match-id
+    private final MatchManager matchManager;
     private BukkitRunnable countDownRunnable;
+
+    private final InventorySnapshotManager snapshotManager;
+    private final Set<InventorySnapshot> snapshots = Sets.newHashSet();
+
+    public Match(InventorySnapshotManager snapshotManager, MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel) {
+        this.snapshotManager = snapshotManager;
+        this.matchManager = matchManager;
+        this.visibilityUpdater = visibilityUpdater;
+        this.lobbyService = lobbyService;
+        this.itemBarService = itemBarService;
+        this.arena = arena;
+        this.ladder = ladder;
+        this.ranked = ranked;
+        this.duel = duel;
+    }
+
+    @Nullable Team winner;
 
     public void init() {
         matchManager.add(this);
@@ -64,13 +74,7 @@ public abstract class Match<T extends Team> implements Recipient {
         startCountDown();
     }
 
-    private void prepareTeams() {
-        prepareTeam(teamA, arena.getSpawnLocation1());
-        prepareTeam(teamB, arena.getSpawnLocation2());
-        updateTeamVisibility();
-    }
-
-    private void prepareTeam(Team team, Location spawnLocation) {
+    void prepareTeam(Team team, Location spawnLocation) {
         team.createMatchSession(this);
         team.reset();
         team.giveKits(ladder);
@@ -78,7 +82,34 @@ public abstract class Match<T extends Team> implements Recipient {
         team.clearRematchData();
     }
 
-    private void startCountDown() {
+    abstract void prepareTeams();
+
+    void end(@Nullable Team winner) {
+        this.state = MatchState.END;
+        this.winner = winner;
+
+        cancelCountDown();
+        createInventorySnapshots();
+        onPreEnd();
+        snapshotManager.addAll(snapshots);
+        sendResultComponent();
+
+        Runnable runnable = () -> {
+            movePlayersToLobby();
+            moveSpectatorsToLobby();
+            finish();
+        };
+
+        TaskDispatcher.runLater(runnable, 3500L, TimeUnit.MILLISECONDS);
+    }
+
+    abstract void onPreEnd();
+
+    private void finish() {
+        matchManager.remove(this);
+    }
+
+    void startCountDown() {
         AtomicInteger count = new AtomicInteger(6);
         (countDownRunnable = new BukkitRunnable() {
             @Override
@@ -94,124 +125,53 @@ public abstract class Match<T extends Team> implements Recipient {
         }).runTaskTimer(PracticePlugin.getPlugin(PracticePlugin.class), 20L, 20L);
     }
 
-    private void broadcast(String message) {
-        Messager.message(this, message);
-    }
-
-    private void broadcast(Messages message) {
-        Messager.message(this, message);
-    }
-
-    private void broadcast(country.pvp.practice.match.team.Team team, String message) {
-        Messager.message(team, message);
-    }
-
-    private void cancelCountDown() {
+    void cancelCountDown() {
         if (countDownRunnable == null) return;
         countDownRunnable.cancel();
     }
 
-    public T getOpponent(Team team) {
-        return team.equals(teamA) ? teamB : teamA;
-    }
+    abstract void movePlayersToLobby();
 
-    public T getOpponent(PlayerSession player) {
-        return teamA.hasPlayer(player) ? teamB : teamA;
-    }
-
-    public T getTeam(PlayerSession player) {
-        return teamA.hasPlayer(player) ? teamA : teamB;
-    }
-
-    public boolean isInMatch(PlayerSession player) {
-        return teamA.hasPlayer(player) || teamB.hasPlayer(player);
-    }
-
-    public boolean isAlive(PlayerSession player) {
-        return getTeam(player).isAlive(player);
+    private void moveSpectatorsToLobby() {
+        for (PlayerSession spectator : spectators) {
+            stopSpectating(spectator, false);
+        }
     }
 
     public void handleDeath(PlayerSession player) {
         createInventorySnapshot(player);
         player.setDead(true);
-
-        if (player.hasLastAttacker()) {
-            PlayerSession killer = player.getLastAttacker();
-
-            broadcast(teamA,
-                    Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
-                            new MessagePattern("{player}", getFormattedDisplayName(player, teamA)),
-                            new MessagePattern("{killer}", getFormattedDisplayName(killer, teamA))));
-            broadcast(teamB,
-                    Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
-                            new MessagePattern("{player}", getFormattedDisplayName(player, teamB)),
-                            new MessagePattern("{killer}", getFormattedDisplayName(killer, teamB))));
-        } else {
-            broadcast(teamA,
-                    Messages.MATCH_PLAYER_KILLED_BY_UNKNOWN.match("{player}", getFormattedDisplayName(player, teamA)));
-            broadcast(teamB,
-                    Messages.MATCH_PLAYER_KILLED_BY_UNKNOWN.match("{player}", getFormattedDisplayName(player, teamB)));
-        }
-
         updateTeamVisibility();
+        broadcastPlayerDeath(player);
         PlayerUtil.resetPlayer(player.getPlayer());
         player.setVelocity(new Vector());
         player.teleport(player.getLocation().add(0, 3, 0));
-
         handleRespawn(player);
     }
 
-    void handleRespawn(PlayerSession player) {
-        Team team = getTeam(player);
 
-        if (team.isDead()) {
-            end(getOpponent(team));
-            return;
-        }
+    abstract void broadcastPlayerDeath(PlayerSession player);
 
-        setupSpectator(player);
+    abstract void handleRespawn(PlayerSession player);
+
+    public abstract void handleDisconnect(PlayerSession player);
+
+    abstract void updateTeamVisibility();
+
+    void broadcast(String message) {
+        Messager.message(this, message);
     }
 
-    public void handleDisconnect(PlayerSession player) {
-        createInventorySnapshot(player);
-        broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, teamA)));
-        broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, teamB)));
-        player.handleDisconnectInMatch();
-        country.pvp.practice.match.team.Team team = getTeam(player);
-
-        if (team.isDead() && state != MatchState.END) {
-            end(getOpponent(team));
-        }
+    void broadcast(Messages message) {
+        Messager.message(this, message);
     }
 
-    private void setupSpectator(PlayerSession player) {
-        player.enableFlying();
+    void broadcast(country.pvp.practice.match.team.Team team, String message) {
+        Messager.message(team, message);
     }
 
-    void end(@Nullable T winner) {
-        this.state = MatchState.END;
-        this.winner = winner;
-        
-        cancelCountDown();
-        onPreEnd();
-        createInventorySnapshots();
-
-        if (winner != null) {
-            T loser = getOpponent(winner);
-            BaseComponent[] components = createFinalComponent(winner, loser);
-
-            for (PlayerSession player : getOnlinePlayers()) {
-                player.sendComponent(components);
-            }
-        }
-
-        Runnable runnable = () -> {
-            movePlayersToLobby();
-            moveSpectatorsToLobby();
-            clear();
-        };
-
-        TaskDispatcher.runLater(runnable, 3500L, TimeUnit.MILLISECONDS);
+    List<PlayerSession> getOnlinePlayers() {
+        return new ArrayList<>(spectators);
     }
 
     public void cancel(String reason) {
@@ -219,7 +179,7 @@ public abstract class Match<T extends Team> implements Recipient {
         end(null);
     }
 
-    private String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
+    String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
         return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
     }
 
@@ -237,61 +197,32 @@ public abstract class Match<T extends Team> implements Recipient {
         }
     }
 
-    protected void createInventorySnapshot(PlayerSession player) {
-        InventorySnapshot snapshot = InventorySnapshot.create(player);
-
-        Team team = getTeam(player);
-        Team opponent = getOpponent(team);
-
-        if (opponent instanceof SoloTeam) {
-            SoloTeam soloOpponent = (SoloTeam) opponent;
-            PlayerSession opponentPlayer = soloOpponent.getPlayerSession();
-            snapshot.setOpponent(opponentPlayer.getUuid());
-        }
-
-        snapshotManager.add(snapshot);
+    void setupSpectator(PlayerSession player) {
+        player.enableFlying();
     }
 
     public void stopSpectating(PlayerSession spectator, boolean broadcast) {
-        if (broadcast) broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
+        if (broadcast)
+            broadcast(Messages.MATCH_PLAYER_STOPPED_SPECTATING.match("{player}", spectator.getName()));
         spectators.remove(spectator);
         lobbyService.moveToLobby(spectator);
     }
 
-    @Override
-    public void receive(String message) {
-        teamA.receive(message);
-        teamB.receive(message);
+    public boolean isBuild() {
+        return ladder.isBuild();
     }
 
-    public int getPlayersCount() {
-        return teamA.size() + teamB.size();
+    abstract void createInventorySnapshots();
+
+    InventorySnapshot createInventorySnapshot(PlayerSession session) {
+        InventorySnapshot snapshot = InventorySnapshot.create(session);
+        snapshots.add(snapshot);
+        return snapshot;
     }
 
-    public Optional<T> getWinner() {
-        return Optional.ofNullable(winner);
-    }
+    abstract void sendResultComponent();
 
-    private BaseComponent[] createFinalComponent(T winner, T loser) {
-        BaseComponent[] winnerComponent = createComponent(winner, true);
-        BaseComponent[] loserComponent = createComponent(loser, false);
-
-        ChatComponentBuilder builder = new ChatComponentBuilder("");
-        builder.append(Bars.CHAT_BAR);
-        builder.append("\n");
-        builder.append(ChatColor.GOLD.toString().concat("Post-Match Inventories ").concat(ChatColor.GRAY.toString()).concat("(click name to view)"));
-        builder.append("\n");
-        builder.append(winnerComponent);
-        builder.append(ChatColor.GRAY + " - ");
-        builder.append(loserComponent);
-        builder.append("\n");
-        builder.append(Bars.CHAT_BAR);
-
-        return builder.create();
-    }
-
-
-    protected BaseComponent[] createComponent(PlayerSession player) {
+    BaseComponent[] createComponent(PlayerSession player) {
         return new ChatComponentBuilder(ChatColor.YELLOW + player.getName())
                 .attachToEachPart(
                         ChatHelper.hover(ChatColor.GREEN.toString().concat("Click to view inventory of ").concat(ChatColor.GOLD.toString()).concat(player.getName())))
@@ -300,25 +231,21 @@ public abstract class Match<T extends Team> implements Recipient {
                 .create();
     }
 
-    public boolean isBuild() {
-        return ladder.isBuild();
-    }
+    public abstract boolean areOnTheSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer);
 
-    private void moveSpectatorsToLobby() {
-        for (PlayerSession spectator : spectators) {
-            stopSpectating(spectator, false);
-        }
-    }
+    public abstract boolean isInMatch(PlayerSession player);
 
-    private void clear() {
-        matchManager.remove(this);
-    }
+    public abstract boolean isAlive(PlayerSession player);
+
+    abstract int getPlayersCount();
+
+    public abstract List<String> getBoard(PlayerSession player);
 
     @Override
     public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Match<?> match = (Match<?>) o;
+        Match match = (Match) o;
         return Objects.equals(id, match.id);
     }
 
@@ -326,18 +253,4 @@ public abstract class Match<T extends Team> implements Recipient {
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    public abstract List<String> getBoard(PlayerSession session);
-
-    abstract BaseComponent[] createComponent(T team, boolean winner);
-
-    abstract Set<PlayerSession> getOnlinePlayers();
-
-    abstract void movePlayersToLobby();
-
-    abstract void createInventorySnapshots();
-
-    abstract void updateTeamVisibility();
-
-    abstract void onPreEnd();
 }

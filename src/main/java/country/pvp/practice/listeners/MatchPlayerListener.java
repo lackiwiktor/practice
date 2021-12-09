@@ -78,7 +78,7 @@ public class MatchPlayerListener extends PlayerListener {
             return;
         }
 
-        if (match.getTeam(damagedPlayer).hasPlayer(damagerPlayer)) {
+        if (match.areOnTheSameTeam(damagedPlayer, damagerPlayer)) {
             event.setCancelled(true);
             return;
         }
@@ -190,7 +190,7 @@ public class MatchPlayerListener extends PlayerListener {
                 String time = TimeUtil.millisToSeconds(playerSession.getRemainingPearlCooldown());
                 Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
                         time + (time.equalsIgnoreCase("1.0") ? "" : "s")));
-                TaskDispatcher.runLater(() -> player.updateInventory(), 100L, TimeUnit.MILLISECONDS);
+                TaskDispatcher.runLater(player::updateInventory, 100L, TimeUnit.MILLISECONDS);
                 event.setCancelled(true);
             } else {
                 playerSession.resetPearlCooldown();
