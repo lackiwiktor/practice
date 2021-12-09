@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Optional;
 
+
 public class PlayerSessionListener extends PlayerListener {
 
     private final PlayerService playerService;

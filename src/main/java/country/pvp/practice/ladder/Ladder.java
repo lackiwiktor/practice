@@ -69,11 +69,11 @@ public class Ladder implements DataObject {
         return new ItemBuilder(icon.clone()).name(displayName).build();
     }
 
-    public void setInventory(ItemStack[] inventory) {
+    public void setInventory(ItemStack... inventory) {
         kit.setInventory(inventory);
     }
 
-    public void setArmor(ItemStack[] armor) {
+    public void setArmor(ItemStack... armor) {
         kit.setArmor(armor);
     }
 
@@ -81,7 +81,7 @@ public class Ladder implements DataObject {
         return editorItems == null ? new ItemStack[0] : Arrays.stream(editorItems).map(it -> it == null ? new ItemStack(Material.AIR) : it.clone()).toArray(ItemStack[]::new);
     }
 
-    public void setEditorItems(ItemStack[] items) {
+    public void setEditorItems(ItemStack... items) {
         editorItems = items;
     }
 

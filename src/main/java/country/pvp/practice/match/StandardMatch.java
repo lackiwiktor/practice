@@ -66,7 +66,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    void movePlayersToLobby() {
+    protected void movePlayersToLobby() {
         for (PlayerSession session : teamA.getOnlinePlayers()) {
             lobbyService.moveToLobby(session);
         }

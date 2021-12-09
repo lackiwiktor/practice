@@ -60,7 +60,7 @@ public class InventorySnapshotMenu extends Menu {
         return buttons;
     }
 
-    private ItemStack[] fixInventoryOrder(ItemStack[] source) {
+    private ItemStack[] fixInventoryOrder(ItemStack... source) {
         ItemStack[] fixed = new ItemStack[36];
 
         System.arraycopy(source, 0, fixed, 27, 9);
@@ -131,6 +131,7 @@ public class InventorySnapshotMenu extends Menu {
             return ChatColor.BLUE.toString().concat(getName(effect.getType()).concat(" ") + (effect.getAmplifier() + 1) + ChatColor.GRAY.toString().concat(" - " + TimeUtil.formatTimeMillisToClock(effect.getDuration() * 50L)));
         }
 
+        //TODO: Make this into map
         public static String getName(PotionEffectType type) {
             if (type.getName().equalsIgnoreCase("fire_resistance")) {
                 return "Fire Resistance";

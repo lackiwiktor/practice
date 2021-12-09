@@ -12,6 +12,7 @@ public abstract class Button {
 
 	public static Button placeholder(final Material material, final byte data, String... title) {
 		return (new Button() {
+			@Override
 			public ItemStack getButtonItem(Player player) {
 				ItemStack it = new ItemStack(material, 1, data);
 				ItemMeta meta = it.getItemMeta();

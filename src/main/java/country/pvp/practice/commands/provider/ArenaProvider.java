@@ -21,7 +21,7 @@ public class ArenaProvider implements BladeProvider<Arena> {
 
     @Override
     public @Nullable Arena provide(BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
-        if (Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
+        if (Strings.isNullOrEmpty(input)  || "null".equals(input)) return null;
 
         return Optional.ofNullable(arenaManager.get(input)).orElseThrow(() -> new BladeExitMessage(ChatColor.RED + "Error: Wrong arena"));
     }

@@ -152,7 +152,7 @@ public class ChatComponentBuilder extends ComponentBuilder {
         return this;
     }
 
-    public ChatComponentBuilder append(BaseComponent[] components) {
+    public ChatComponentBuilder append(BaseComponent... components) {
         for (BaseComponent component : components) {
             append((TextComponent) component);
         }
@@ -176,6 +176,7 @@ public class ChatComponentBuilder extends ComponentBuilder {
 
         append(text);
         color(color);
+        bold(bold);
         underlined(underline);
         italic(italic);
         strikethrough(strike);
@@ -210,7 +211,7 @@ public class ChatComponentBuilder extends ComponentBuilder {
             components.remove(components.size() - 1);
         }
 
-        return components.toArray(new BaseComponent[components.size()]);
+        return components.toArray(new BaseComponent[0]);
     }
 
 }

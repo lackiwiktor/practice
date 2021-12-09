@@ -6,9 +6,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 @RequiredArgsConstructor
 public class Configuration {
 
-    private final FileConfiguration configuration;
+    private final FileConfiguration file;
 
     String getMongoString() {
-        return configuration.getString("mongodb_link");
+        return file.getString("mongodb_link");
     }
 }

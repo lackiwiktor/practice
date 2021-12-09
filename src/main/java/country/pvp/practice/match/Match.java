@@ -134,7 +134,7 @@ public abstract class Match implements Recipient {
         countDownRunnable.cancel();
     }
 
-    abstract void movePlayersToLobby();
+    protected abstract void movePlayersToLobby();
 
     private void moveSpectatorsToLobby() {
         for (PlayerSession spectator : spectators) {

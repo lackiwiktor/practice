@@ -118,7 +118,7 @@ public class PlayerSession implements DataObject, Recipient {
         return state == PlayerState.EDITING_KIT && sessionData != null;
     }
 
-    public void setBar(ItemStack[] bar) {
+    public void setBar(ItemStack... bar) {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "Player must be online in order to change his item bar");
         for (int i = 0; i < bar.length; i++) {
@@ -299,7 +299,7 @@ public class PlayerSession implements DataObject, Recipient {
         return ((CraftPlayer) player).getHandle().ping;
     }
 
-    public void sendComponent(BaseComponent[] components) {
+    public void sendComponent(BaseComponent... components) {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         player.spigot().sendMessage(components);

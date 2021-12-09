@@ -3,7 +3,9 @@ package country.pvp.practice.visibility;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.player.PlayerSession;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class VisibilityProvider {
 
     /**

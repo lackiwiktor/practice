@@ -2,7 +2,7 @@ package country.pvp.practice.match.team;
 
 import country.pvp.practice.party.Party;
 
-public class PartyTeam extends MultiTeam {
+public final class PartyTeam extends MultiTeam {
 
     private final Party party;
 
