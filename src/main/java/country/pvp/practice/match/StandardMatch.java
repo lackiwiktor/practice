@@ -1,5 +1,6 @@
 package country.pvp.practice.match;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.itembar.ItemBarService;
@@ -10,15 +11,11 @@ import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.match.team.Team;
-import country.pvp.practice.message.Bars;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messages;
-import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.ChatColor;
 
 import java.util.List;
 
@@ -44,7 +41,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    void onPreEnd() {
+    void handleEnd() {
         if (winner instanceof SoloTeam && getOpponent(winner) instanceof SoloTeam) {
             SoloTeam loserTeam = (SoloTeam) getOpponent(winner);
             SoloTeam winnerTeam = (SoloTeam) winner;
@@ -106,10 +103,7 @@ public class StandardMatch extends Match {
 
         if (team.isDead()) {
             end(getOpponent(team));
-            return;
         }
-
-        setupSpectator(player);
     }
 
     @Override
@@ -174,6 +168,17 @@ public class StandardMatch extends Match {
     }
 
     @Override
+    Team[] getLosers() {
+        Preconditions.checkNotNull(winner, "winner");
+        return new Team[]{getOpponent(winner)};
+    }
+
+    @Override
+    public boolean isOnSameTeam(PlayerSession player, PlayerSession other) {
+        return getTeam(player).hasPlayer(other);
+    }
+
+    @Override
     void createInventorySnapshots() {
         for (PlayerSession session : teamA.getOnlinePlayers()) {
             if (teamA.isAlive(session)) createInventorySnapshot(session);
@@ -182,51 +187,6 @@ public class StandardMatch extends Match {
         for (PlayerSession session : teamB.getOnlinePlayers()) {
             if (teamB.isAlive(session)) createInventorySnapshot(session);
         }
-    }
-
-    @Override
-    void sendResultComponent() {
-        if (winner != null) {
-            Team loser = getOpponent(winner);
-            BaseComponent[] components = createFinalComponent(winner, loser);
-
-            for (PlayerSession player : getOnlinePlayers()) {
-                player.sendComponent(components);
-            }
-        }
-    }
-
-    private BaseComponent[] createFinalComponent(Team winner, Team loser) {
-        BaseComponent[] winnerComponent = createComponent(winner, true);
-        BaseComponent[] loserComponent = createComponent(loser, false);
-
-        ChatComponentBuilder builder = new ChatComponentBuilder("");
-        builder.append(Bars.CHAT_BAR);
-        builder.append("\n");
-        builder.append(ChatColor.GOLD.toString().concat("Post-Match Inventories ").concat(ChatColor.GRAY.toString()).concat("(click name to view)"));
-        builder.append("\n");
-        builder.append(winnerComponent);
-        builder.append(ChatColor.GRAY + " - ");
-        builder.append(loserComponent);
-        builder.append("\n");
-        builder.append(Bars.CHAT_BAR);
-
-        return builder.create();
-    }
-
-    private BaseComponent[] createComponent(Team team, boolean winner) {
-        ChatComponentBuilder builder = new ChatComponentBuilder(winner ? ChatColor.GREEN + "Winner: " : ChatColor.RED + "Loser: ");
-
-        for (PlayerSession player : team.getPlayers()) {
-            builder.append(createComponent(player));
-        }
-
-        return builder.create();
-    }
-
-    @Override
-    public boolean areOnTheSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer) {
-        return getTeam(damagedPlayer).equals(getTeam(damagerPlayer));
     }
 
     @Override

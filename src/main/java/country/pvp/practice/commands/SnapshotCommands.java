@@ -1,4 +1,4 @@
-package country.pvp.practice.match.snapshot.command;
+package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
 import country.pvp.practice.message.Messager;
@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class ViewInventoryCommand {
+public class SnapshotCommands {
 
     private final InventorySnapshotManager snapshotManager;
     private final InventorySnapshotMenuProvider inventorySnapshotMenuProvider;
 
-    @Command("viewinv")
+    @Command("viewsnapshot")
     public void viewInv(@Sender Player sender, @Name("id") UUID id) {
         Optional<InventorySnapshot> snapshotOptional = snapshotManager.get(id);
 

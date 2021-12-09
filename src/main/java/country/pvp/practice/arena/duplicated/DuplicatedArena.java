@@ -31,7 +31,7 @@ public class DuplicatedArena extends Arena {
         return new DuplicatedArena(id, arena);
     }
 
-    public static DuplicatedArena from( Arena arena, int offset) {
+    public static DuplicatedArena from(Arena arena, int offset) {
         return new DuplicatedArena(UUID.randomUUID(), arena, offset);
     }
 
@@ -55,7 +55,7 @@ public class DuplicatedArena extends Arena {
     }
 
     @Override
-    public void applyDocument( Document document) {
+    public void applyDocument(Document document) {
         offset = document.getInteger("offset");
     }
 

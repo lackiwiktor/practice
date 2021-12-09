@@ -21,6 +21,7 @@ public class VisibilityUpdater {
     }
 
     public void update(PlayerSession observer, PlayerSession observable) {
+        if (observer.equals(observable)) return;
         Visibility visibility = visibilityProvider.provide(observer, observable);
         visibility.apply(observer, observable);
     }

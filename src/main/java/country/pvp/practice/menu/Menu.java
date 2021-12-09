@@ -122,7 +122,7 @@ public abstract class Menu {
 		this.setClosedByMenu(false);
 	}
 
-	public int size( Map<Integer, Button> buttons) {
+	public int size(Map<Integer, Button> buttons) {
 		int highest = 0;
 
 		for (int buttonValue : buttons.keySet()) {

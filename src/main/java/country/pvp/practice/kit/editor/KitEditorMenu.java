@@ -74,7 +74,7 @@ public class KitEditorMenu extends Menu {
         }
 
         @Override
-        public boolean shouldUpdate( Player player, ClickType clickType) {
+        public boolean shouldUpdate(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 NamedKit newKit = playerSession.getKit(ladder, index);
 
@@ -116,7 +116,7 @@ public class KitEditorMenu extends Menu {
         }
 
         @Override
-        public void clicked( Player player, ClickType clickType) {
+        public void clicked(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 NamedKit kit = playerSession.getKit(ladder, index);
                 kit.apply(playerSession);

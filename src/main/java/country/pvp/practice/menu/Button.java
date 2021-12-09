@@ -24,16 +24,16 @@ public abstract class Button {
 		});
 	}
 
-	public static void playFail( Player player) {
+	public static void playFail(Player player) {
 		player.playSound(player.getLocation(), Sound.DIG_GRASS, 20F, 0.1F);
 
 	}
 
-	public static void playSuccess( Player player) {
+	public static void playSuccess(Player player) {
 		player.playSound(player.getLocation(), Sound.NOTE_PIANO, 20F, 15F);
 	}
 
-	public static void playNeutral( Player player) {
+	public static void playNeutral(Player player) {
 		player.playSound(player.getLocation(), Sound.CLICK, 20F, 1F);
 	}
 

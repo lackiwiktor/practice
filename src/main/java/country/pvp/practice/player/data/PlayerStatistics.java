@@ -32,7 +32,7 @@ public class PlayerStatistics implements SerializableObject {
     }
 
     @Override
-    public void applyDocument( Document document) {
+    public void applyDocument(Document document) {
         for (Map.Entry<String, Object> entry : document.entrySet()) {
             setElo(entry.getKey(), (Integer) entry.getValue());
         }

@@ -28,7 +28,7 @@ public class PracticeBoard extends PlayerListener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onJoin( PlayerJoinEvent event) {
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         FastBoard board = new FastBoard(player);
         board.updateTitle(TITLE);
@@ -38,7 +38,7 @@ public class PracticeBoard extends PlayerListener {
     }
 
     @EventHandler
-    public void onQuit( PlayerQuitEvent event) {
+    public void onQuit(PlayerQuitEvent event) {
         PlayerSession playerSession = get(event);
         FastBoard board = this.boards.remove(playerSession);
         if (board != null) {

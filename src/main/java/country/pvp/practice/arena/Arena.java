@@ -44,7 +44,7 @@ public class Arena implements DataObject {
     }
 
     @Override
-    public void applyDocument( Document document) {
+    public void applyDocument(Document document) {
         displayName = document.getString("displayName");
         schematic = document.getString("schematic");
         icon = ItemStackAdapter.fromJson(document.getString("icon"));

@@ -10,9 +10,7 @@ import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.Team;
-import country.pvp.practice.message.Messager;
-import country.pvp.practice.message.Messages;
-import country.pvp.practice.message.Recipient;
+import country.pvp.practice.message.*;
 import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.message.component.ChatHelper;
 import country.pvp.practice.player.PlayerSession;
@@ -90,8 +88,8 @@ public abstract class Match implements Recipient {
 
         cancelCountDown();
         createInventorySnapshots();
-        onPreEnd();
         snapshotManager.addAll(snapshots);
+        handleEnd();
         sendResultComponent();
 
         Runnable runnable = () -> {
@@ -103,7 +101,13 @@ public abstract class Match implements Recipient {
         TaskDispatcher.runLater(runnable, 3500L, TimeUnit.MILLISECONDS);
     }
 
-    abstract void onPreEnd();
+    void moveTeamToLobby(Team team) {
+        for (PlayerSession session : team.getOnlinePlayers()) {
+            lobbyService.moveToLobby(session);
+        }
+    }
+
+    abstract void handleEnd();
 
     private void finish() {
         matchManager.remove(this);
@@ -146,9 +150,9 @@ public abstract class Match implements Recipient {
         PlayerUtil.resetPlayer(player.getPlayer());
         player.setVelocity(new Vector());
         player.teleport(player.getLocation().add(0, 3, 0));
+        player.enableFlying();
         handleRespawn(player);
     }
-
 
     abstract void broadcastPlayerDeath(PlayerSession player);
 
@@ -184,21 +188,20 @@ public abstract class Match implements Recipient {
     }
 
     public void startSpectating(PlayerSession spectator, PlayerSession player) {
-        spectator.setState(PlayerState.SPECTATING, new SessionSpectatingData(this));
         spectators.add(spectator);
-        itemBarService.apply(spectator);
         broadcast(Messages.MATCH_PLAYER_STARTED_SPECTATING.match("{player}", spectator.getName()));
-        spectator.teleport(player.getLocation());
-        setupSpectator(spectator);
+        spectator.setState(PlayerState.SPECTATING, new SessionSpectatingData(this));
+        setupSpectator(spectator, player);
+    }
 
+    private void setupSpectator(PlayerSession spectator, PlayerSession other) {
+        spectator.enableFlying();
+        itemBarService.apply(spectator);
+        spectator.teleport(other.getLocation());
         for (PlayerSession matchPlayer : getOnlinePlayers()) {
             visibilityUpdater.update(spectator, matchPlayer);
             visibilityUpdater.update(matchPlayer, spectator);
         }
-    }
-
-    void setupSpectator(PlayerSession player) {
-        player.enableFlying();
     }
 
     public void stopSpectating(PlayerSession spectator, boolean broadcast) {
@@ -220,18 +223,74 @@ public abstract class Match implements Recipient {
         return snapshot;
     }
 
-    abstract void sendResultComponent();
+    private void sendResultComponent() {
+        BaseComponent[] components = createMatchResultMessage(winner, getLosers());
 
-    BaseComponent[] createComponent(PlayerSession player) {
+        for (PlayerSession player : getOnlinePlayers()) {
+            player.sendComponent(components);
+        }
+    }
+
+    abstract Team[] getLosers();
+
+    BaseComponent[] createMatchResultMessage(Team winner, Team... losers) {
+        ChatComponentBuilder builder = new ChatComponentBuilder("");
+        builder.append(Bars.CHAT_BAR + "\n");
+        builder.append(Messages.MATCH_RESULT_OVERVIEW.get() + "\n");
+
+        BaseComponent[] winnerComponent = new ChatComponentBuilder(Messages.MATCH_RESULT_OVERVIEW_WINNER.get())
+                .append(createTeamSnapshotMessage(winner))
+                .create();
+        ChatComponentBuilder loserComponentBuilder = new ChatComponentBuilder(Messages.MATCH_RESULT_OVERVIEW_LOSER.get());
+
+        for (int i = 0; i < losers.length; i++) {
+            loserComponentBuilder.append(createTeamSnapshotMessage(losers[i]));
+            if (i < losers.length - 1) {
+                loserComponentBuilder.append(MessageUtil.color("&7, "));
+                loserComponentBuilder.getCurrent().setClickEvent(null);
+                loserComponentBuilder.getCurrent().setHoverEvent(null);
+            }
+        }
+
+        BaseComponent[] loserComponent = loserComponentBuilder.create();
+
+        builder.append(winnerComponent);
+        builder.append(Messages.MATCH_RESULT_OVERVIEW_SPLITTER.get());
+        builder.append(loserComponent);
+        builder.append(Bars.CHAT_BAR);
+        builder.getCurrent().setClickEvent(null);
+        builder.getCurrent().setHoverEvent(null);
+
+        return builder.create();
+    }
+
+    private BaseComponent[] createTeamSnapshotMessage(Team team) {
+        ChatComponentBuilder builder = new ChatComponentBuilder("");
+        List<PlayerSession> players = team.getPlayers();
+
+        for (int i = 0; i < team.size(); i++) {
+            PlayerSession player = players.get(i);
+            builder.append(createPlayerSnapshotMessage(player));
+            if (i < team.size() - 1) {
+                builder.append(MessageUtil.color("&7, "));
+                builder.getCurrent().setClickEvent(null);
+                builder.getCurrent().setHoverEvent(null);
+            }
+        }
+
+        return builder.create();
+    }
+
+    BaseComponent[] createPlayerSnapshotMessage(PlayerSession player) {
         return new ChatComponentBuilder(ChatColor.YELLOW + player.getName())
                 .attachToEachPart(
-                        ChatHelper.hover(ChatColor.GREEN.toString().concat("Click to view inventory of ").concat(ChatColor.GOLD.toString()).concat(player.getName())))
+                        ChatHelper.hover(Messages.MATCH_RESULT_OVERVIEW_HOVER.match("{player}", player.getName())))
                 .attachToEachPart(
-                        ChatHelper.click("/viewinv ".concat(player.getUuid().toString())))
+                        ChatHelper.click("/viewsnapshot ".concat(player.getUuid().toString())))
                 .create();
     }
 
-    public abstract boolean areOnTheSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer);
+    public abstract boolean isOnSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer);
 
     public abstract boolean isInMatch(PlayerSession player);
 

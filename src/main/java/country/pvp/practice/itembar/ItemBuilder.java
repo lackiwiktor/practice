@@ -16,7 +16,7 @@ public class ItemBuilder {
 
   private final ItemStack is;
 
-  public ItemBuilder( Material mat) {
+  public ItemBuilder(Material mat) {
     is = new ItemStack(mat);
   }
 
@@ -33,14 +33,14 @@ public class ItemBuilder {
     return this;
   }
 
-  public ItemBuilder name( String name) {
+  public ItemBuilder name(String name) {
     ItemMeta meta = is.getItemMeta();
     meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
     is.setItemMeta(meta);
     return this;
   }
 
-  public ItemBuilder lore( String name) {
+  public ItemBuilder lore(String name) {
     ItemMeta meta = is.getItemMeta();
     List<String> lore = meta.getLore();
 
@@ -82,7 +82,7 @@ public class ItemBuilder {
     return this;
   }
 
-  public ItemBuilder lore( List<String> lore) {
+  public ItemBuilder lore(List<String> lore) {
     ItemMeta meta = is.getItemMeta();
     List<String> toSet = meta.getLore();
 
@@ -121,7 +121,7 @@ public class ItemBuilder {
     return this;
   }
 
-  public ItemBuilder enchantment( Map<Enchantment, Integer> enchantmens) {
+  public ItemBuilder enchantment(Map<Enchantment, Integer> enchantmens) {
     for (Map.Entry<Enchantment, Integer> enchantmentIntegerEntry : enchantmens.entrySet()) {
       is.addUnsafeEnchantment(enchantmentIntegerEntry.getKey(), enchantmentIntegerEntry.getValue());
     }
