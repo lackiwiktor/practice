@@ -15,7 +15,7 @@ public class PlayerQueueListener extends PlayerListener {
     }
 
     @EventHandler
-    public void playerQuit( PlayerQuitEvent event) {
+    public void playerQuit(PlayerQuitEvent event) {
         PlayerSession playerSession = get(event);
 
         if (playerSession.isInQueue()) {

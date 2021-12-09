@@ -13,7 +13,7 @@ public class VisibilityProvider {
      * @param observable player who is looked on
      * @return visibility
      */
-    public Visibility provide(PlayerSession observer, PlayerSession observable) {
+    public static Visibility provide(PlayerSession observer, PlayerSession observable) {
         switch (observer.getState()) {
             case QUEUING:
             case IN_LOBBY:

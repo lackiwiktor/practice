@@ -34,12 +34,12 @@ public class Kit implements SerializableObject {
     }
 
     @Override
-    public void applyDocument( Document document) {
+    public void applyDocument(Document document) {
         inventory = (ItemStack[]) document.get("inventory", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
         armor = (ItemStack[]) document.get("armor", List.class).stream().map(it -> ItemStackAdapter.fromJson((String) it)).toArray(ItemStack[]::new);
     }
 
-    public void apply( PlayerSession player) {
+    public void apply(PlayerSession player) {
         Player bukkitPlayer = player.getPlayer();
         Preconditions.checkNotNull(bukkitPlayer, "player");
         PlayerInventory playerInventory = bukkitPlayer.getInventory();

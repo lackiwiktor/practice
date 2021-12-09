@@ -20,7 +20,7 @@ public class LadderProvider implements BladeProvider<Ladder> {
     private final LadderManager ladderManager;
 
     @Override
-    public @Nullable Ladder provide( BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
+    public @Nullable Ladder provide(BladeContext context, BladeParameter parameter, @Nullable String input) throws BladeExitMessage {
         System.out.println(input);
         if (Strings.isNullOrEmpty(input)  || input.equals("null")) return null;
 

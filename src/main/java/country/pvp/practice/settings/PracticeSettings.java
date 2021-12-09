@@ -34,7 +34,7 @@ public class PracticeSettings implements DataObject {
     }
 
     @Override
-    public void applyDocument( Document document) {
+    public void applyDocument(Document document) {
         spawnLocation = LocationAdapter.fromJson(document.getString("spawnLocation"));
         editorLocation = LocationAdapter.fromJson(document.getString("editorLocation"));
     }

@@ -14,6 +14,11 @@ public enum Messages {
     QUEUE_FOUND_OPPONENT("&eFound opponent: &f{player}"),
     MATCH_START("&6Match has started!"),
     MATCH_CANCELLED("&4This match has been cancelled. ({reason})"),
+    MATCH_RESULT_OVERVIEW("&6Post-Match Inventories &7(click name to view)"),
+    MATCH_RESULT_OVERVIEW_WINNER("&aWinner: "),
+    MATCH_RESULT_OVERVIEW_SPLITTER(" &7⎟ "),
+    MATCH_RESULT_OVERVIEW_LOSER("&cLoser: "),
+    MATCH_RESULT_OVERVIEW_HOVER("&aClick to view inventory of &6{player}&a."),
     MATCH_PLAYER_EQUIP_KIT("&eYou have equipped {kit}."),
     MATCH_PLAYER_DISCONNECTED("&c{player} &chas disconnected!"),
     MATCH_PLAYER_PEARL_COOLDOWN("&bYou will be able to use enderpearl again in &f{time}&b."),
@@ -30,7 +35,7 @@ public enum Messages {
     private final String value;
 
     public String get() {
-        return value;
+        return MessageUtil.color(value);
     }
 
     public String match(String placeholder, Object value) {
@@ -38,12 +43,12 @@ public enum Messages {
     }
 
     public String match(MessagePattern @Nullable ... patterns) {
-        if (patterns == null) return value;
+        if (patterns == null) return get();
 
-        String matched = value;
+        String matched = get();
 
         for (MessagePattern pattern : patterns) {
-            matched = pattern.translate(matched);
+            matched = pattern.replace(matched);
         }
 
         return matched;

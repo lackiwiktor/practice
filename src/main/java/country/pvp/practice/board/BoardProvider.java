@@ -20,7 +20,7 @@ public class BoardProvider {
 
     private final MatchManager matchManager;
 
-    public List<String> provide( PlayerSession player) {
+    public List<String> provide(PlayerSession player) {
         List<String> lines = Lists.newArrayList();
 
         switch (player.getState()) {

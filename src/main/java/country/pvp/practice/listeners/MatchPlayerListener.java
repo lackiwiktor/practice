@@ -78,7 +78,7 @@ public class MatchPlayerListener extends PlayerListener {
             return;
         }
 
-        if (match.areOnTheSameTeam(damagedPlayer, damagerPlayer)) {
+        if (match.isOnSameTeam(damagedPlayer, damagerPlayer)) {
             event.setCancelled(true);
             return;
         }
@@ -126,6 +126,7 @@ public class MatchPlayerListener extends PlayerListener {
 
         Match match = player.getCurrentMatch();
         match.handleDisconnect(player);
+        event.getPlayer().setHealth(0);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -22,7 +22,7 @@ import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
-import country.pvp.practice.match.snapshot.command.ViewInventoryCommand;
+import country.pvp.practice.commands.SnapshotCommands;
 import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.party.PartyInviteRequestInvalidateTask;
 import country.pvp.practice.player.*;
@@ -92,7 +92,7 @@ public class Practice {
         registerCommand(LadderCommands.class);
         registerCommand(PracticeSettingsCommand.class);
         registerCommand(MatchCommands.class);
-        registerCommand(ViewInventoryCommand.class);
+        registerCommand(SnapshotCommands.class);
         registerCommand(QueueCommands.class);
         registerCommand(KitEditorCommands.class);
         registerCommand(PartyCommands.class);
