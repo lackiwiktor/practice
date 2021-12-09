@@ -10,7 +10,9 @@ import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
 import org.bukkit.Location;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,7 +57,7 @@ public class PartyTeam extends Team {
     }
 
     @Override
-    public void createMatchSession(Match<?> match) {
+    public void createMatchSession(Match match) {
         for (PlayerSession session : getOnlinePlayers()) {
             session.setState(PlayerState.IN_MATCH, new SessionMatchData(match));
         }
@@ -95,15 +97,18 @@ public class PartyTeam extends Team {
     @Override
     public void receive(String message) {
         for (PlayerSession session : getOnlinePlayers()) {
-            session.receive(message);
+            if (session.isOnline())
+                session.receive(message);
         }
     }
 
-    public Set<PlayerSession> getOnlinePlayers() {
-        return players.stream().filter(PlayerSession::isOnline).collect(Collectors.toSet());
+    @Override
+    public List<PlayerSession> getOnlinePlayers() {
+        return players.stream().filter(PlayerSession::isOnline).collect(Collectors.toList());
     }
 
-    public Set<PlayerSession> getPlayers() {
-        return Collections.unmodifiableSet(players);
+    @Override
+    public List<PlayerSession> getPlayers() {
+        return Collections.unmodifiableList(new ArrayList<>(players));
     }
 }

@@ -12,16 +12,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
-@Data
+@Data(staticConstructor = "of")
 public class SoloTeam extends Team implements Ranked {
 
     private final PlayerSession playerSession;
-
-    public static SoloTeam of(PlayerSession player) {
-        return new SoloTeam(player);
-    }
 
     @Override
     public int getElo(Ladder ladder) {
@@ -72,7 +70,7 @@ public class SoloTeam extends Team implements Ranked {
     }
 
     @Override
-    public void createMatchSession(Match<?> match) {
+    public void createMatchSession(Match match) {
         playerSession.setState(PlayerState.IN_MATCH, new SessionMatchData(match));
     }
 
@@ -95,8 +93,14 @@ public class SoloTeam extends Team implements Ranked {
     }
 
     @Override
+    public List<PlayerSession> getPlayers() {
+        return Collections.singletonList(playerSession);
+    }
+
+    @Override
     public void receive(String message) {
-        playerSession.receive(message);
+        if (playerSession.isOnline())
+            playerSession.receive(message);
     }
 
     @Override

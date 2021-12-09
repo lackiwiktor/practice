@@ -31,7 +31,7 @@ public class VisibilityProvider {
                 return Visibility.HIDDEN;
             case SPECTATING:
                 if (observable.isInMatch()) {
-                    Match match = observer.getCurrentMatch();
+                    Match match = observer.getCurrentlySpectatingMatch();
                     return match.isInMatch(observable) ? Visibility.SHOWN : Visibility.HIDDEN;
                 }
                 return Visibility.HIDDEN;

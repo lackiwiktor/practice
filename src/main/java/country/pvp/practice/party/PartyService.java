@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import country.pvp.practice.invitation.Invitation;
 import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.itembar.ItemBarService;
+import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
@@ -16,6 +17,7 @@ public class PartyService {
     private final ItemBarService itemBarService;
     private final InvitationService invitationService;
     private final PartyManager partyManager;
+    private final MatchManager matchManager;
 
     public void createParty(PlayerSession leader) {
         if (leader.hasParty()) {

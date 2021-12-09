@@ -6,6 +6,8 @@ import country.pvp.practice.duel.PlayerDuelService;
 import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
+import country.pvp.practice.match.MatchProvider;
+import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
@@ -16,18 +18,25 @@ public class MatchCommands extends PlayerCommands {
 
     private final PlayerDuelService playerDuelService;
     private final KitChooseMenuProvider kitChooseMenuProvider;
+    private final MatchProvider matchProvider;
 
     @Inject
-    public MatchCommands(PlayerManager playerManager, PlayerDuelService playerDuelService, KitChooseMenuProvider kitChooseMenuProvider) {
+    public MatchCommands(PlayerManager playerManager, PlayerDuelService playerDuelService, KitChooseMenuProvider kitChooseMenuProvider, MatchProvider matchProvider) {
         super(playerManager);
         this.playerDuelService = playerDuelService;
         this.kitChooseMenuProvider = kitChooseMenuProvider;
+        this.matchProvider = matchProvider;
     }
 
     @Command("match cancel")
-    public void cancel(@Sender Player sender, @Name("match") Match<?> match, @Combined @Optional("Cancelled by the staff member") @Name("reason") String reason) {
+    public void cancel(@Sender Player sender, @Name("match") Match match, @Combined @Optional("Cancelled by the staff member") @Name("reason") String reason) {
         match.cancel(reason);
         Messager.messageSuccess(sender, "Successfully cancelled this match.");
+    }
+
+    @Command("match ffa")
+    public void ffa(@Sender Player sender, Ladder ladder, PlayerSession p1, PlayerSession p2, PlayerSession p3) {
+        matchProvider.provide(ladder, SoloTeam.of(p1), SoloTeam.of(p2), SoloTeam.of(p3)).init();
     }
 
     @Command("spectate")

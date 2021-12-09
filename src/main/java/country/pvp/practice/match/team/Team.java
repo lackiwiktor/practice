@@ -7,6 +7,9 @@ import country.pvp.practice.message.Recipient;
 import country.pvp.practice.player.PlayerSession;
 import org.bukkit.Location;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public abstract class Team implements Recipient {
 
     public boolean isAlive(PlayerSession player) {
@@ -35,7 +38,7 @@ public abstract class Team implements Recipient {
 
     public abstract void clearRematchData();
 
-    public abstract void createMatchSession(Match<?> match);
+    public abstract void createMatchSession(Match match);
 
     public abstract void teleport(Location location);
 
@@ -43,4 +46,12 @@ public abstract class Team implements Recipient {
 
     public abstract void reset();
 
+    public List<PlayerSession> getOnlinePlayers() {
+        return getPlayers()
+                .stream()
+                .filter(PlayerSession::isOnline)
+                .collect(Collectors.toList());
+    }
+
+    public abstract List<PlayerSession> getPlayers();
 }

@@ -38,8 +38,8 @@ public class BoardProvider {
                 lines.add("  Ladder: " + MessageUtil.color(queueData.getLadderDisplayName()));
                 break;
             case IN_MATCH:
-                Match<?> matchData = player.getCurrentMatch();
-                lines.addAll(matchData.getBoard(player));
+                Match match = player.getCurrentMatch();
+                lines.addAll(match.getBoard(player));
                 break;
             case SPECTATING:
             case EDITING_KIT:

@@ -8,10 +8,7 @@ import country.pvp.practice.duel.PlayerDuelRequest;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.match.Match;
-import country.pvp.practice.match.PlayerMatchStatistics;
-import country.pvp.practice.match.RematchData;
-import country.pvp.practice.match.SessionMatchData;
+import country.pvp.practice.match.*;
 import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.player.data.PlayerKits;
@@ -262,10 +259,16 @@ public class PlayerSession implements DataObject, Recipient {
         player.updateInventory();
     }
 
-    public Match<?> getCurrentMatch() {
+    public Match getCurrentMatch() {
         SessionMatchData matchData = getStateData();
         Preconditions.checkNotNull(matchData, "data");
         return matchData.getMatch();
+    }
+
+    public Match getCurrentlySpectatingMatch() {
+        SessionSpectatingData spectatingData = getStateData();
+        Preconditions.checkNotNull(spectatingData, "data");
+        return spectatingData.getMatch();
     }
 
     public void handleBeingHit(PlayerSession attacker) {
@@ -350,9 +353,9 @@ public class PlayerSession implements DataObject, Recipient {
     }
 
     public void stopSpectating(boolean broadcast) {
-        SessionMatchData matchData = getStateData();
-        Preconditions.checkNotNull(matchData, "data");
-        Match<?> match = matchData.getMatch();
+        SessionSpectatingData spectatingData = getStateData();
+        Preconditions.checkNotNull(spectatingData, "data");
+        Match match = spectatingData.getMatch();
         match.stopSpectating(this, broadcast);
     }
 

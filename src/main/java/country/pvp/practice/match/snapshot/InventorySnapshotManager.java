@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class InventorySnapshotManager {
@@ -20,5 +21,9 @@ public class InventorySnapshotManager {
 
     void invalidate() {
         snapshots.entrySet().removeIf(entry -> entry.getValue().hasExpired());
+    }
+
+    public void addAll(Set<InventorySnapshot> snapshots) {
+        snapshots.forEach(this::add);
     }
 }

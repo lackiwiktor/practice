@@ -14,6 +14,7 @@ public enum Visibility {
     private final BiConsumer<Player, Player> apply;
 
     public void apply(PlayerSession observer, PlayerSession observable) {
+        System.out.println(observer.getName() + " " + this.name() + " " + observable.getName());
         this.apply.accept(observer.getPlayer(), observable.getPlayer());
     }
 
