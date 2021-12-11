@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class PartyInviteRequestInvalidateTask implements Runnable {
+public class PartyRequestInvalidateTask implements Runnable {
 
     private final PartyManager partyManager;
 
@@ -12,6 +12,7 @@ public class PartyInviteRequestInvalidateTask implements Runnable {
     public void run() {
         for (Party party : partyManager.getAll()) {
             party.invalidateInviteRequests();
+            party.invalidateDuelRequests();
         }
     }
 }

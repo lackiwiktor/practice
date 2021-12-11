@@ -6,7 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.arena.ArenaService;
 import country.pvp.practice.board.PracticeBoard;
-import country.pvp.practice.duel.PlayerDuelService;
+import country.pvp.practice.player.duel.PlayerDuelService;
 import country.pvp.practice.invitation.InvitationManager;
 import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.itembar.ItemBarService;
@@ -25,7 +25,6 @@ import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.menu.QueueMenuProvider;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsService;
-import country.pvp.practice.visibility.VisibilityProvider;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +43,6 @@ public class PracticeModule extends AbstractModule {
         bind(ItemBarService.class).asEagerSingleton();
         bind(PlayerManager.class).asEagerSingleton();
         bind(PlayerService.class).asEagerSingleton();
-        bind(VisibilityProvider.class).asEagerSingleton();
         bind(VisibilityUpdater.class).asEagerSingleton();
         bind(LadderManager.class).asEagerSingleton();
         bind(LadderService.class).asEagerSingleton();

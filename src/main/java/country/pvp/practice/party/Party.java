@@ -1,25 +1,31 @@
 package country.pvp.practice.party;
 
 import com.google.common.collect.Sets;
+import country.pvp.practice.duel.DuelInvitable;
 import country.pvp.practice.duel.Request;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
-import country.pvp.practice.message.Recipient;
+import country.pvp.practice.party.duel.PartyDuelRequest;
 import country.pvp.practice.player.PlayerSession;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
-public class Party implements Recipient {
+public class Party implements DuelInvitable<Party, PartyDuelRequest> {
 
-    private PlayerSession leader;
+    private final UUID id = UUID.randomUUID(); //party-id
     private final Set<PlayerSession> members = Sets.newHashSet();
+    private final Set<PartyDuelRequest> duelRequests = Sets.newConcurrentHashSet();
     private final Set<PartyInviteRequest> requests = Sets.newConcurrentHashSet();
+    private PlayerSession leader;
     private boolean disbanded;
 
     public Party(PlayerSession leader) {
@@ -68,19 +74,6 @@ public class Party implements Recipient {
         return members.size();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Party party = (Party) o;
-        return Objects.equals(leader, party.leader);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(leader);
-    }
-
     public void removePlayerInvite(PlayerSession invitee) {
         requests.removeIf(it -> it.getInvitee().equals(invitee));
     }
@@ -97,6 +90,52 @@ public class Party implements Recipient {
     @Override
     public void receive(String message) {
         members.forEach(it -> Messager.message(it, message));
+    }
+
+    @Override
+    public void receive(BaseComponent[] components) {
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Party party = (Party) o;
+        return Objects.equals(id, party.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public void addDuelRequest(PartyDuelRequest request) {
+        duelRequests.add(request);
+    }
+
+    @Override
+    public boolean hasDuelRequest(DuelInvitable inviter) {
+        return duelRequests.stream().anyMatch(it -> it.getInviter().equals(inviter));
+    }
+
+    @Override
+    public void clearDuelRequests(DuelInvitable inviter) {
+        duelRequests.removeIf(it -> it.getInviter().equals(inviter));
+    }
+
+    @Override
+    public void invalidateDuelRequests() {
+        duelRequests.removeIf(Request::hasExpired);
+    }
+
+    @Override
+    public @Nullable PartyDuelRequest getDuelRequest(DuelInvitable inviter) {
+        return duelRequests.stream()
+                .filter(it -> it.getInviter().equals(inviter))
+                .findFirst()
+                .orElse(null);
     }
 
     @RequiredArgsConstructor

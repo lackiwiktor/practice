@@ -3,13 +3,13 @@ package country.pvp.practice.player;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import country.pvp.practice.data.DataObject;
-import country.pvp.practice.duel.DuelRequest;
-import country.pvp.practice.duel.PlayerDuelRequest;
+import country.pvp.practice.duel.DuelInvitable;
+import country.pvp.practice.player.duel.PlayerDuelRequest;
+import country.pvp.practice.duel.Request;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.*;
-import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.player.data.PlayerKits;
 import country.pvp.practice.player.data.PlayerState;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Data
-public class PlayerSession implements DataObject, Recipient {
+public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, PlayerDuelRequest> {
 
     private final UUID uuid;
     private String name;
@@ -88,6 +88,11 @@ public class PlayerSession implements DataObject, Recipient {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         player.sendMessage(message);
+    }
+
+    @Override
+    public void receive(BaseComponent[] components) {
+
     }
 
     @Override
@@ -164,25 +169,6 @@ public class PlayerSession implements DataObject, Recipient {
         return kits.getKits(ladder);
     }
 
-    public void addDuelRequest(PlayerDuelRequest request) {
-        duelRequests.add(request);
-    }
-
-    public boolean hasDuelRequest(PlayerSession inviter) {
-        return duelRequests.stream().anyMatch(it -> it.getInviter().equals(inviter));
-    }
-
-    public @Nullable PlayerDuelRequest getDuelRequest(PlayerSession inviter) {
-        return duelRequests.stream().filter(it -> it.getInviter().equals(inviter)).findFirst().orElse(null);
-    }
-
-    public void clearDuelRequests(PlayerSession inviter) {
-        duelRequests.removeIf(it -> it.getInviter().equals(inviter));
-    }
-
-    public void invalidateDuelRequests() {
-        duelRequests.removeIf(DuelRequest::hasExpired);
-    }
 
     public boolean hasParty() {
         return party != null;
@@ -425,5 +411,33 @@ public class PlayerSession implements DataObject, Recipient {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
+    }
+
+    @Override
+    public void addDuelRequest(PlayerDuelRequest request) {
+        duelRequests.add(request);
+    }
+
+    @Override
+    public boolean hasDuelRequest(DuelInvitable inviter) {
+        return duelRequests.stream().anyMatch(it -> it.getInviter().equals(inviter));
+    }
+
+    @Override
+    public void clearDuelRequests(DuelInvitable inviter) {
+        duelRequests.removeIf(it -> it.getInviter().equals(inviter));
+    }
+
+    @Override
+    public void invalidateDuelRequests() {
+        duelRequests.removeIf(Request::hasExpired);
+    }
+
+    @Override
+    public @Nullable PlayerDuelRequest getDuelRequest(DuelInvitable inviter) {
+        return duelRequests.stream()
+                .filter(it -> it.getInviter().equals(inviter))
+                .findFirst()
+                .orElse(null);
     }
 }

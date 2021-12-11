@@ -13,6 +13,7 @@ public class DuplicatedArena extends Arena {
     private final UUID id;
     private final Arena parent;
     private int offset;
+    private boolean occupied;
 
     public DuplicatedArena(UUID id, Arena parent) {
         super(parent.getName());
@@ -79,4 +80,9 @@ public class DuplicatedArena extends Arena {
 
         return location.clone().add(offset, 0, offset);
     }
+
+    public boolean isAvailable() {
+        return !occupied;
+    }
+
 }

@@ -24,7 +24,7 @@ import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
 import country.pvp.practice.menu.MenuListener;
-import country.pvp.practice.party.PartyInviteRequestInvalidateTask;
+import country.pvp.practice.party.PartyRequestInvalidateTask;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.QueueTask;
@@ -78,7 +78,7 @@ public class Practice {
         schedule(InventorySnapshotInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(DuelRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(InvitationInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
-        schedule(PartyInviteRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
+        schedule(PartyRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(LeaderBoardsFetchTask.class, 15L, TimeUnit.SECONDS, true);
 
         loadSettings();
