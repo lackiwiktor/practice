@@ -231,9 +231,7 @@ public abstract class Match implements Recipient {
         }
     }
 
-    abstract Team[] getLosers();
-
-    BaseComponent[] createMatchResultMessage(Team winner, Team... losers) {
+    private BaseComponent[] createMatchResultMessage(Team winner, Team... losers) {
         ChatComponentBuilder builder = new ChatComponentBuilder("");
         builder.append(Bars.CHAT_BAR + "\n");
         builder.append(Messages.MATCH_RESULT_OVERVIEW.get() + "\n");
@@ -281,7 +279,7 @@ public abstract class Match implements Recipient {
         return builder.create();
     }
 
-    BaseComponent[] createPlayerSnapshotMessage(PlayerSession player) {
+    private BaseComponent[] createPlayerSnapshotMessage(PlayerSession player) {
         return new ChatComponentBuilder(ChatColor.YELLOW + player.getName())
                 .attachToEachPart(
                         ChatHelper.hover(Messages.MATCH_RESULT_OVERVIEW_HOVER.match("{player}", player.getName())))
@@ -290,11 +288,14 @@ public abstract class Match implements Recipient {
                 .create();
     }
 
+
     public abstract boolean isOnSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer);
 
     public abstract boolean isInMatch(PlayerSession player);
 
     public abstract boolean isAlive(PlayerSession player);
+
+    abstract Team[] getLosers();
 
     abstract int getPlayersCount();
 

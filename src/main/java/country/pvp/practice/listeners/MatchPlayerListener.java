@@ -129,7 +129,7 @@ public class MatchPlayerListener extends PlayerListener {
         event.getPlayer().setHealth(0);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void potionSplash(PotionSplashEvent event) {
         if (event.getPotion().getShooter() instanceof Player) {
             Player shooter = (Player) event.getPotion().getShooter();
@@ -165,7 +165,7 @@ public class MatchPlayerListener extends PlayerListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void playerInteract(PlayerInteractEvent event) {
         Action action = event.getAction();
         if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
@@ -181,6 +181,7 @@ public class MatchPlayerListener extends PlayerListener {
             Match match = playerSession.getCurrentMatch();
 
             if (match.getState() != MatchState.FIGHT) {
+                Messager.message(playerSession, "You can't use pearls right now.");
                 event.setCancelled(true);
                 return;
             }

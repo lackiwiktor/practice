@@ -69,6 +69,10 @@
 
     <repositories>
         <repository>
+            <id>funkemunky-releases</id>
+            <url>https://nexus.funkemunky.cc/content/repositories/releases/</url>
+        </repository>
+        <repository>
             <id>maven-central</id>
             <url>https://repo1.maven.org/maven2</url>
         </repository>
@@ -79,10 +83,6 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 
@@ -130,15 +130,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <groupId>org.github.spigot</groupId>
+            <artifactId>1.8.8</artifactId>
+            <version>1.8.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

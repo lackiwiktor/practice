@@ -26,8 +26,7 @@ public class ItemBar {
         return Arrays.stream(items).map(it -> it == null ? new ItemStack(Material.AIR) : it.getItem()).toArray(ItemStack[]::new);
     }
 
-    @Nullable
-    static ItemBar get(PlayerSession player) {
+    @Nullable static ItemBar get(PlayerSession player) {
         switch (player.getState()) {
             case IN_LOBBY:
                 ItemBarItem[] items = new ItemBarItem[9];
