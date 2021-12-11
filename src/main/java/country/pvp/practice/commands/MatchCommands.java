@@ -1,8 +1,8 @@
 package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
-import country.pvp.practice.duel.PlayerDuelRequest;
-import country.pvp.practice.duel.PlayerDuelService;
+import country.pvp.practice.player.duel.PlayerDuelRequest;
+import country.pvp.practice.player.duel.PlayerDuelService;
 import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
@@ -67,10 +67,10 @@ public class MatchCommands extends PlayerCommands {
         }
 
         if (ladder != null) {
-            playerDuelService.inviteForDuel(inviter, invitee, ladder);
+            playerDuelService.invite(inviter, invitee, ladder, "Hello!");
         } else {
             kitChooseMenuProvider
-                    .provide((l) -> playerDuelService.inviteForDuel(inviter, invitee, l))
+                    .provide((l) -> playerDuelService.invite(inviter, invitee, l, "Hello!"))
                     .openMenu(sender);
         }
     }

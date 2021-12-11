@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 public class VisibilityUpdater {
 
     private final PlayerManager playerManager;
-    private final VisibilityProvider visibilityProvider;
 
     public void update(PlayerSession player) {
         for (PlayerSession other : playerManager.getAll()) {
@@ -22,7 +21,7 @@ public class VisibilityUpdater {
 
     public void update(PlayerSession observer, PlayerSession observable) {
         if (observer.equals(observable)) return;
-        Visibility visibility = visibilityProvider.provide(observer, observable);
+        Visibility visibility = VisibilityProvider.provide(observer, observable);
         visibility.apply(observer, observable);
     }
 }

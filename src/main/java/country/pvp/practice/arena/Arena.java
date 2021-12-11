@@ -19,7 +19,6 @@ public class Arena implements DataObject {
     private Location spawnLocation2;
     private Location spectatorLocation;
     private Location center;
-    private boolean occupied;
 
     @Override
     public String getCollection() {
@@ -57,10 +56,6 @@ public class Arena implements DataObject {
 
     public boolean isSetup() {
         return spawnLocation1 != null && spawnLocation2 != null && spectatorLocation != null && center != null;
-    }
-
-    public boolean isAvailable() {
-        return isSetup() && !occupied;
     }
 
 }
