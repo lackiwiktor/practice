@@ -166,11 +166,6 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    public boolean isOnSameTeam(PlayerSession player, PlayerSession other) {
-        return getTeam(player).hasPlayer(other);
-    }
-
-    @Override
     protected void createInventorySnapshots() {
         for (PlayerSession session : teamA.getOnlinePlayers()) {
             if (teamA.isAlive(session)) createInventorySnapshot(session);
@@ -179,16 +174,6 @@ public class StandardMatch extends Match {
         for (PlayerSession session : teamB.getOnlinePlayers()) {
             if (teamB.isAlive(session)) createInventorySnapshot(session);
         }
-    }
-
-    @Override
-    public boolean isInMatch(PlayerSession player) {
-        return teamA.hasPlayer(player) || teamB.hasPlayer(player);
-    }
-
-    @Override
-    public boolean isAlive(PlayerSession player) {
-        return getTeam(player).isAlive(player);
     }
 
     @Override
