@@ -37,7 +37,7 @@ public class PartyEventMenu extends Menu {
     public Map<Integer, Button> getButtons(Player player) {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
-        buttons.put(12, new EventButton(PartyEvent.FFA));
+        buttons.put(11, new EventButton(PartyEvent.FFA));
         buttons.put(15, new EventButton(PartyEvent.SPLIT));
 
         return buttons;

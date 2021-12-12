@@ -2,10 +2,7 @@ package country.pvp.practice.match.snapshot;
 
 import com.google.common.collect.Maps;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class InventorySnapshotManager {
 
@@ -23,7 +20,7 @@ public class InventorySnapshotManager {
         snapshots.entrySet().removeIf(entry -> entry.getValue().hasExpired());
     }
 
-    public void addAll(Set<InventorySnapshot> snapshots) {
+    public void addAll(Collection<InventorySnapshot> snapshots) {
         snapshots.forEach(this::add);
     }
 }

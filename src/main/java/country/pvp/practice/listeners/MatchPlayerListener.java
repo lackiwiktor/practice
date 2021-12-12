@@ -160,13 +160,16 @@ public class MatchPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         PlayerSession playerSession = get(player);
 
-        if (playerSession.isInMatch() && event.getItem().getType() == Material.POTION) {
+        if (event.getItem().getType() == Material.POTION && playerSession.isInMatch()) {
             TaskDispatcher.runLater(() -> player.setItemInHand(new ItemStack(Material.AIR)), 1L, TimeUnit.MILLISECONDS);
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void playerInteract(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
+        if (item == null || item.getType() != Material.ENDER_PEARL) return;
+
         Action action = event.getAction();
         if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
@@ -175,10 +178,7 @@ public class MatchPlayerListener extends PlayerListener {
         if (!playerSession.isInMatch()) return;
 
         Player player = event.getPlayer();
-        ItemStack item = event.getItem();
-
-        if (item.getType() == Material.ENDER_PEARL) {
-            Match match = playerSession.getCurrentMatch();
+        Match match = playerSession.getCurrentMatch();
 
             if (match.getState() != MatchState.FIGHT) {
                 Messager.message(playerSession, "You can't use pearls right now.");
@@ -188,13 +188,12 @@ public class MatchPlayerListener extends PlayerListener {
 
             if (!playerSession.hasPearlCooldownExpired()) {
                 String time = TimeUtil.millisToSeconds(playerSession.getRemainingPearlCooldown());
-                Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
+                Messager.message(playerSession, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
                         time + ("1.0".equals(time) ? "" : "s")));
                 TaskDispatcher.runLater(player::updateInventory, 100L, TimeUnit.MILLISECONDS);
                 event.setCancelled(true);
             } else {
                 playerSession.resetPearlCooldown();
             }
-        }
     }
 }

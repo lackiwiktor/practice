@@ -1,4 +1,4 @@
-package country.pvp.practice.match;
+package country.pvp.practice.match.type;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -6,6 +6,10 @@ import country.pvp.practice.arena.Arena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.MatchManager;
+import country.pvp.practice.match.MatchState;
+import country.pvp.practice.match.RematchData;
 import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
@@ -26,7 +30,7 @@ public class StandardMatch extends Match {
     private final Team teamA;
     private final Team teamB;
 
-    StandardMatch(MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel, InventorySnapshotManager snapshotManager, PlayerService playerService, Team teamA, Team teamB) {
+    public StandardMatch(MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel, InventorySnapshotManager snapshotManager, PlayerService playerService, Team teamA, Team teamB) {
         super(snapshotManager, matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, ranked, duel);
         this.playerService = playerService;
         this.teamA = teamA;
@@ -34,14 +38,14 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    void prepareTeams() {
+    protected void prepareTeams() {
         prepareTeam(teamA, arena.getSpawnLocation1());
         prepareTeam(teamB, arena.getSpawnLocation2());
-        updateTeamVisibility();
+        updateVisibility();
     }
 
     @Override
-    void handleEnd() {
+    protected void handleEnd() {
         if (winner instanceof SoloTeam && getOpponent(winner) instanceof SoloTeam) {
             SoloTeam loserTeam = (SoloTeam) getOpponent(winner);
             SoloTeam winnerTeam = (SoloTeam) winner;
@@ -77,7 +81,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    void broadcastPlayerDeath(PlayerSession player) {
+    protected void broadcastPlayerDeath(PlayerSession player) {
         if (player.hasLastAttacker()) {
             PlayerSession killer = player.getLastAttacker();
 
@@ -98,7 +102,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    void handleRespawn(PlayerSession player) {
+    protected void handleRespawn(PlayerSession player) {
         Team team = getTeam(player);
 
         if (team.isDead()) {
@@ -119,15 +123,6 @@ public class StandardMatch extends Match {
         }
     }
 
-    @Override
-    void updateTeamVisibility() {
-        for (PlayerSession session : teamA.getOnlinePlayers()) {
-            for (PlayerSession other : teamB.getOnlinePlayers()) {
-                visibilityUpdater.update(session, other);
-                visibilityUpdater.update(other, session);
-            }
-        }
-    }
 
     public Team getTeam(PlayerSession player) {
         return teamA.hasPlayer(player) ? teamA : teamB;
@@ -144,15 +139,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    List<PlayerSession> getOnlinePlayers() {
-        List<PlayerSession> players = super.getOnlinePlayers();
-        players.addAll(teamA.getOnlinePlayers());
-        players.addAll(teamB.getOnlinePlayers());
-        return players;
-    }
-
-    @Override
-    InventorySnapshot createInventorySnapshot(PlayerSession player) {
+    protected InventorySnapshot createInventorySnapshot(PlayerSession player) {
         InventorySnapshot snapshot = super.createInventorySnapshot(player);
 
         Team team = getTeam(player);
@@ -161,14 +148,19 @@ public class StandardMatch extends Match {
         if (opponent instanceof SoloTeam) {
             SoloTeam soloOpponent = (SoloTeam) opponent;
             PlayerSession opponentPlayer = soloOpponent.getPlayerSession();
-            snapshot.setOpponent(opponentPlayer.getUuid());
+            InventorySnapshot inventorySnapshot = snapshots.get(opponentPlayer);
+
+            if (inventorySnapshot != null) {
+                inventorySnapshot.setOpponent(snapshot.getId());
+                snapshot.setOpponent(inventorySnapshot.getId());
+            }
         }
 
         return snapshot;
     }
 
     @Override
-    Team[] getLosers() {
+    protected Team[] getLosers() {
         Preconditions.checkNotNull(winner, "winner");
         return new Team[]{getOpponent(winner)};
     }
@@ -179,7 +171,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    void createInventorySnapshots() {
+    protected void createInventorySnapshots() {
         for (PlayerSession session : teamA.getOnlinePlayers()) {
             if (teamA.isAlive(session)) createInventorySnapshot(session);
         }
@@ -200,8 +192,16 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    int getPlayersCount() {
+    protected int getPlayersCount() {
         return teamA.size() + teamB.size();
+    }
+
+    @Override
+    protected List<PlayerSession> getOnlinePlayers() {
+        List<PlayerSession> players = Lists.newArrayList();
+        players.addAll(teamA.getOnlinePlayers());
+        players.addAll(teamB.getOnlinePlayers());
+        return players;
     }
 
     @Override

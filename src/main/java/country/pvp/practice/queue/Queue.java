@@ -7,7 +7,7 @@ import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
-import country.pvp.practice.match.StandardMatch;
+import country.pvp.practice.match.type.StandardMatch;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;

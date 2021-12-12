@@ -19,7 +19,7 @@ public abstract class DuelService<V extends DuelInvitable, D extends DuelRequest
     protected abstract D createDuelRequest(V inviter, Ladder ladder);
 
     public void invite(V inviter, V invitee, Ladder ladder, String message) {
-        System.out.println("XD??");
+        System.out.println(message);
         if (!canSendDuel(inviter, invitee)) return;
 
         if (inviter.hasDuelRequest(invitee)) {

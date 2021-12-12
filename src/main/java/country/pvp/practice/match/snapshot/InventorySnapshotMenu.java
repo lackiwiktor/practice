@@ -2,11 +2,11 @@ package country.pvp.practice.match.snapshot;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import country.pvp.practice.message.FormatUtil;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.menu.Button;
 import country.pvp.practice.menu.Menu;
+import country.pvp.practice.message.FormatUtil;
 import country.pvp.practice.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
@@ -47,7 +47,8 @@ public class InventorySnapshotMenu extends Menu {
         buttons.put(45, new HealthButton(snapshot.getHealth()));
         buttons.put(46, new HungerButton(snapshot.getHunger()));
         buttons.put(47, new PotionEffectsButton(snapshot.getEffects()));
-        buttons.put(48, new StatisticsButton(snapshot.getStatistics(), snapshot.getInventory()));
+        buttons.put(48, new HealthPotionsButton(snapshot.getInventory()));
+        buttons.put(49, new StatisticsButton(snapshot.getStatistics()));
 
         Optional<UUID> opponentOptional = snapshot.getOpponent();
 
@@ -70,7 +71,7 @@ public class InventorySnapshotMenu extends Menu {
     }
 
     @RequiredArgsConstructor
-    static class PlaceholderButton extends Button {
+    class PlaceholderButton extends Button {
 
         private final ItemStack item;
 
@@ -81,7 +82,7 @@ public class InventorySnapshotMenu extends Menu {
     }
 
     @RequiredArgsConstructor
-    static class HealthButton extends Button {
+    class HealthButton extends Button {
 
         private final double health;
 
@@ -95,7 +96,7 @@ public class InventorySnapshotMenu extends Menu {
     }
 
     @RequiredArgsConstructor
-    static class HungerButton extends Button {
+    class HungerButton extends Button {
 
         private final int hunger;
 
@@ -109,7 +110,7 @@ public class InventorySnapshotMenu extends Menu {
     }
 
     @RequiredArgsConstructor
-    static class PotionEffectsButton extends Button {
+    class PotionEffectsButton extends Button {
 
         private final Collection<PotionEffect> effects;
 
@@ -132,7 +133,7 @@ public class InventorySnapshotMenu extends Menu {
         }
 
         //TODO: Make this into map
-        public static String getName(PotionEffectType type) {
+        public String getName(PotionEffectType type) {
             if (type.getName().equalsIgnoreCase("fire_resistance")) {
                 return "Fire Resistance";
             } else if (type.getName().equalsIgnoreCase("speed")) {
@@ -152,7 +153,7 @@ public class InventorySnapshotMenu extends Menu {
     }
 
     @RequiredArgsConstructor
-    static class OpponentSnapshotButton extends Button {
+    class OpponentSnapshotButton extends Button {
 
         private final InventorySnapshotManager snapshotManager;
         private final InventorySnapshot snapshot;
@@ -173,22 +174,38 @@ public class InventorySnapshotMenu extends Menu {
     }
 
     @RequiredArgsConstructor
-    static class StatisticsButton extends Button {
+    class StatisticsButton extends Button {
 
         private final PlayerMatchStatistics statistics;
-        private final ItemStack[] inventory;
+
 
         @Override
         public ItemStack getButtonItem(Player player) {
             List<String> lore = Lists.newArrayList();
             lore.add("Hits: " + statistics.getHits());
             lore.add("Longest Combo: " + statistics.getLongestCombo());
-            lore.add("Potions Left: " + countHealthPotions());
             lore.add("Potion Accuracy: " + statistics.getPotionAccuracy() + "%");
 
             return new ItemBuilder(Material.PAPER)
                     .name(ChatColor.GREEN.toString().concat("Match Stats"))
                     .lore(lore)
+                    .build();
+        }
+    }
+
+
+    @RequiredArgsConstructor
+    private class HealthPotionsButton extends Button {
+
+        private final ItemStack[] inventory;
+
+        @Override
+        public ItemStack getButtonItem(Player player) {
+            int healthPotionsCount = countHealthPotions();
+            return new ItemBuilder(Material.POTION)
+                    .amount(healthPotionsCount)
+                    .durability(16421)
+                    .name(ChatColor.GREEN.toString().concat(healthPotionsCount + " health potions"))
                     .build();
         }
 
@@ -202,6 +219,4 @@ public class InventorySnapshotMenu extends Menu {
             return count;
         }
     }
-
-
 }
