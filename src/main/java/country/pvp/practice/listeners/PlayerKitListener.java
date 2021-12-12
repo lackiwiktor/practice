@@ -47,7 +47,7 @@ public class PlayerKitListener extends PlayerListener {
         });
     }
 
-    @EventHandler(ignoreCancelled = true)
+   @EventHandler(ignoreCancelled = true)
     public void dropItem(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
         PlayerSession playerSession = get(event);
@@ -81,6 +81,7 @@ public class PlayerKitListener extends PlayerListener {
 
         Optional.ofNullable(playerSession.getMatchingKit(match.getLadder(), item)).ifPresent(it -> event.setCancelled(true));
     }
+
 
     @EventHandler
     public void deathEvent(PlayerDeathEvent event) {

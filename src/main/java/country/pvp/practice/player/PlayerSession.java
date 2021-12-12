@@ -440,7 +440,12 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
 
     @Override
     public void receiveInvite(BaseComponent[] component) {
-
         sendComponent(component);
+    }
+
+    public int getEntityId() {
+        Player player = getPlayer();
+        Preconditions.checkNotNull(player, "player");
+        return player.getEntityId();
     }
 }
