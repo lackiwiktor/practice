@@ -47,6 +47,7 @@ public class PlayerKitListener extends PlayerListener {
         });
     }
 
+
    @EventHandler(ignoreCancelled = true)
     public void dropItem(PlayerDropItemEvent event) {
         ItemStack item = event.getItemDrop().getItemStack();
@@ -69,8 +70,7 @@ public class PlayerKitListener extends PlayerListener {
         Match match = playerSession.getCurrentMatch();
 
         PlayerInventory playerInventory = event.getWhoClicked().getInventory();
-
-        if (event.getClick().isKeyboardClick()) {
+        if (event.getClick().isKeyboardClick() && event.getHotbarButton() > 0) {
             ItemStack hotbatItem = playerInventory.getItem(event.getHotbarButton());
 
             if (hotbatItem == null) return;
@@ -83,11 +83,12 @@ public class PlayerKitListener extends PlayerListener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void deathEvent(PlayerDeathEvent event) {
         PlayerSession playerSession = get(event.getEntity());
         if (!playerSession.isInMatch()) return;
         Match match = playerSession.getCurrentMatch();
+        event.setDroppedExp(0);
         event.getDrops().removeIf(it -> playerSession.getMatchingKit(match.getLadder(), it) != null);
     }
 }

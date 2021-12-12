@@ -1,9 +1,11 @@
-package country.pvp.practice.match.team;
+package country.pvp.practice.match.team.type;
 
 import com.google.common.base.Preconditions;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.SessionMatchData;
+import country.pvp.practice.match.team.Ranked;
+import country.pvp.practice.match.team.Team;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;

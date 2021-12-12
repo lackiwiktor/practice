@@ -11,7 +11,7 @@ import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.MatchState;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
-import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.match.team.Team;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messages;
@@ -72,7 +72,7 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    protected void handleRespawn(PlayerSession player) {
+    protected void tryEndingMatch(PlayerSession player) {
         if (getAliveTeamsCount() <= 1) {
             Optional<Team> winnerOptional = getAliveTeam();
             end(winnerOptional.orElse(null));
