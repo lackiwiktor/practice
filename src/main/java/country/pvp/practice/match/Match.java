@@ -233,8 +233,7 @@ public abstract class Match implements Recipient {
 
     private BaseComponent[] createMatchResultMessage(Team winner, Team... losers) {
         ChatComponentBuilder builder = new ChatComponentBuilder("");
-        builder.append(Bars.CHAT_BAR + "\n");
-        builder.append(Messages.MATCH_RESULT_OVERVIEW.get() + "\n");
+        builder.append(Bars.CHAT_BAR + "\n" + Messages.MATCH_RESULT_OVERVIEW.get() + "\n");
 
         BaseComponent[] winnerComponent = new ChatComponentBuilder(Messages.MATCH_RESULT_OVERVIEW_WINNER.get())
                 .append(createTeamSnapshotMessage(winner))

@@ -1,7 +1,6 @@
 package country.pvp.practice.invitation;
 
 import com.google.inject.Inject;
-import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.component.ChatComponentBuilder;
 import country.pvp.practice.message.component.ChatHelper;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class InvitationService {
                         .attachToEachPart(
                                 ChatHelper.click("/declineinvitation " + invitation.getId().toString()))
                         .create());
-        Messager.message(invitee, builder.create());
+        invitee.receiveInvite(builder.create());
     }
 
     public void accept(Invitation invitation) {

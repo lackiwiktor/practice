@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.Optional;
+
 
 public class PlayerKitListener extends PlayerListener {
 
@@ -39,7 +41,7 @@ public class PlayerKitListener extends PlayerListener {
 
         Match match = playerSession.getCurrentMatch();
 
-        playerSession.getMatchingKit(match.getLadder(), item).ifPresent(it -> {
+        Optional.ofNullable(playerSession.getMatchingKit(match.getLadder(), item)).ifPresent(it -> {
             Messager.message(playerSession, Messages.MATCH_PLAYER_EQUIP_KIT.match("{kit}", it.getName()));
             it.apply(playerSession);
         });
@@ -54,7 +56,7 @@ public class PlayerKitListener extends PlayerListener {
 
         Match match = playerSession.getCurrentMatch();
 
-        playerSession.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
+        Optional.ofNullable(playerSession.getMatchingKit(match.getLadder(), item)).ifPresent(it -> event.setCancelled(true));
     }
 
     @EventHandler
@@ -73,11 +75,11 @@ public class PlayerKitListener extends PlayerListener {
 
             if (hotbatItem == null) return;
 
-            playerSession.getMatchingKit(match.getLadder(), hotbatItem).ifPresent(it -> event.setCancelled(true));
+            Optional.ofNullable(playerSession.getMatchingKit(match.getLadder(), hotbatItem)).ifPresent(it -> event.setCancelled(true));
             return;
         }
 
-        playerSession.getMatchingKit(match.getLadder(), item).ifPresent(it -> event.setCancelled(true));
+        Optional.ofNullable(playerSession.getMatchingKit(match.getLadder(), item)).ifPresent(it -> event.setCancelled(true));
     }
 
     @EventHandler
@@ -85,6 +87,6 @@ public class PlayerKitListener extends PlayerListener {
         PlayerSession playerSession = get(event.getEntity());
         if (!playerSession.isInMatch()) return;
         Match match = playerSession.getCurrentMatch();
-        event.getDrops().removeIf(it -> playerSession.getMatchingKit(match.getLadder(), it).isPresent());
+        event.getDrops().removeIf(it -> playerSession.getMatchingKit(match.getLadder(), it) != null);
     }
 }
