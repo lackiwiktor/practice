@@ -38,6 +38,7 @@ public class FreeForAllMatch extends Match {
         for (Team team : teams) {
             prepareTeam(team, arena.getCenter());
         }
+
         updateVisibility();
     }
 
