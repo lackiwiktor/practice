@@ -1,4 +1,4 @@
-package country.pvp.practice.match.team;
+package country.pvp.practice.match.team.type;
 
 import country.pvp.practice.party.Party;
 

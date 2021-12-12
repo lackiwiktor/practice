@@ -22,9 +22,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.TimeUnit;
@@ -165,6 +163,28 @@ public class MatchPlayerListener extends PlayerListener {
         }
     }
 
+    @EventHandler
+    public void itemPickup(PlayerPickupItemEvent event) {
+        PlayerSession player = get(event);
+
+        if (player.isInMatch()) {
+            Match currentMatch = player.getCurrentMatch();
+
+            if (currentMatch.getState() != MatchState.FIGHT || !currentMatch.isAlive(player)) event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void itemDrop(PlayerDropItemEvent event) {
+        PlayerSession player = get(event);
+
+        if (player.isInMatch()) {
+            Match currentMatch = player.getCurrentMatch();
+
+            if (currentMatch.getState() != MatchState.FIGHT) event.setCancelled(true);
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void playerInteract(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
@@ -180,20 +200,20 @@ public class MatchPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Match match = playerSession.getCurrentMatch();
 
-            if (match.getState() != MatchState.FIGHT) {
-                Messager.message(playerSession, "You can't use pearls right now.");
-                event.setCancelled(true);
-                return;
-            }
+        if (match.getState() != MatchState.FIGHT) {
+            Messager.message(playerSession, "You can't use pearls right now.");
+            event.setCancelled(true);
+            return;
+        }
 
-            if (!playerSession.hasPearlCooldownExpired()) {
-                String time = TimeUtil.millisToSeconds(playerSession.getRemainingPearlCooldown());
-                Messager.message(playerSession, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
-                        time + ("1.0".equals(time) ? "" : "s")));
-                TaskDispatcher.runLater(player::updateInventory, 100L, TimeUnit.MILLISECONDS);
-                event.setCancelled(true);
-            } else {
-                playerSession.resetPearlCooldown();
-            }
+        if (!playerSession.hasPearlCooldownExpired()) {
+            String time = TimeUtil.millisToSeconds(playerSession.getRemainingPearlCooldown());
+            Messager.message(playerSession, Messages.MATCH_PLAYER_PEARL_COOLDOWN.match("{time}",
+                    time + ("1.0".equals(time) ? "" : "s")));
+            TaskDispatcher.runLater(player::updateInventory, 100L, TimeUnit.MILLISECONDS);
+            event.setCancelled(true);
+        } else {
+            playerSession.resetPearlCooldown();
+        }
     }
 }

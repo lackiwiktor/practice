@@ -5,7 +5,7 @@ import country.pvp.practice.duel.DuelService;
 import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
-import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.player.PlayerSession;
 

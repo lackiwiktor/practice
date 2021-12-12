@@ -5,7 +5,7 @@ import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchProvider;
-import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;

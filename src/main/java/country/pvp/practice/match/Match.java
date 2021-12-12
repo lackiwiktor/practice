@@ -23,10 +23,10 @@ import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.server.v1_8_R3.EntityLightning;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityWeather;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -83,7 +83,9 @@ public abstract class Match implements Recipient {
         team.createMatchSession(this);
         team.reset();
         team.giveKits(ladder);
-        team.teleport(spawnLocation);
+        team.teleport(
+                spawnLocation.getBlock().getType() == Material.AIR ?
+                        spawnLocation : spawnLocation.add(0, 2, 0));
         team.clearRematchData();
     }
 
@@ -160,31 +162,26 @@ public abstract class Match implements Recipient {
         deadPlayer.setDead(true);
         broadcastPlayerDeath(deadPlayer);
         sendDeathPackets(deadPlayer);
-        PlayerUtil.resetPlayer(deadPlayer.getPlayer());
         updateVisibility();
+        PlayerUtil.resetPlayer(deadPlayer.getPlayer());
         deadPlayer.setVelocity(new Vector());
         deadPlayer.enableFlying();
-        handleRespawn(deadPlayer);
+        tryEndingMatch(deadPlayer);
     }
 
     private void sendDeathPackets(PlayerSession deadPlayer) {
         Location location = deadPlayer.getLocation();
 
         PacketPlayOutSpawnEntityWeather lightningPacket = new PacketPlayOutSpawnEntityWeather(new EntityLightning(((CraftWorld) location.getWorld()).getHandle(), location.getX(), location.getY(), location.getZ(), true));
-        PacketPlayOutEntityStatus statusPacket = new PacketPlayOutEntityStatus(((CraftPlayer) deadPlayer.getPlayer()).getHandle(), (byte) 3);
-
         for (PlayerSession playerSession : getAllOnlinePlayers()) {
             Player player = playerSession.getPlayer();
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(lightningPacket);
-
-            if (!deadPlayer.equals(playerSession))
-                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(statusPacket);
         }
     }
 
     protected abstract void broadcastPlayerDeath(PlayerSession player);
 
-    protected abstract void handleRespawn(PlayerSession player);
+    protected abstract void tryEndingMatch(PlayerSession player);
 
     public abstract void handleDisconnect(PlayerSession player);
 

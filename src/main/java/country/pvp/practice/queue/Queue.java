@@ -7,8 +7,8 @@ import country.pvp.practice.arena.ArenaManager;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
-import country.pvp.practice.match.type.StandardMatch;
-import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.match.type.TeamMatch;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
@@ -76,7 +76,7 @@ public class Queue {
         return entries.size();
     }
 
-    private StandardMatch createMatch(SessionQueueData queueData1, SessionQueueData queueData2) {
+    private TeamMatch createMatch(SessionQueueData queueData1, SessionQueueData queueData2) {
         return matchProvider.provide(ladder, ranked, false, SoloTeam.of(queueData1.getPlayer()), SoloTeam.of(queueData2.getPlayer()));
     }
 }

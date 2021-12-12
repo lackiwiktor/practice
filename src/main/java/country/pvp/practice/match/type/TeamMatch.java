@@ -13,7 +13,7 @@ import country.pvp.practice.match.RematchData;
 import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
-import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.match.team.Team;
 import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messages;
@@ -24,13 +24,13 @@ import country.pvp.practice.visibility.VisibilityUpdater;
 import java.util.List;
 
 
-public class StandardMatch extends Match {
+public class TeamMatch extends Match {
 
     private final PlayerService playerService;
     private final Team teamA;
     private final Team teamB;
 
-    public StandardMatch(MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel, InventorySnapshotManager snapshotManager, PlayerService playerService, Team teamA, Team teamB) {
+    public TeamMatch(MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel, InventorySnapshotManager snapshotManager, PlayerService playerService, Team teamA, Team teamB) {
         super(snapshotManager, matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, ranked, duel);
         this.playerService = playerService;
         this.teamA = teamA;
@@ -102,7 +102,7 @@ public class StandardMatch extends Match {
     }
 
     @Override
-    protected void handleRespawn(PlayerSession player) {
+    protected void tryEndingMatch(PlayerSession player) {
         Team team = getTeam(player);
 
         if (team.isDead()) {
