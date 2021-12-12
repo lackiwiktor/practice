@@ -4,17 +4,18 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import country.pvp.practice.data.DataObject;
 import country.pvp.practice.duel.DuelInvitable;
-import country.pvp.practice.player.duel.PlayerDuelRequest;
 import country.pvp.practice.duel.Request;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.*;
+import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.player.data.PlayerKits;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.player.data.PlayerStatistics;
 import country.pvp.practice.player.data.SessionData;
+import country.pvp.practice.player.duel.PlayerDuelRequest;
 import country.pvp.practice.queue.SessionQueueData;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Data
-public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, PlayerDuelRequest> {
+public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, PlayerDuelRequest>, Recipient {
 
     private final UUID uuid;
     private String name;
@@ -88,11 +89,6 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
         player.sendMessage(message);
-    }
-
-    @Override
-    public void receive(BaseComponent[] components) {
-
     }
 
     @Override
@@ -220,16 +216,17 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
         player.teleport(location);
     }
 
-    public Optional<NamedKit> getMatchingKit(Ladder ladder, ItemStack itemStack) {
+    @Nullable
+    public NamedKit getMatchingKit(Ladder ladder, ItemStack itemStack) {
         Optional<NamedKit> playerKit = Arrays.stream(kits.getKits(ladder)).filter(it -> it != null && it.getIcon().isSimilar(itemStack)).findFirst();
 
         if (!playerKit.isPresent()) {
             if (ladder.getKit().getIcon().isSimilar(itemStack)) {
-                return Optional.of(NamedKit.from("Default Kit", ladder.getKit())); //Give default kit
+                return NamedKit.from("Default Kit", ladder.getKit()); //Give default kit
             }
-        } else return playerKit; //Give custom player kit
+        } else return playerKit.get(); //Give custom player kit
 
-        return Optional.empty();
+        return null;
     }
 
     public void giveKits(Ladder ladder) {
@@ -439,5 +436,11 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
                 .filter(it -> it.getInviter().equals(inviter))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public void receiveInvite(BaseComponent[] component) {
+
+        sendComponent(component);
     }
 }

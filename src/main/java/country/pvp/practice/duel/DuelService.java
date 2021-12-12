@@ -3,7 +3,6 @@ package country.pvp.practice.duel;
 import country.pvp.practice.invitation.Invitation;
 import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.message.Messager;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -20,8 +19,8 @@ public abstract class DuelService<V extends DuelInvitable, D extends DuelRequest
     protected abstract D createDuelRequest(V inviter, Ladder ladder);
 
     public void invite(V inviter, V invitee, Ladder ladder, String message) {
-        if (canSendDuel(inviter, invitee))
-            return;
+        System.out.println(message);
+        if (!canSendDuel(inviter, invitee)) return;
 
         if (inviter.hasDuelRequest(invitee)) {
             DuelRequest duelRequest = inviter.getDuelRequest(invitee);
@@ -62,11 +61,6 @@ public abstract class DuelService<V extends DuelInvitable, D extends DuelRequest
     }
 
     public void acceptInvite(V inviter, V invitee, Ladder ladder) {
-        if (!invitee.hasDuelRequest(inviter)) {
-            Messager.messageError(invitee, "You have not received a duel request from this player.");
-            return;
-        }
-
         acceptInvite0(inviter, invitee, ladder);
     }
 }

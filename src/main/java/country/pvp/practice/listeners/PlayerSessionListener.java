@@ -50,7 +50,7 @@ public class PlayerSessionListener extends PlayerListener {
         event.setJoinMessage(null);
 
         if (get(event) == null)
-            event.getPlayer().kickPlayer("Not initalized correctly.");
+            event.getPlayer().kickPlayer("Not initialized correctly.");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

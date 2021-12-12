@@ -1,6 +1,8 @@
 package country.pvp.practice.invitation;
 
-import country.pvp.practice.message.Recipient;
+import net.md_5.bungee.api.chat.BaseComponent;
 
-public interface Invitable extends Recipient {
+public interface Invitable {
+
+    void receiveInvite(BaseComponent[] component);
 }

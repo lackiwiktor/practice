@@ -1,5 +1,7 @@
 package country.pvp.practice.match;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import country.pvp.practice.PracticePlugin;
 import country.pvp.practice.arena.Arena;
@@ -32,23 +34,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Data
 public abstract class Match implements Recipient {
 
-    final VisibilityUpdater visibilityUpdater;
-    final LobbyService lobbyService;
-    final ItemBarService itemBarService;
-    final Arena arena;
-    final Ladder ladder;
-    final boolean ranked;
-    final boolean duel;
-    final Set<PlayerSession> spectators = Sets.newHashSet();
-    MatchState state = MatchState.COUNTDOWN;
-    private final UUID id = UUID.randomUUID(); //match-id
+    protected final VisibilityUpdater visibilityUpdater;
+    protected final LobbyService lobbyService;
+    protected final ItemBarService itemBarService;
+    protected final Arena arena;
+    protected final Ladder ladder;
+    protected final boolean ranked;
+    protected final boolean duel;
+    protected final Set<PlayerSession> spectators = Sets.newHashSet();
+    protected final Map<PlayerSession, InventorySnapshot> snapshots = Maps.newHashMap();
+    protected MatchState state = MatchState.COUNTDOWN;
+    protected @Nullable Team winner;
+    private final UUID id = UUID.randomUUID();
     private final MatchManager matchManager;
+    private final InventorySnapshotManager snapshotManager;
     private BukkitRunnable countDownRunnable;
 
-    private final InventorySnapshotManager snapshotManager;
-    private final Set<InventorySnapshot> snapshots = Sets.newHashSet();
-
-    public Match(InventorySnapshotManager snapshotManager, MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel) {
+    protected Match(InventorySnapshotManager snapshotManager, MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel) {
         this.snapshotManager = snapshotManager;
         this.matchManager = matchManager;
         this.visibilityUpdater = visibilityUpdater;
@@ -60,8 +62,6 @@ public abstract class Match implements Recipient {
         this.duel = duel;
     }
 
-    @Nullable Team winner;
-
     public void init() {
         matchManager.add(this);
         TaskDispatcher.runLater(this::start, 100L, TimeUnit.MILLISECONDS);
@@ -72,7 +72,7 @@ public abstract class Match implements Recipient {
         startCountDown();
     }
 
-    void prepareTeam(Team team, Location spawnLocation) {
+    protected void prepareTeam(Team team, Location spawnLocation) {
         team.createMatchSession(this);
         team.reset();
         team.giveKits(ladder);
@@ -80,15 +80,16 @@ public abstract class Match implements Recipient {
         team.clearRematchData();
     }
 
-    abstract void prepareTeams();
+    protected abstract void prepareTeams();
 
-    void end(@Nullable Team winner) {
+    protected void end(@Nullable Team winner) {
         this.state = MatchState.END;
         this.winner = winner;
 
         cancelCountDown();
         createInventorySnapshots();
-        snapshotManager.addAll(snapshots);
+        snapshots.values().forEach(it -> it.setCreatedAt(System.currentTimeMillis()));
+        snapshotManager.addAll(snapshots.values());
         handleEnd();
         sendResultComponent();
 
@@ -101,19 +102,24 @@ public abstract class Match implements Recipient {
         TaskDispatcher.runLater(runnable, 3500L, TimeUnit.MILLISECONDS);
     }
 
-    void moveTeamToLobby(Team team) {
+    protected void moveTeamToLobby(Team team) {
         for (PlayerSession session : team.getOnlinePlayers()) {
             lobbyService.moveToLobby(session);
         }
     }
 
-    abstract void handleEnd();
+    protected abstract void handleEnd();
 
     private void finish() {
         matchManager.remove(this);
     }
 
-    void startCountDown() {
+    public void cancel(String reason) {
+        broadcast(Messages.MATCH_CANCELLED.match("{reason}", reason));
+        end(null);
+    }
+
+    protected void startCountDown() {
         AtomicInteger count = new AtomicInteger(6);
         (countDownRunnable = new BukkitRunnable() {
             @Override
@@ -129,7 +135,7 @@ public abstract class Match implements Recipient {
         }).runTaskTimer(PracticePlugin.getPlugin(PracticePlugin.class), 20L, 20L);
     }
 
-    void cancelCountDown() {
+    protected void cancelCountDown() {
         if (countDownRunnable == null) return;
         countDownRunnable.cancel();
     }
@@ -145,7 +151,7 @@ public abstract class Match implements Recipient {
     public void handleDeath(PlayerSession player) {
         createInventorySnapshot(player);
         player.setDead(true);
-        updateTeamVisibility();
+        updateVisibility();
         broadcastPlayerDeath(player);
         PlayerUtil.resetPlayer(player.getPlayer());
         player.setVelocity(new Vector());
@@ -154,36 +160,52 @@ public abstract class Match implements Recipient {
         handleRespawn(player);
     }
 
-    abstract void broadcastPlayerDeath(PlayerSession player);
+    protected abstract void broadcastPlayerDeath(PlayerSession player);
 
-    abstract void handleRespawn(PlayerSession player);
+    protected abstract void handleRespawn(PlayerSession player);
 
     public abstract void handleDisconnect(PlayerSession player);
 
-    abstract void updateTeamVisibility();
+    protected void updateVisibility() {
+        for (PlayerSession session : getOnlinePlayers()) {
+            for (PlayerSession other : getOnlinePlayers()) {
+                visibilityUpdater.update(session, other);
+                visibilityUpdater.update(other, session);
+            }
+        }
+    }
 
-    void broadcast(String message) {
+    protected void broadcast(String message) {
         Messager.message(this, message);
     }
 
-    void broadcast(Messages message) {
+    protected void broadcast(Messages message) {
         Messager.message(this, message);
     }
 
-    void broadcast(country.pvp.practice.match.team.Team team, String message) {
+    protected void broadcast(country.pvp.practice.match.team.Team team, String message) {
         Messager.message(team, message);
     }
 
-    List<PlayerSession> getOnlinePlayers() {
-        return new ArrayList<>(spectators);
+    /**
+     * Returns the list of currently online players including spectators
+     *
+     * @return list of online players
+     */
+    protected List<PlayerSession> getAllOnlinePlayers() {
+        List<PlayerSession> players = Lists.newArrayList(getOnlinePlayers());
+        players.addAll(spectators);
+        return players;
     }
 
-    public void cancel(String reason) {
-        broadcast(Messages.MATCH_CANCELLED.match("{reason}", reason));
-        end(null);
-    }
+    /**
+     * Returns the list of currently online players, excluding spectators
+     *
+     * @return list of online players
+     */
+    protected abstract List<PlayerSession> getOnlinePlayers();
 
-    String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
+    protected String getFormattedDisplayName(PlayerSession player, country.pvp.practice.match.team.Team team) {
         return (team.hasPlayer(player) ? ChatColor.GREEN : ChatColor.RED) + player.getName();
     }
 
@@ -198,7 +220,7 @@ public abstract class Match implements Recipient {
         spectator.enableFlying();
         itemBarService.apply(spectator);
         spectator.teleport(other.getLocation());
-        for (PlayerSession matchPlayer : getOnlinePlayers()) {
+        for (PlayerSession matchPlayer : getAllOnlinePlayers()) {
             visibilityUpdater.update(spectator, matchPlayer);
             visibilityUpdater.update(matchPlayer, spectator);
         }
@@ -215,27 +237,26 @@ public abstract class Match implements Recipient {
         return ladder.isBuild();
     }
 
-    abstract void createInventorySnapshots();
+    protected abstract void createInventorySnapshots();
 
-    InventorySnapshot createInventorySnapshot(PlayerSession session) {
+    protected InventorySnapshot createInventorySnapshot(PlayerSession session) {
         InventorySnapshot snapshot = InventorySnapshot.create(session);
-        snapshots.add(snapshot);
+        snapshots.put(session, snapshot);
         return snapshot;
     }
 
     private void sendResultComponent() {
         BaseComponent[] components = createMatchResultMessage(winner, getLosers());
 
-        for (PlayerSession player : getOnlinePlayers()) {
+        for (PlayerSession player : getAllOnlinePlayers()) {
+            Messager.message(player, Bars.CHAT_BAR);
             player.sendComponent(components);
+            Messager.message(player, Bars.CHAT_BAR);
         }
     }
 
     private BaseComponent[] createMatchResultMessage(Team winner, Team... losers) {
         ChatComponentBuilder builder = new ChatComponentBuilder("");
-        builder.append(Bars.CHAT_BAR + "\n");
-        builder.append(Messages.MATCH_RESULT_OVERVIEW.get() + "\n");
-
         BaseComponent[] winnerComponent = new ChatComponentBuilder(Messages.MATCH_RESULT_OVERVIEW_WINNER.get())
                 .append(createTeamSnapshotMessage(winner))
                 .create();
@@ -255,9 +276,6 @@ public abstract class Match implements Recipient {
         builder.append(winnerComponent);
         builder.append(Messages.MATCH_RESULT_OVERVIEW_SPLITTER.get());
         builder.append(loserComponent);
-        builder.append(Bars.CHAT_BAR);
-        builder.getCurrent().setClickEvent(null);
-        builder.getCurrent().setHoverEvent(null);
 
         return builder.create();
     }
@@ -284,7 +302,7 @@ public abstract class Match implements Recipient {
                 .attachToEachPart(
                         ChatHelper.hover(Messages.MATCH_RESULT_OVERVIEW_HOVER.match("{player}", player.getName())))
                 .attachToEachPart(
-                        ChatHelper.click("/viewsnapshot ".concat(player.getUuid().toString())))
+                        ChatHelper.click("/viewsnapshot ".concat(snapshots.get(player).getId().toString())))
                 .create();
     }
 
@@ -295,9 +313,9 @@ public abstract class Match implements Recipient {
 
     public abstract boolean isAlive(PlayerSession player);
 
-    abstract Team[] getLosers();
+    protected abstract Team[] getLosers();
 
-    abstract int getPlayersCount();
+    protected abstract int getPlayersCount();
 
     public abstract List<String> getBoard(PlayerSession player);
 

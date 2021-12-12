@@ -1,4 +1,4 @@
-package country.pvp.practice.match;
+package country.pvp.practice.match.type;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -7,6 +7,9 @@ import country.pvp.practice.arena.Arena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
+import country.pvp.practice.match.Match;
+import country.pvp.practice.match.MatchManager;
+import country.pvp.practice.match.MatchState;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.SoloTeam;
 import country.pvp.practice.match.team.Team;
@@ -31,15 +34,15 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    void prepareTeams() {
+    protected void prepareTeams() {
         for (Team team : teams) {
             prepareTeam(team, arena.getCenter());
         }
-        updateTeamVisibility();
+        updateVisibility();
     }
 
     @Override
-    void handleEnd() {
+    protected void handleEnd() {
     }
 
     @Override
@@ -50,39 +53,25 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    void broadcastPlayerDeath(PlayerSession player) {
+    protected void broadcastPlayerDeath(PlayerSession player) {
         if (player.hasLastAttacker()) {
             PlayerSession killer = player.getLastAttacker();
 
             for (Team team : teams) {
-                Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
+                broadcast(team, Messages.MATCH_PLAYER_KILLED_BY_PLAYER.match(
                         new MessagePattern("{player}", getFormattedDisplayName(player, team)),
-                        new MessagePattern("{killer}", getFormattedDisplayName(killer, team)));
+                        new MessagePattern("{killer}", getFormattedDisplayName(killer, team))));
             }
         } else {
             for (Team team : teams) {
-                Messages.MATCH_PLAYER_KILLED_BY_UNKNOWN.match(
-                        new MessagePattern("{player}", getFormattedDisplayName(player, team)));
+                broadcast(team, Messages.MATCH_PLAYER_KILLED_BY_UNKNOWN.match(
+                        new MessagePattern("{player}", getFormattedDisplayName(player, team))));
             }
         }
     }
 
     @Override
-    void updateTeamVisibility() {
-        for (Team team : teams) {
-            for (Team otherTeam : teams) {
-                for (PlayerSession player : team.getOnlinePlayers()) {
-                    for (PlayerSession other : otherTeam.getOnlinePlayers()) {
-                        visibilityUpdater.update(player, other);
-                        visibilityUpdater.update(other, player);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    void handleRespawn(PlayerSession player) {
+    protected void handleRespawn(PlayerSession player) {
         if (getAliveTeamsCount() <= 1) {
             Optional<Team> winnerOptional = getAliveTeam();
             end(winnerOptional.orElse(null));
@@ -106,7 +95,7 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    void createInventorySnapshots() {
+    protected void createInventorySnapshots() {
         for (Team team : teams) {
             for (PlayerSession player : team.getOnlinePlayers()) {
                 if (team.isAlive(player)) createInventorySnapshot(player);
@@ -115,7 +104,7 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    Team[] getLosers() {
+    protected Team[] getLosers() {
         Preconditions.checkNotNull(winner, "winner");
         return teams.stream().filter(it -> !it.equals(winner)).toArray(Team[]::new);
     }
@@ -136,7 +125,7 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    int getPlayersCount() {
+    protected int getPlayersCount() {
         return teams.size();
     }
 
@@ -164,8 +153,8 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    List<PlayerSession> getOnlinePlayers() {
-        List<PlayerSession> players = super.getOnlinePlayers();
+    protected List<PlayerSession> getOnlinePlayers() {
+        List<PlayerSession> players = Lists.newArrayList();
         for (Team team : teams) {
             players.addAll(team.getOnlinePlayers());
         }

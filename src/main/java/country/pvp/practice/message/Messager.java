@@ -1,7 +1,6 @@
 package country.pvp.practice.message;
 
 import lombok.experimental.UtilityClass;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -56,7 +55,4 @@ public class Messager {
         message(recipient, message.match(patterns));
     }
 
-    public static void message(Recipient recipient, BaseComponent[] components) {
-        recipient.receive(components);
-    }
 }

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 public enum Messages {
 
     PLAYER_JOINED_QUEUE("&eYou have joined the {ranked} {queue} &equeue."),
+    PLAYER_DUEL_INVITATION("&ePlayer &f{player} &7(&f{ping} &ems&7)&e sent you a {ladder} &eduel request."),
     PLAYER_LEFT_QUEUE("&cYou have left the queue."),
     MATCH_COUNTDOWN("&eMatch will start in &f{time} &eseconds."),
     QUEUE_FOUND_OPPONENT("&eFound opponent: &f{player}"),
@@ -45,12 +46,12 @@ public enum Messages {
     public String match(MessagePattern @Nullable ... patterns) {
         if (patterns == null) return get();
 
-        String matched = get();
+        String matched = value;
 
         for (MessagePattern pattern : patterns) {
             matched = pattern.replace(matched);
         }
 
-        return matched;
+        return MessageUtil.color(matched);
     }
 }

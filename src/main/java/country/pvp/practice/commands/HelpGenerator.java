@@ -7,10 +7,7 @@ import me.vaperion.blade.command.context.BladeContext;
 import me.vaperion.blade.utils.MessageBuilder;
 import org.bukkit.ChatColor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class HelpGenerator implements me.vaperion.blade.command.help.HelpGenerator {
 
@@ -20,6 +17,7 @@ public class HelpGenerator implements me.vaperion.blade.command.help.HelpGenerat
         if (list.isEmpty()) return Collections.singletonList(ChatColor.RED + "Command not found.");
 
         List<String> help = new ArrayList<>(Collections.singletonList(ChatColor.YELLOW + "   Help:"));
+        list.sort(Comparator.comparing(o -> o.getAliases()[0]));
         for (BladeCommand command : list) {
             help.add(getUsage(command, command.getAliases()[0]) + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + command.getDescription());
         }

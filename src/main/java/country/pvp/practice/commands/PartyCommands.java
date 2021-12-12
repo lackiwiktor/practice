@@ -5,6 +5,7 @@ import country.pvp.practice.message.Messager;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.party.PartyManager;
 import country.pvp.practice.party.PartyService;
+import country.pvp.practice.party.menu.PartyEventMenuProvider;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
 import me.vaperion.blade.command.annotation.Command;
@@ -17,12 +18,14 @@ public class PartyCommands extends PlayerCommands {
 
     private final PartyService partyService;
     private final PartyManager partyManager;
+    private final PartyEventMenuProvider partyEventMenuProvider;
 
     @Inject
-    public PartyCommands(PlayerManager playerManager, PartyService partyService, PartyManager partyManager) {
+    public PartyCommands(PlayerManager playerManager, PartyService partyService, PartyManager partyManager, PartyEventMenuProvider partyEventMenuProvider) {
         super(playerManager);
         this.partyService = partyService;
         this.partyManager = partyManager;
+        this.partyEventMenuProvider = partyEventMenuProvider;
     }
 
     @Command("party create")
@@ -116,6 +119,25 @@ public class PartyCommands extends PlayerCommands {
 
         Party party = player.getParty();
         Messager.message(sender, "Party Members: " + party.getMembers().size());
+    }
+
+    @Command("party event")
+    public void info(@Sender Player sender) {
+        PlayerSession leader = get(sender);
+
+        if (!leader.hasParty()) {
+            Messager.messageError(leader, "You do not have a party.");
+            return;
+        }
+
+        Party party = leader.getParty();
+
+        if (!party.isLeader(leader)) {
+            Messager.messageError(leader, "You must be a leader of the party to start party event.");
+            return;
+        }
+
+        partyEventMenuProvider.provide(party).openMenu(sender);
     }
 
     @Command("party list")

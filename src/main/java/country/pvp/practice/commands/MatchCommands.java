@@ -1,16 +1,18 @@
 package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
-import country.pvp.practice.player.duel.PlayerDuelRequest;
-import country.pvp.practice.player.duel.PlayerDuelService;
 import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.SoloTeam;
+import country.pvp.practice.message.MessagePattern;
 import country.pvp.practice.message.Messager;
+import country.pvp.practice.message.Messages;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.player.duel.PlayerDuelRequest;
+import country.pvp.practice.player.duel.PlayerDuelService;
 import me.vaperion.blade.command.annotation.*;
 import org.bukkit.entity.Player;
 
@@ -67,10 +69,16 @@ public class MatchCommands extends PlayerCommands {
         }
 
         if (ladder != null) {
-            playerDuelService.invite(inviter, invitee, ladder, "Hello!");
+            playerDuelService.invite(inviter, invitee, ladder, Messages.PLAYER_DUEL_INVITATION.match(
+                    new MessagePattern("{player}", inviter.getName()),
+                    new MessagePattern("{ping}", inviter.getPing()),
+                    new MessagePattern("{ladder}", ladder.getDisplayName())));
         } else {
             kitChooseMenuProvider
-                    .provide((l) -> playerDuelService.invite(inviter, invitee, l, "Hello!"))
+                    .provide((l) -> playerDuelService.invite(inviter, invitee, l, Messages.PLAYER_DUEL_INVITATION.match(
+                            new MessagePattern("{player}", inviter.getName()),
+                            new MessagePattern("{ping}", inviter.getPing()),
+                            new MessagePattern("{ladder}", ladder.getDisplayName()))))
                     .openMenu(sender);
         }
     }

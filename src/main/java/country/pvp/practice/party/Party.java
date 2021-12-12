@@ -5,6 +5,7 @@ import country.pvp.practice.duel.DuelInvitable;
 import country.pvp.practice.duel.Request;
 import country.pvp.practice.message.Messager;
 import country.pvp.practice.message.Messages;
+import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.duel.PartyDuelRequest;
 import country.pvp.practice.player.PlayerSession;
 import lombok.Data;
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-public class Party implements DuelInvitable<Party, PartyDuelRequest> {
+public class Party implements DuelInvitable<Party, PartyDuelRequest>, Recipient {
 
     private final UUID id = UUID.randomUUID(); //party-id
     private final Set<PlayerSession> members = Sets.newHashSet();
@@ -89,12 +90,7 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest> {
 
     @Override
     public void receive(String message) {
-        members.forEach(it -> Messager.message(it, message));
-    }
-
-    @Override
-    public void receive(BaseComponent[] components) {
-
+        members.forEach(it -> it.receive(message));
     }
 
     @Override
@@ -136,6 +132,11 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest> {
                 .filter(it -> it.getInviter().equals(inviter))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public void receiveInvite(BaseComponent[] component) {
+        leader.sendComponent(component);
     }
 
     @RequiredArgsConstructor
