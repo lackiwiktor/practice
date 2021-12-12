@@ -110,21 +110,6 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    public boolean isOnSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer) {
-        return getTeam(damagedPlayer).hasPlayer(damagerPlayer);
-    }
-
-    @Override
-    public boolean isInMatch(PlayerSession player) {
-        return teams.stream().anyMatch(it -> it.hasPlayer(player));
-    }
-
-    @Override
-    public boolean isAlive(PlayerSession player) {
-        return getTeam(player).isAlive(player);
-    }
-
-    @Override
     protected int getPlayersCount() {
         return teams.size();
     }
@@ -141,9 +126,11 @@ public class FreeForAllMatch extends Match {
         }
     }
 
+    @Override
     public Team getTeam(PlayerSession player) {
         return teams.stream().filter(it -> it.hasPlayer(player)).findFirst().orElse(null);
     }
+
     private int getAliveTeamsCount() {
         return (int) teams.stream().filter(it -> !it.isDead()).count();
     }

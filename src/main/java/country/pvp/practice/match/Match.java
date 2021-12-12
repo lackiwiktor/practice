@@ -1,5 +1,6 @@
 package country.pvp.practice.match;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -306,12 +307,23 @@ public abstract class Match implements Recipient {
                 .create();
     }
 
+    public boolean isOnSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer) {
+        Team team = getTeam(damagedPlayer);
+        Preconditions.checkNotNull(team, "team");
+        return team.hasPlayer(damagerPlayer);
+    }
 
-    public abstract boolean isOnSameTeam(PlayerSession damagedPlayer, PlayerSession damagerPlayer);
+    public boolean isInMatch(PlayerSession player) {
+        return getTeam(player) != null;
+    }
 
-    public abstract boolean isInMatch(PlayerSession player);
+    public boolean isAlive(PlayerSession player) {
+        Team team = getTeam(player);
+        Preconditions.checkNotNull(team, "team");
+        return team.isAlive(player);
+    }
 
-    public abstract boolean isAlive(PlayerSession player);
+    protected abstract @Nullable Team getTeam(PlayerSession player);
 
     protected abstract Team[] getLosers();
 
