@@ -51,6 +51,7 @@ public class KitEditorListener extends PlayerListener {
         event.setCancelled(true);
     }
 
+
     @EventHandler(ignoreCancelled = true)
     public void dropItem(PlayerDropItemEvent event) {
         PlayerSession playerSession = get(event);

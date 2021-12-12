@@ -1,6 +1,7 @@
 package country.pvp.practice.menu;
 
 import com.google.common.collect.Maps;
+import country.pvp.practice.Reflections;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -31,18 +32,7 @@ public abstract class Menu {
 	private boolean closedByMenu = false;
 	private boolean placeholder = false;
 	private Button placeholderButton = Button.placeholder(Material.STAINED_GLASS_PANE, (byte) 15, " ");
-	private static final Field CONTAINER_COUNTER_FIELD;
-
-	static {
-		Field field = null;
-		try {
-			field = EntityPlayer.class.getDeclaredField("containerCounter");
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		}
-		if (!field.isAccessible()) field.setAccessible(true);
-		CONTAINER_COUNTER_FIELD = field;
-	}
+	private static final Field CONTAINER_COUNTER_FIELD = Reflections.getField(EntityPlayer.class, "containerCounter");
 
 	private ItemStack createItemStack(Player player, Button button) {
 		ItemStack item = button.getButtonItem(player);
