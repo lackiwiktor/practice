@@ -14,7 +14,6 @@ public class MongoRepositoryImpl<V extends DataObject> implements Repository<V> 
 
     protected final MongoDatabase database;
 
-
     @Override
     public void save(V entity) {
         database.getCollection(entity.getCollection()).replaceOne(Filters.eq("_id", entity.getId()), entity.getDocument(), new ReplaceOptions().upsert(true));

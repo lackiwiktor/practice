@@ -135,6 +135,12 @@
             <version>1.8.8</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <version>6.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
