@@ -3,11 +3,11 @@ package country.pvp.practice.arena;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
-import country.pvp.practice.data.mongo.MongoRepository;
+import country.pvp.practice.util.data.mongo.MongoRepositoryImpl;
 
 import java.util.Set;
 
-public class ArenaService extends MongoRepository<Arena> {
+public class ArenaService extends MongoRepositoryImpl<Arena> {
 
     @Inject
     public ArenaService(MongoDatabase database) {

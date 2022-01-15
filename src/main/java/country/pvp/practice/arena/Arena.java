@@ -1,24 +1,36 @@
 package country.pvp.practice.arena;
 
-import country.pvp.practice.data.DataObject;
-import country.pvp.practice.serialization.ItemStackAdapter;
-import country.pvp.practice.serialization.LocationAdapter;
+import country.pvp.practice.PracticePlugin;
+import country.pvp.practice.util.Region;
+import country.pvp.practice.util.RegionAdapter;
+import country.pvp.practice.util.data.DataObject;
+import country.pvp.practice.util.serialization.ItemStackAdapter;
+import country.pvp.practice.util.serialization.LocationAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 @Data
 public class Arena implements DataObject {
+
+    public static final File WORLD_EDIT_SCHEMATICS_FOLDER = new File(JavaPlugin.getPlugin(PracticePlugin.class).getDataFolder(), "schematics");
 
     private final String name;
     private String displayName;
     private String schematic;
     private ItemStack icon;
-    private Location spawnLocation1;
-    private Location spawnLocation2;
-    private Location spectatorLocation;
-    private Location center;
+    private int gridIndex;
+    private boolean occupied;
+    Location spawnLocation1;
+    Location spawnLocation2;
+    Region region;
 
     @Override
     public String getCollection() {
@@ -36,10 +48,11 @@ public class Arena implements DataObject {
         document.put("displayName", displayName);
         document.put("schematic", schematic);
         document.put("icon", ItemStackAdapter.toJson(icon));
+        document.put("gridIndex", gridIndex);
         document.put("spawnLocation1", LocationAdapter.toJson(spawnLocation1));
         document.put("spawnLocation2", LocationAdapter.toJson(spawnLocation2));
-        document.put("spectatorLocation", LocationAdapter.toJson(spectatorLocation));
-        document.put("center", LocationAdapter.toJson(center));
+        document.put("region", RegionAdapter.toJson(region));
+
         return document;
     }
 
@@ -50,12 +63,44 @@ public class Arena implements DataObject {
         icon = ItemStackAdapter.fromJson(document.getString("icon"));
         spawnLocation1 = LocationAdapter.fromJson(document.getString("spawnLocation1"));
         spawnLocation2 = LocationAdapter.fromJson(document.getString("spawnLocation2"));
-        spectatorLocation = LocationAdapter.fromJson(document.getString("spectatorLocation"));
-        center = LocationAdapter.fromJson(document.getString("center"));
+        region = RegionAdapter.fromJson(document.getString("region"));
+        gridIndex = document.getInteger("gridIndex");
+    }
+
+    public boolean isIn(Location location) {
+        return region.isIn(location);
     }
 
     public boolean isSetup() {
-        return spawnLocation1 != null && spawnLocation2 != null && spectatorLocation != null && center != null;
+        return icon != null && displayName != null && region != null && spawnLocation1 != null && spawnLocation2 != null;
     }
 
+    public @Nullable File getSchematic() {
+        return Paths.get(WORLD_EDIT_SCHEMATICS_FOLDER.getAbsolutePath(), name.concat(".schematic")).toFile();
+    }
+
+    public Location getCenter() {
+        return spawnLocation1;
+    }
+
+    public synchronized void setOccupied(boolean occupied) {
+        this.occupied = occupied;
+    }
+
+    public synchronized boolean isOccupied() {
+        return occupied;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Arena arena = (Arena) o;
+        return Objects.equals(name, arena.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }

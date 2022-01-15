@@ -6,6 +6,8 @@ import country.pvp.practice.player.PlayerSession;
 
 public class PlayerDuelRequest extends DuelRequest<PlayerSession> {
 
+   // private @Nullable Arena arena;
+
     public PlayerDuelRequest(PlayerSession inviter, Ladder ladder) {
         super(inviter, ladder);
     }

@@ -1,12 +1,11 @@
 package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
-import country.pvp.practice.message.Messager;
+import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.queue.menu.QueueMenuProvider;
 import me.vaperion.blade.command.annotation.Command;
-import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
 
 public class QueueCommands extends PlayerCommands {
@@ -20,11 +19,11 @@ public class QueueCommands extends PlayerCommands {
     }
 
     @Command("ranked")
-    public void ranked(@Sender Player sender) {
+    public void ranked(@me.vaperion.blade.command.annotation.Sender Player sender) {
         PlayerSession senderPlayer = get(sender);
 
         if (!canJoinQueue(senderPlayer)) {
-            Messager.messageError(senderPlayer, "You can join a queue only in the lobby.");
+            Sender.messageError(senderPlayer, "You can join a queue only in the lobby.");
             return;
         }
 
@@ -32,11 +31,11 @@ public class QueueCommands extends PlayerCommands {
     }
 
     @Command("unranked")
-    public void unranked(@Sender Player sender) {
+    public void unranked(@me.vaperion.blade.command.annotation.Sender Player sender) {
         PlayerSession senderPlayer = get(sender);
 
         if (!canJoinQueue(senderPlayer)) {
-            Messager.messageError(senderPlayer, "You can join a queue only in the lobby.");
+            Sender.messageError(senderPlayer, "You can join a queue only in the lobby.");
             return;
         }
 

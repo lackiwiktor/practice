@@ -1,7 +1,7 @@
 package country.pvp.practice.player.data;
 
 import com.google.common.collect.Maps;
-import country.pvp.practice.data.SerializableObject;
+import country.pvp.practice.util.data.SerializableObject;
 import country.pvp.practice.ladder.Ladder;
 import org.bson.Document;
 

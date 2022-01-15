@@ -3,7 +3,7 @@ package country.pvp.practice.lobby;
 import com.google.inject.Inject;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.player.PlayerUtil;
+import country.pvp.practice.util.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.visibility.VisibilityUpdater;
@@ -24,7 +24,7 @@ public class LobbyService {
 
     public void moveToLobby(PlayerSession player) {
         player.setState(PlayerState.IN_LOBBY);
-        PlayerUtil.resetPlayer(player.getPlayer());
+        PlayerUtil.resetPlayer(player.getPlayer(), false);
         player.disableFlying();
         itemBarService.apply(player);
         visibilityUpdater.update(player);

@@ -1,7 +1,7 @@
 package country.pvp.practice.invitation;
 
-import country.pvp.practice.expiring.Expiring;
-import country.pvp.practice.time.TimeUtil;
+import country.pvp.practice.util.Expiring;
+import country.pvp.practice.util.TimeUtil;
 import lombok.Data;
 
 import java.util.UUID;

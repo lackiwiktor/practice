@@ -1,7 +1,7 @@
 package country.pvp.practice.settings;
 
-import country.pvp.practice.data.DataObject;
-import country.pvp.practice.serialization.LocationAdapter;
+import country.pvp.practice.util.data.DataObject;
+import country.pvp.practice.util.serialization.LocationAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Location;

@@ -2,14 +2,12 @@ package country.pvp.practice.player;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import country.pvp.practice.data.DataObject;
 import country.pvp.practice.duel.DuelInvitable;
 import country.pvp.practice.duel.Request;
 import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.kit.editor.SessionEditingData;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.*;
-import country.pvp.practice.message.Recipient;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.player.data.PlayerKits;
 import country.pvp.practice.player.data.PlayerState;
@@ -17,6 +15,8 @@ import country.pvp.practice.player.data.PlayerStatistics;
 import country.pvp.practice.player.data.SessionData;
 import country.pvp.practice.player.duel.PlayerDuelRequest;
 import country.pvp.practice.queue.SessionQueueData;
+import country.pvp.practice.util.data.DataObject;
+import country.pvp.practice.util.message.Recipient;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bson.Document;
@@ -108,15 +108,19 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
     }
 
     public boolean isInQueue() {
-        return state == PlayerState.QUEUING && sessionData != null;
+        return state == PlayerState.QUEUING;
     }
 
     public boolean isInMatch() {
-        return state == PlayerState.IN_MATCH && sessionData != null;
+        return state == PlayerState.IN_MATCH;
     }
 
     public boolean isInEditor() {
-        return state == PlayerState.EDITING_KIT && sessionData != null;
+        return state == PlayerState.EDITING_KIT;
+    }
+
+    public boolean isSelecting() {
+        return state == PlayerState.SELECTING;
     }
 
     public void setBar(ItemStack... bar) {

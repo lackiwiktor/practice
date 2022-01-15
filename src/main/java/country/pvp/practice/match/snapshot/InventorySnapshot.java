@@ -1,10 +1,10 @@
 package country.pvp.practice.match.snapshot;
 
 import com.google.common.base.Preconditions;
-import country.pvp.practice.expiring.Expiring;
+import country.pvp.practice.util.Expiring;
 import country.pvp.practice.match.PlayerMatchStatistics;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.time.TimeUtil;
+import country.pvp.practice.util.TimeUtil;
 import lombok.Data;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

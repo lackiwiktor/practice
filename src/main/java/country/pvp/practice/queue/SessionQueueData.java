@@ -2,10 +2,10 @@ package country.pvp.practice.queue;
 
 import com.google.common.base.Preconditions;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.message.Recipient;
+import country.pvp.practice.util.message.Recipient;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.SessionData;
-import country.pvp.practice.time.TimeUtil;
+import country.pvp.practice.util.TimeUtil;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 

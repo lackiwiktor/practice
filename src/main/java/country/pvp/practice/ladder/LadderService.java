@@ -3,11 +3,11 @@ package country.pvp.practice.ladder;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
-import country.pvp.practice.data.mongo.MongoRepository;
+import country.pvp.practice.util.data.mongo.MongoRepositoryImpl;
 
 import java.util.Set;
 
-public class LadderService extends MongoRepository<Ladder> {
+public class LadderService extends MongoRepositoryImpl<Ladder> {
 
     @Inject
     public LadderService(MongoDatabase database) {

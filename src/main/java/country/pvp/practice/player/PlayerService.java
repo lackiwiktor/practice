@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import country.pvp.practice.data.mongo.MongoRepository;
+import country.pvp.practice.util.data.mongo.MongoRepositoryImpl;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerService extends MongoRepository<PlayerSession> {
+public class PlayerService extends MongoRepositoryImpl<PlayerSession> {
 
     @Inject
     public PlayerService(MongoDatabase database) {

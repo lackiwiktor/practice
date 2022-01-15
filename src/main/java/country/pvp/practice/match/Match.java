@@ -4,21 +4,24 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import country.pvp.practice.PracticePlugin;
+import country.pvp.practice.Messages;
 import country.pvp.practice.arena.Arena;
-import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.Team;
-import country.pvp.practice.message.*;
-import country.pvp.practice.message.component.ChatComponentBuilder;
-import country.pvp.practice.message.component.ChatHelper;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.player.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
+import country.pvp.practice.util.PlayerUtil;
+import country.pvp.practice.util.TaskDispatcher;
+import country.pvp.practice.util.message.Bars;
+import country.pvp.practice.util.message.MessageUtil;
+import country.pvp.practice.util.message.Sender;
+import country.pvp.practice.util.message.Recipient;
+import country.pvp.practice.util.message.component.ChatComponentBuilder;
+import country.pvp.practice.util.message.component.ChatHelper;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.Data;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -27,8 +30,11 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityWeather;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -36,7 +42,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 public abstract class Match implements Recipient {
@@ -50,12 +55,19 @@ public abstract class Match implements Recipient {
     protected final boolean duel;
     protected final Set<PlayerSession> spectators = Sets.newHashSet();
     protected final Map<PlayerSession, InventorySnapshot> snapshots = Maps.newHashMap();
-    protected MatchState state = MatchState.COUNTDOWN;
+
+    protected MatchState state = MatchState.STARTING_ROUND;
     protected @Nullable Team winner;
+
     private final UUID id = UUID.randomUUID();
+    private final MatchLogicTask logicTask = new MatchLogicTask(this);
     private final MatchManager matchManager;
     private final InventorySnapshotManager snapshotManager;
+    private final Set<Location> placedBlocks = Sets.newHashSet();
+    private final Set<Item> droppedItems = Sets.newHashSet();
+
     private BukkitRunnable countDownRunnable;
+    private long startedOn = System.currentTimeMillis();
 
     protected Match(InventorySnapshotManager snapshotManager, MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel) {
         this.snapshotManager = snapshotManager;
@@ -71,44 +83,58 @@ public abstract class Match implements Recipient {
 
     public void init() {
         matchManager.add(this);
-        TaskDispatcher.runLater(this::start, 100L, TimeUnit.MILLISECONDS);
+        arena.setOccupied(true);
+        TaskDispatcher.scheduleSync(logicTask, 1L, TimeUnit.SECONDS);
+        TaskDispatcher.sync(this::start);
     }
 
     private void start() {
         prepareTeams();
-        startCountDown();
+        resetTeams();
+        onRoundStart();
     }
 
-    protected void prepareTeam(Team team, Location spawnLocation) {
+    public void onRoundStart() {
+        snapshots.clear();
+        prepareTeams();
+        startedOn = System.currentTimeMillis();
+    }
+
+    protected void prepareTeam(Team team) {
         team.createMatchSession(this);
+        team.clearRematchData();
+    }
+
+    protected void resetTeam(Team team, Location spawnLocation) {
+        Preconditions.checkNotNull(spawnLocation);
+        Preconditions.checkNotNull(spawnLocation.getBlock());
         team.reset();
         team.giveKits(ladder);
-        team.teleport(
-                spawnLocation.getBlock().getType() == Material.AIR ?
-                        spawnLocation : spawnLocation.add(0, 2, 0));
-        team.clearRematchData();
+        team.teleport(spawnLocation.getBlock().getType() == Material.AIR ?
+                spawnLocation : spawnLocation.add(0, 2, 0));
     }
 
     protected abstract void prepareTeams();
 
-    protected void end(@Nullable Team winner) {
-        this.state = MatchState.END;
-        this.winner = winner;
+    protected abstract void resetTeams();
 
-        cancelCountDown();
+    public abstract boolean canStartRound();
+
+    public void onRoundEnd() {
+        state = MatchState.ENDING_ROUND;
         createInventorySnapshots();
         snapshots.values().forEach(it -> it.setCreatedAt(System.currentTimeMillis()));
         snapshotManager.addAll(snapshots.values());
-        handleEnd();
         sendResultComponent();
+    }
 
-        Runnable runnable = () -> {
-            movePlayersToLobby();
-            moveSpectatorsToLobby();
-            finish();
-        };
-
-        TaskDispatcher.runLater(runnable, 3500L, TimeUnit.MILLISECONDS);
+    protected void end() {
+        state = MatchState.ENDING_MATCH;
+        handleEnd();
+        movePlayersToLobby();
+        moveSpectatorsToLobby();
+        cleanup();
+        finish();
     }
 
     protected void moveTeamToLobby(Team team) {
@@ -121,32 +147,12 @@ public abstract class Match implements Recipient {
 
     private void finish() {
         matchManager.remove(this);
+        arena.setOccupied(false);
     }
 
     public void cancel(String reason) {
         broadcast(Messages.MATCH_CANCELLED.match("{reason}", reason));
-        end(null);
-    }
-
-    protected void startCountDown() {
-        AtomicInteger count = new AtomicInteger(6);
-        (countDownRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (count.decrementAndGet() > 0) {
-                    broadcast(Messages.MATCH_COUNTDOWN.match("{time}", count.get()));
-                } else {
-                    state = MatchState.FIGHT;
-                    broadcast(Messages.MATCH_START);
-                    cancel();
-                }
-            }
-        }).runTaskTimer(PracticePlugin.getPlugin(PracticePlugin.class), 20L, 20L);
-    }
-
-    protected void cancelCountDown() {
-        if (countDownRunnable == null) return;
-        countDownRunnable.cancel();
+        end();
     }
 
     protected abstract void movePlayersToLobby();
@@ -157,16 +163,51 @@ public abstract class Match implements Recipient {
         }
     }
 
-    public void handleDeath(PlayerSession deadPlayer) {
+    public void handlePlayerDeath(PlayerSession deadPlayer) {
         createInventorySnapshot(deadPlayer);
         deadPlayer.setDead(true);
         broadcastPlayerDeath(deadPlayer);
-        sendDeathPackets(deadPlayer);
         updateVisibility();
         PlayerUtil.resetPlayer(deadPlayer.getPlayer());
+        sendDeathPackets(deadPlayer);
         deadPlayer.setVelocity(new Vector());
-        deadPlayer.enableFlying();
-        tryEndingMatch(deadPlayer);
+
+        if (canEndRound()) {
+            state = MatchState.ENDING_ROUND;
+            startedOn = System.currentTimeMillis() - startedOn;
+            onRoundEnd();
+
+            if (canEndMatch()) {
+                state = MatchState.ENDING_MATCH;
+            }
+
+            logicTask.setNextAction(4);
+        } else {
+            deadPlayer.enableFlying();
+        }
+    }
+
+    protected abstract boolean canEndMatch();
+
+    public void handlePlayerDisconnect(PlayerSession disconnectedPlayer) {
+        createInventorySnapshot(disconnectedPlayer);
+        broadcastPlayerDisconnect(disconnectedPlayer);
+        disconnectedPlayer.handleDisconnectInMatch();
+
+        if (canEndRound()) {
+            state = MatchState.ENDING_ROUND;
+            startedOn = System.currentTimeMillis() - startedOn;
+            onRoundEnd();
+
+            if (canEndMatch())
+                state = MatchState.ENDING_MATCH;
+        }
+    }
+
+    protected abstract void broadcastPlayerDisconnect(PlayerSession disconnectedPlayer);
+
+    protected void broadcastPlayerDisconnect(Team team, PlayerSession disconnectedPlayer) {
+        broadcast(team, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(disconnectedPlayer, team)));
     }
 
     private void sendDeathPackets(PlayerSession deadPlayer) {
@@ -181,29 +222,30 @@ public abstract class Match implements Recipient {
 
     protected abstract void broadcastPlayerDeath(PlayerSession player);
 
-    protected abstract void tryEndingMatch(PlayerSession player);
-
-    public abstract void handleDisconnect(PlayerSession player);
+    protected abstract boolean canEndRound();
 
     protected void updateVisibility() {
-        for (PlayerSession session : getOnlinePlayers()) {
-            for (PlayerSession other : getOnlinePlayers()) {
-                visibilityUpdater.update(session, other);
-                visibilityUpdater.update(other, session);
-            }
+        for (PlayerSession session : getAllOnlinePlayers()) {
+            visibilityUpdater.update(session);
+        }
+    }
+
+    protected void updateVisibility(boolean flicker) {
+        for (PlayerSession session : getAllOnlinePlayers()) {
+            visibilityUpdater.update(session, flicker);
         }
     }
 
     protected void broadcast(String message) {
-        Messager.message(this, message);
+        Sender.message(this, message);
     }
 
     protected void broadcast(Messages message) {
-        Messager.message(this, message);
+        Sender.message(this, message);
     }
 
     protected void broadcast(country.pvp.practice.match.team.Team team, String message) {
-        Messager.message(team, message);
+        Sender.message(team, message);
     }
 
     /**
@@ -239,10 +281,7 @@ public abstract class Match implements Recipient {
         spectator.enableFlying();
         itemBarService.apply(spectator);
         spectator.teleport(other.getLocation());
-        for (PlayerSession matchPlayer : getAllOnlinePlayers()) {
-            visibilityUpdater.update(spectator, matchPlayer);
-            visibilityUpdater.update(matchPlayer, spectator);
-        }
+        updateVisibility();
     }
 
     public void stopSpectating(PlayerSession spectator, boolean broadcast) {
@@ -268,9 +307,9 @@ public abstract class Match implements Recipient {
         BaseComponent[] components = createMatchResultMessage(winner, getLosers());
 
         for (PlayerSession player : getAllOnlinePlayers()) {
-            Messager.message(player, Bars.CHAT_BAR);
+            Sender.message(player, Bars.CHAT_BAR);
             player.sendComponent(components);
-            Messager.message(player, Bars.CHAT_BAR);
+            Sender.message(player, Bars.CHAT_BAR);
         }
     }
 
@@ -339,6 +378,27 @@ public abstract class Match implements Recipient {
         Team team = getTeam(player);
         Preconditions.checkNotNull(team, "team");
         return team.isAlive(player);
+    }
+
+    public void addDroppedItem(Item item) {
+        droppedItems.add(item);
+    }
+
+    public void addPlacedBlock(Block block) {
+        placedBlocks.add(block.getLocation());
+    }
+
+    public boolean hasBeenPlacedByPlayer(Block block) {
+        return placedBlocks.contains(block.getLocation());
+    }
+
+    public void removePlacedBlock(Block block) {
+        placedBlocks.remove(block.getLocation());
+    }
+
+    public void cleanup() {
+        droppedItems.forEach(Entity::remove);
+        placedBlocks.forEach(it -> it.getBlock().setType(Material.AIR));
     }
 
     protected abstract @Nullable Team getTeam(PlayerSession player);

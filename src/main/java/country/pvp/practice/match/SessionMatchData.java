@@ -1,11 +1,11 @@
 package country.pvp.practice.match;
 
-import country.pvp.practice.expiring.Expiring;
-import country.pvp.practice.message.Messager;
-import country.pvp.practice.message.Messages;
+import country.pvp.practice.Messages;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.SessionData;
-import country.pvp.practice.time.TimeUtil;
+import country.pvp.practice.util.Expiring;
+import country.pvp.practice.util.TimeUtil;
+import country.pvp.practice.util.message.Sender;
 import lombok.Data;
 
 @Data
@@ -20,6 +20,13 @@ public class SessionMatchData implements SessionData {
 
     public void handleHit() {
         statistics.handleHit();
+    }
+
+    public void setDisconnected(boolean disconnected) {
+        this.disconnected = disconnected;
+        if (disconnected) {
+            this.dead = true;
+        }
     }
 
     public void handleBeingHit(PlayerSession player) {
@@ -76,7 +83,7 @@ public class SessionMatchData implements SessionData {
 
         public void notify(PlayerSession player) {
             if (notify) {
-                Messager.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN_EXPIRED);
+                Sender.message(player, Messages.MATCH_PLAYER_PEARL_COOLDOWN_EXPIRED);
                 notify = false;
             }
         }

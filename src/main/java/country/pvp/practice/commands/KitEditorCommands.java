@@ -3,11 +3,10 @@ package country.pvp.practice.commands;
 import com.google.inject.Inject;
 import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.kit.editor.KitEditorService;
-import country.pvp.practice.message.Messager;
+import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
 import me.vaperion.blade.command.annotation.Command;
-import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
 
 public class KitEditorCommands extends PlayerCommands {
@@ -23,11 +22,11 @@ public class KitEditorCommands extends PlayerCommands {
     }
 
     @Command("kiteditor")
-    public void kitEditor(@Sender Player sender) {
+    public void kitEditor(@me.vaperion.blade.command.annotation.Sender Player sender) {
         PlayerSession senderPlayer = get(sender);
 
         if (!senderPlayer.isInLobby()) {
-            Messager.messageError(senderPlayer, "You can enter the kit editor only in the lobby.");
+            Sender.messageError(senderPlayer, "You can enter the kit editor only in the lobby.");
             return;
         }
 
