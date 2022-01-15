@@ -3,7 +3,10 @@ package country.pvp.practice.visibility;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.TaskDispatcher;
 import lombok.RequiredArgsConstructor;
+
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class VisibilityUpdater {
@@ -11,17 +14,37 @@ public class VisibilityUpdater {
     private final PlayerManager playerManager;
 
     public void update(PlayerSession player) {
-        for (PlayerSession other : playerManager.getAll()) {
-            if (!other.isOnline()) continue;
+        update(player, false);
+    }
 
-            update(player, other);
-            update(other, player);
+    public void update(PlayerSession player, boolean flicker) {
+        if (flicker) {
+            for (PlayerSession other : playerManager.getAll()) {
+                update(player, other, Visibility.HIDDEN);
+                update(other, player, Visibility.HIDDEN);
+            }
         }
+
+        Runnable runnable = () -> {
+            for (PlayerSession other : playerManager.getAll()) {
+                if (!other.isOnline() || player.equals(other)) continue;
+
+                update(player, other);
+                update(other, player);
+            }
+        };
+
+        if (flicker) TaskDispatcher.runLater(runnable, 500L, TimeUnit.MILLISECONDS);
+        else runnable.run();
     }
 
     public void update(PlayerSession observer, PlayerSession observable) {
-        if (observer.equals(observable)) return;
         Visibility visibility = VisibilityProvider.provide(observer, observable);
+
+        update(observer, observable, visibility);
+    }
+
+    public void update(PlayerSession observer, PlayerSession observable, Visibility visibility) {
         visibility.apply(observer, observable);
     }
 }

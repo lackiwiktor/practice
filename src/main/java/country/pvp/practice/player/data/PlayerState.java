@@ -5,5 +5,6 @@ public enum PlayerState {
   QUEUING,
   EDITING_KIT,
   IN_MATCH,
-  SPECTATING
+  SPECTATING,
+  SELECTING
 }

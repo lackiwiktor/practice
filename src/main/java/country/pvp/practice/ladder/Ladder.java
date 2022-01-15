@@ -1,9 +1,9 @@
 package country.pvp.practice.ladder;
 
-import country.pvp.practice.data.DataObject;
+import country.pvp.practice.util.data.DataObject;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.kit.Kit;
-import country.pvp.practice.serialization.ItemStackAdapter;
+import country.pvp.practice.util.serialization.ItemStackAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Material;
@@ -37,7 +37,6 @@ public class Ladder implements DataObject {
         document.put("editorItems", Arrays.stream(editorItems).map(ItemStackAdapter::toJson).collect(Collectors.toList()));
         return document;
     }
-
 
     @Override
     public void applyDocument(Document document) {

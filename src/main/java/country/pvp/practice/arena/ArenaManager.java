@@ -42,8 +42,4 @@ public class ArenaManager {
         return Collections.unmodifiableSet(arenas.values().stream().filter(Arena::isSetup).collect(Collectors.toSet()));
     }
 
-    public Arena getRandom() {
-        return getAll().toArray(new Arena[0])[(int) (arenas.size() * Math.random())];
-    }
-
 }

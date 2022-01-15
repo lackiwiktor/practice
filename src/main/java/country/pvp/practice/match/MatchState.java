@@ -1,5 +1,8 @@
 package country.pvp.practice.match;
 
 public enum MatchState {
-    COUNTDOWN, FIGHT, END
+    STARTING_ROUND,
+    PLAYING_ROUND,
+    ENDING_ROUND,
+    ENDING_MATCH
 }

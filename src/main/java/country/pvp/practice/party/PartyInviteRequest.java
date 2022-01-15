@@ -2,7 +2,7 @@ package country.pvp.practice.party;
 
 import country.pvp.practice.duel.Request;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.time.TimeUtil;
+import country.pvp.practice.util.TimeUtil;
 import lombok.Data;
 
 @Data

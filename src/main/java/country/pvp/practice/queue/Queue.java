@@ -9,9 +9,9 @@ import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.type.TeamMatch;
 import country.pvp.practice.match.team.type.SoloTeam;
-import country.pvp.practice.message.MessagePattern;
-import country.pvp.practice.message.Messager;
-import country.pvp.practice.message.Messages;
+import country.pvp.practice.util.message.MessagePattern;
+import country.pvp.practice.util.message.Sender;
+import country.pvp.practice.Messages;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.PlayerState;
 import lombok.Data;
@@ -36,7 +36,7 @@ public class Queue {
         entries.add(entry);
         player.setState(PlayerState.QUEUING, entry);
         itemBarService.apply(player);
-        Messager.message(player, Messages.PLAYER_JOINED_QUEUE.match(
+        Sender.message(player, Messages.PLAYER_JOINED_QUEUE.match(
                 new MessagePattern("{queue}", ladder.getDisplayName()),
                 new MessagePattern("{ranked}", ranked ? "&branked" : "&dunranked")));
     }
@@ -45,7 +45,7 @@ public class Queue {
         entries.removeIf(it -> it.getPlayer().equals(player));
 
         if (leftQueue) {
-            Messager.message(player, Messages.PLAYER_LEFT_QUEUE);
+            Sender.message(player, Messages.PLAYER_LEFT_QUEUE);
             player.setState(PlayerState.IN_LOBBY);
             itemBarService.apply(player);
         }
@@ -60,8 +60,8 @@ public class Queue {
                 if (entry.equals(other) || toRemove.contains(entry) || toRemove.contains(other)) continue;
                 if (ranked && !entry.isWithinEloRange(other)) continue;
 
-                Messager.messageSuccess(entry, Messages.QUEUE_FOUND_OPPONENT.match("{player}", other.getName()));
-                Messager.messageSuccess(other, Messages.QUEUE_FOUND_OPPONENT.match("{player}", entry.getName()));
+                Sender.messageSuccess(entry, Messages.QUEUE_FOUND_OPPONENT.match("{player}", other.getName()));
+                Sender.messageSuccess(other, Messages.QUEUE_FOUND_OPPONENT.match("{player}", entry.getName()));
 
                 createMatch(entry, other).init();
                 toRemove.addAll(ImmutableList.of(entry, other));

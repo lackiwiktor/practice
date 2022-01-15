@@ -3,7 +3,7 @@ package country.pvp.practice.kit.editor;
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.player.PlayerUtil;
+import country.pvp.practice.util.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.visibility.VisibilityUpdater;

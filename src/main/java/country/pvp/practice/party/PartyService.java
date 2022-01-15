@@ -5,7 +5,7 @@ import country.pvp.practice.invitation.Invitation;
 import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.message.Messager;
+import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class PartyService {
 
     public void createParty(PlayerSession leader) {
         if (leader.hasParty()) {
-            Messager.messageError(leader, "You already are in a party.");
+            Sender.messageError(leader, "You already are in a party.");
             return;
         }
 
@@ -32,7 +32,7 @@ public class PartyService {
 
     public void disbandParty(PlayerSession senderPlayer, Party party) {
         if (!senderPlayer.isPartyLeader()) {
-            Messager.messageError(senderPlayer, "You are not the leader of the party.");
+            Sender.messageError(senderPlayer, "You are not the leader of the party.");
             return;
         }
 
@@ -76,17 +76,17 @@ public class PartyService {
 
     private void addToParty0(Party party, PlayerSession player) {
         if (!player.isInLobby()) {
-            Messager.messageError(player, "You must be in the lobby in order to accept a party invite");
+            Sender.messageError(player, "You must be in the lobby in order to accept a party invite");
             return;
         }
 
         if (party.isDisbanded()) {
-            Messager.messageError(player, "This party has disbanded.");
+            Sender.messageError(player, "This party has disbanded.");
             return;
         }
 
         if (player.hasParty()) {
-            Messager.messageError(player, "You already are in a party.");
+            Sender.messageError(player, "You already are in a party.");
             return;
         }
 
@@ -97,7 +97,7 @@ public class PartyService {
 
     private void addToParty(Party party, PlayerSession player) {
         if (!party.isPlayerInvited(player)) {
-            Messager.messageError(player, "You have not been invited to this party or the request has expired.");
+            Sender.messageError(player, "You have not been invited to this party or the request has expired.");
             return;
         }
 

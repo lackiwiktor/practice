@@ -2,23 +2,22 @@ package country.pvp.practice.match.type;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import country.pvp.practice.Messages;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.match.MatchState;
 import country.pvp.practice.match.RematchData;
 import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
-import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.match.team.Team;
-import country.pvp.practice.message.MessagePattern;
-import country.pvp.practice.message.Messages;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.MessagePattern;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
 import java.util.List;
@@ -39,9 +38,23 @@ public class TeamMatch extends Match {
 
     @Override
     protected void prepareTeams() {
-        prepareTeam(teamA, arena.getSpawnLocation1());
-        prepareTeam(teamB, arena.getSpawnLocation2());
-        updateVisibility();
+        prepareTeam(teamA);
+        prepareTeam(teamB);
+    }
+
+    @Override
+    protected void resetTeams() {
+        Preconditions.checkNotNull(arena.getSpawnLocation1());
+        Preconditions.checkNotNull(arena.getSpawnLocation2());
+        resetTeam(teamA, arena.getSpawnLocation1());
+        resetTeam(teamB, arena.getSpawnLocation2());
+
+        updateVisibility(true);
+    }
+
+    @Override
+    public boolean canStartRound() {
+        return false;
     }
 
     @Override
@@ -81,6 +94,17 @@ public class TeamMatch extends Match {
     }
 
     @Override
+    protected boolean canEndMatch() {
+        return true;
+    }
+
+    @Override
+    protected void broadcastPlayerDisconnect(PlayerSession disconnectedPlayer) {
+        broadcastPlayerDisconnect(teamA, disconnectedPlayer);
+        broadcastPlayerDisconnect(teamB, disconnectedPlayer);
+    }
+
+    @Override
     protected void broadcastPlayerDeath(PlayerSession player) {
         if (player.hasLastAttacker()) {
             PlayerSession killer = player.getLastAttacker();
@@ -102,25 +126,16 @@ public class TeamMatch extends Match {
     }
 
     @Override
-    protected void tryEndingMatch(PlayerSession player) {
-        Team team = getTeam(player);
-
-        if (team.isDead()) {
-            end(getOpponent(team));
+    protected boolean canEndRound() {
+        if (teamA.isDead()) {
+            winner = teamA;
+            return true;
+        } else if (teamB.isDead()) {
+            winner = teamB;
+            return true;
         }
-    }
 
-    @Override
-    public void handleDisconnect(PlayerSession player) {
-        createInventorySnapshot(player);
-        broadcast(teamA, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, teamA)));
-        broadcast(teamB, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, teamB)));
-        player.handleDisconnectInMatch();
-        country.pvp.practice.match.team.Team team = getTeam(player);
-
-        if (team.isDead() && state != MatchState.END) {
-            end(getOpponent(team));
-        }
+        return false;
     }
 
 

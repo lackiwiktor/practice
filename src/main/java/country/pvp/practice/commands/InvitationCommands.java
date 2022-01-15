@@ -4,11 +4,10 @@ import com.google.inject.Inject;
 import country.pvp.practice.invitation.Invitation;
 import country.pvp.practice.invitation.InvitationManager;
 import country.pvp.practice.invitation.InvitationService;
-import country.pvp.practice.message.Messager;
+import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.player.PlayerManager;
 import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
-import me.vaperion.blade.command.annotation.Sender;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -27,11 +26,11 @@ public class InvitationCommands extends PlayerCommands {
     }
 
     @Command("acceptinvitation")
-    public void accept(@Sender Player sender, @Name("id") UUID uuid) {
+    public void accept(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("id") UUID uuid) {
         Optional<Invitation> invitationOptional = invitationManager.get(uuid);
 
         if (!invitationOptional.isPresent()) {
-            Messager.messageError(sender, "You have not received an invite from this player or it has expired.");
+            Sender.messageError(sender, "You have not received an invite from this player or it has expired.");
             return;
         }
 
@@ -41,11 +40,11 @@ public class InvitationCommands extends PlayerCommands {
     }
 
     @Command("declineinvitation")
-    public void decline(@Sender Player sender, @Name("id") UUID uuid) {
+    public void decline(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("id") UUID uuid) {
         Optional<Invitation> invitationOptional = invitationManager.get(uuid);
 
         if (!invitationOptional.isPresent()) {
-            Messager.messageError(sender, "You have not received an invite from this player or it has expired.");
+            Sender.messageError(sender, "You have not received an invite from this player or it has expired.");
             return;
         }
 

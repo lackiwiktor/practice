@@ -1,7 +1,7 @@
 package country.pvp.practice.itembar;
 
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.player.PlayerUtil;
+import country.pvp.practice.util.PlayerUtil;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemBarService {

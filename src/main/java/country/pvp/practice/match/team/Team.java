@@ -3,7 +3,7 @@ package country.pvp.practice.match.team;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.SessionMatchData;
-import country.pvp.practice.message.Recipient;
+import country.pvp.practice.util.message.Recipient;
 import country.pvp.practice.player.PlayerSession;
 import org.bukkit.Location;
 

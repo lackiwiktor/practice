@@ -2,15 +2,12 @@ package country.pvp.practice;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import country.pvp.practice.arena.Arena;
-import country.pvp.practice.arena.ArenaManager;
-import country.pvp.practice.arena.ArenaService;
+import country.pvp.practice.arena.*;
 import country.pvp.practice.board.BoardTask;
 import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.commands.*;
 import country.pvp.practice.commands.provider.ArenaProvider;
 import country.pvp.practice.commands.provider.LadderProvider;
-import country.pvp.practice.concurrent.TaskDispatcher;
 import country.pvp.practice.duel.DuelRequestInvalidateTask;
 import country.pvp.practice.invitation.InvitationInvalidateTask;
 import country.pvp.practice.kit.editor.KitEditorListener;
@@ -23,7 +20,6 @@ import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
-import country.pvp.practice.menu.MenuListener;
 import country.pvp.practice.party.PartyRequestInvalidateTask;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
@@ -31,11 +27,15 @@ import country.pvp.practice.queue.QueueTask;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
 import country.pvp.practice.settings.PracticeSettingsService;
+import country.pvp.practice.util.TaskDispatcher;
+import country.pvp.practice.util.menu.MenuListener;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.Blade;
 import me.vaperion.blade.command.bindings.impl.BukkitBindings;
 import me.vaperion.blade.command.container.impl.BukkitCommandContainer;
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,21 +55,25 @@ public class Practice {
     private final QueueManager queueManager;
     private final PracticeSettings practiceSettings;
     private final PracticeSettingsService practiceSettingsService;
+    private final DuplicatedArenaService duplicatedArenaService;
+    private final DuplicatedArenaManager duplicatedArenaManager;
     private final MatchManager matchManager;
 
     private Blade blade;
 
     void onEnable() {
         register(ItemBarListener.class);
-        register(PlayerSessionListener.class);
+        register(SessionListener.class);
         register(PracticeBoard.class);
-        register(PlayerLobbyListener.class);
+        register(LobbyListener.class);
         register(MenuListener.class);
-        register(PlayerKitListener.class);
-        register(MatchPlayerListener.class);
-        register(PlayerQueueListener.class);
-        register(PlayerPartyListener.class);
+        register(KitListener.class);
+        register(MatchListener.class);
+        register(QueueListener.class);
+        register(PartyListener.class);
         register(KitEditorListener.class);
+        register(ArenaSelectionListener.class);
+        register(ArenaBlockListener.class);
 
         schedule(QueueTask.class, 1000L, TimeUnit.MILLISECONDS, true);
         schedule(BoardTask.class, 500L, TimeUnit.MILLISECONDS, true);
@@ -81,8 +85,13 @@ public class Practice {
         schedule(PartyRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(LeaderBoardsFetchTask.class, 15L, TimeUnit.SECONDS, true);
 
+        if (Bukkit.getWorld("arenas") == null) {
+            Bukkit.createWorld(new WorldCreator("arenas").generateStructures(false).type(WorldType.FLAT)).save();
+        }
+
         loadSettings();
         loadArenas();
+        loadArenaDuplicates();
         loadLadders();
         initPlayerQueues();
 
@@ -161,6 +170,10 @@ public class Practice {
 
     private void loadArenas() {
         arenaManager.addAll(arenaService.loadAll());
+    }
+
+    private void loadArenaDuplicates() {
+        duplicatedArenaManager.addAll(duplicatedArenaService.loadAll());
     }
 
     private void loadSettings() {

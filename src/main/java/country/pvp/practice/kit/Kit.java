@@ -1,10 +1,10 @@
 package country.pvp.practice.kit;
 
 import com.google.common.base.Preconditions;
-import country.pvp.practice.data.SerializableObject;
+import country.pvp.practice.util.data.SerializableObject;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.serialization.ItemStackAdapter;
+import country.pvp.practice.util.serialization.ItemStackAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Material;

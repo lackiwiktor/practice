@@ -1,11 +1,11 @@
 package country.pvp.practice.kit;
 
 import com.google.common.collect.Maps;
-import country.pvp.practice.data.Callback;
+import country.pvp.practice.util.data.Callback;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
-import country.pvp.practice.menu.Button;
-import country.pvp.practice.menu.Menu;
+import country.pvp.practice.util.menu.Button;
+import country.pvp.practice.util.menu.Menu;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;

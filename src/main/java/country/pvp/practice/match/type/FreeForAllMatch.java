@@ -3,19 +3,18 @@ package country.pvp.practice.match.type;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import country.pvp.practice.Messages;
 import country.pvp.practice.arena.Arena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.match.MatchState;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
-import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.match.team.Team;
-import country.pvp.practice.message.MessagePattern;
-import country.pvp.practice.message.Messages;
+import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.MessagePattern;
 import country.pvp.practice.visibility.VisibilityUpdater;
 
 import java.util.Arrays;
@@ -36,10 +35,22 @@ public class FreeForAllMatch extends Match {
     @Override
     protected void prepareTeams() {
         for (Team team : teams) {
-            prepareTeam(team, arena.getCenter());
+            prepareTeam(team);
+        }
+    }
+
+    @Override
+    protected void resetTeams() {
+        for (Team team : teams) {
+            resetTeam(team, arena.getCenter());
         }
 
-        updateVisibility();
+        updateVisibility(true);
+    }
+
+    @Override
+    public boolean canStartRound() {
+        return false;
     }
 
     @Override
@@ -50,6 +61,18 @@ public class FreeForAllMatch extends Match {
     protected void movePlayersToLobby() {
         for (Team team : teams) {
             moveTeamToLobby(team);
+        }
+    }
+
+    @Override
+    protected boolean canEndMatch() {
+        return getAliveTeamsCount() <= 1;
+    }
+
+    @Override
+    protected void broadcastPlayerDisconnect(PlayerSession disconnectedPlayer) {
+        for (Team team : teams) {
+            broadcastPlayerDisconnect(team, disconnectedPlayer);
         }
     }
 
@@ -72,27 +95,13 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    protected void tryEndingMatch(PlayerSession player) {
+    protected boolean canEndRound() {
         if (getAliveTeamsCount() <= 1) {
-            Optional<Team> winnerOptional = getAliveTeam();
-            end(winnerOptional.orElse(null));
-        }
-    }
-
-    @Override
-    public void handleDisconnect(PlayerSession player) {
-        createInventorySnapshot(player);
-
-        for (Team team : teams) {
-            broadcast(team, Messages.MATCH_PLAYER_DISCONNECTED.match("{player}", getFormattedDisplayName(player, team)));
+            getAliveTeam().ifPresent(it -> winner = it);
+            return true;
         }
 
-        player.handleDisconnectInMatch();
-
-        if (state != MatchState.END && getAliveTeamsCount() <= 1) {
-            Optional<Team> winnerOptional = getAliveTeam();
-            end(winnerOptional.orElse(null));
-        }
+        return false;
     }
 
     @Override

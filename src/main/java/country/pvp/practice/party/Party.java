@@ -3,9 +3,9 @@ package country.pvp.practice.party;
 import com.google.common.collect.Sets;
 import country.pvp.practice.duel.DuelInvitable;
 import country.pvp.practice.duel.Request;
-import country.pvp.practice.message.Messager;
-import country.pvp.practice.message.Messages;
-import country.pvp.practice.message.Recipient;
+import country.pvp.practice.util.message.Sender;
+import country.pvp.practice.Messages;
+import country.pvp.practice.util.message.Recipient;
 import country.pvp.practice.party.duel.PartyDuelRequest;
 import country.pvp.practice.player.PlayerSession;
 import lombok.Data;
@@ -85,7 +85,7 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest>, Recipient 
     }
 
     private void broadcast(String message) {
-        Messager.message(this, message);
+        Sender.message(this, message);
     }
 
     @Override
