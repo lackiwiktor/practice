@@ -29,7 +29,6 @@ public class DuplicatedArena extends Arena {
     private final Arena parent;
     private final UUID id;
 
-
     public DuplicatedArena(Arena parent, Region region) {
         this(UUID.randomUUID(), parent);
         this.region = region;
@@ -114,8 +113,9 @@ public class DuplicatedArena extends Arena {
 
     @Override
     public Document getDocument() {
-        Document document = new Document("parent", parent.getName());
+        Document document = new Document("_id", getId());
 
+        document.put("parent", parent.getName());
         document.put("spawnLocation1", LocationAdapter.toJson(spawnLocation1));
         document.put("spawnLocation2", LocationAdapter.toJson(spawnLocation2));
         document.put("region", RegionAdapter.toJson(region));
