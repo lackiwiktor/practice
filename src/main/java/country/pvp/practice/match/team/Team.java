@@ -3,8 +3,8 @@ package country.pvp.practice.match.team;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.SessionMatchData;
-import country.pvp.practice.util.message.Recipient;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.Recipient;
 import org.bukkit.Location;
 
 import java.util.List;
@@ -51,6 +51,17 @@ public abstract class Team implements Recipient {
                 .stream()
                 .filter(PlayerSession::isOnline)
                 .collect(Collectors.toList());
+    }
+
+    public List<PlayerSession> getAlivePlayers() {
+        return getPlayers()
+                .stream()
+                .filter(this::isAlive)
+                .collect(Collectors.toList());
+    }
+
+    public int getAlivePlayersCount() {
+        return getAlivePlayers().size();
     }
 
     public abstract List<PlayerSession> getPlayers();

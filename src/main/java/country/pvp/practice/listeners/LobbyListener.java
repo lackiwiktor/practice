@@ -6,6 +6,7 @@ import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.player.data.PlayerState;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -92,7 +93,7 @@ public class LobbyListener extends PlayerListener {
     public void playerMove(PlayerMoveEvent event) {
         if (!event.getTo().getWorld().getName().equals("world")) return;
 
-        if (event.getTo().getY() <= 40) {
+        if (lobbyService.shouldRebound(event.getTo())) {
             cancelIfInState(event.getPlayer(), event, true, PlayerState.IN_LOBBY, PlayerState.QUEUING);
 
             if (event.isCancelled()) {
@@ -106,7 +107,8 @@ public class LobbyListener extends PlayerListener {
     private void cancelIfInState(Player player, Cancellable event, boolean permBypass, PlayerState... states) {
         PlayerSession playerSession = get(player);
 
-        if (Arrays.asList(states).contains(playerSession.getState()) && (!permBypass || !playerSession.hasPermission("practice.admin"))) {
+        if (Arrays.asList(states).contains(playerSession.getState())
+                && (!permBypass || !(playerSession.hasPermission("practice.admin") && GameMode.CREATIVE.equals(player.getGameMode())))) {
             event.setCancelled(true);
         }
     }

@@ -7,6 +7,7 @@ import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.type.PartyTeam;
 import country.pvp.practice.party.Party;
+import country.pvp.practice.util.message.Sender;
 
 public class PartyDuelService extends DuelService<Party, PartyDuelRequest> {
 
@@ -25,16 +26,30 @@ public class PartyDuelService extends DuelService<Party, PartyDuelRequest> {
 
     @Override
     protected boolean canSendDuel(Party inviter, Party invitee) {
-        return true;
+        return check(inviter, invitee);
     }
 
     @Override
     protected boolean canAcceptDuel(Party inviter, Party invitee) {
-        return true;
+        return check(inviter, invitee);
     }
 
     @Override
     protected PartyDuelRequest createDuelRequest(Party inviter, Ladder ladder) {
         return new PartyDuelRequest(inviter, ladder);
+    }
+
+    private boolean check(Party inviter, Party invitee) {
+        if (!invitee.isInLobby()) {
+            Sender.messageError(invitee, "You must be in lobby if you want to duel someone.");
+            return false;
+        }
+
+        if (!inviter.isInLobby()) {
+            Sender.messageError(invitee, "This party is busy right now.");
+            return false;
+        }
+
+        return true;
     }
 }

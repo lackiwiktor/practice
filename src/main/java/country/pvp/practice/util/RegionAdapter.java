@@ -34,11 +34,11 @@ public class RegionAdapter {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
         int minX = jsonObject.get("minX").getAsInt();
-        int maxX = jsonObject.get("minX").getAsInt();
-        int minY = jsonObject.get("minX").getAsInt();
-        int maxY = jsonObject.get("minX").getAsInt();
-        int minZ = jsonObject.get("minX").getAsInt();
-        int maxZ = jsonObject.get("minX").getAsInt();
+        int maxX = jsonObject.get("maxX").getAsInt();
+        int minY = jsonObject.get("minY").getAsInt();
+        int maxY = jsonObject.get("maxY").getAsInt();
+        int minZ = jsonObject.get("minZ").getAsInt();
+        int maxZ = jsonObject.get("maxZ").getAsInt();
 
         return new Region(minX, maxX, minY, maxY, minZ, maxZ);
     }

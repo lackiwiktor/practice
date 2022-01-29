@@ -58,7 +58,7 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
         this.uuid = uuid;
     }
 
-    public void setState(PlayerState state) {
+    public synchronized void setState(PlayerState state) {
         this.state = state;
         if (state == PlayerState.IN_LOBBY) sessionData = null;
     }
@@ -282,7 +282,11 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
 
     public int getPing() {
         Player player = getPlayer();
-        Preconditions.checkNotNull(player, "player");
+
+        if (player == null) {
+            return -1;
+        }
+
         return ((CraftPlayer) player).getHandle().ping;
     }
 
@@ -296,10 +300,10 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
         this.party = null;
     }
 
-    public void chat(String message) {
+    public void runCommand(String command) {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
-        player.chat(message);
+        Bukkit.dispatchCommand(player, command);
     }
 
     public void removeFromQueue(boolean left) {
@@ -447,9 +451,9 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
         sendComponent(component);
     }
 
-    public int getEntityId() {
+    public double getHealth() {
         Player player = getPlayer();
         Preconditions.checkNotNull(player, "player");
-        return player.getEntityId();
+        return player.getHealth();
     }
 }

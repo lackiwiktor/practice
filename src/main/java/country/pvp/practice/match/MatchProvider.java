@@ -2,7 +2,7 @@ package country.pvp.practice.match;
 
 import com.google.inject.Inject;
 import com.mongodb.lang.Nullable;
-import country.pvp.practice.arena.Arena;
+import country.pvp.practice.arena.DuplicatedArena;
 import country.pvp.practice.arena.DuplicatedArenaManager;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
@@ -29,9 +29,9 @@ public class MatchProvider {
     private final PlayerService playerService;
 
     public @Nullable TeamMatch provide(Ladder ladder, boolean ranked, boolean duel, Team teamA, Team teamB) {
-        Arena arena = arenaManager.getRandom();
+        DuplicatedArena arena = arenaManager.getRandom();
 
-        if(arena == null) {
+        if (arena == null) {
             Sender.messageError(teamA, "No arenas are available right now.");
             Sender.messageError(teamB, "No arenas are available right now.");
 
@@ -41,21 +41,42 @@ public class MatchProvider {
         }
 
 
-        return new TeamMatch(matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, ranked, duel, snapshotManager, playerService, teamA, teamB);
+        return new TeamMatch(matchManager,
+                visibilityUpdater,
+                lobbyService,
+                itemBarService,
+                arena,
+                ladder,
+                ranked,
+                duel,
+                snapshotManager,
+                playerService,
+                teamA,
+                teamB,
+                3);
     }
 
     public @Nullable FreeForAllMatch provide(Ladder ladder, SoloTeam... teams) {
-        Arena arena = arenaManager.getRandom();
+        DuplicatedArena arena = arenaManager.getRandom();
 
-        for(Team team : teams) {
-            Sender.messageError(team, "No arenas are available right now.");
-            Sender.messageError(team, "No arenas are available right now.");
+        if (arena == null) {
+            for (Team team : teams) {
+                Sender.messageError(team, "No arenas are available right now.");
 
-            team.getOnlinePlayers().forEach(it -> itemBarService.apply(it));
-            return null;
+                team.getOnlinePlayers().forEach(it -> itemBarService.apply(it));
+                return null;
+            }
         }
 
-        return new FreeForAllMatch(matchManager, visibilityUpdater, lobbyService, itemBarService, snapshotManager, arena, ladder, false, teams);
+        return new FreeForAllMatch(matchManager,
+                visibilityUpdater,
+                lobbyService,
+                itemBarService,
+                snapshotManager,
+                arena,
+                ladder,
+                false,
+                teams);
     }
 
 }

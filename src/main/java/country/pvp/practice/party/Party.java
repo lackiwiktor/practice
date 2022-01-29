@@ -1,13 +1,13 @@
 package country.pvp.practice.party;
 
 import com.google.common.collect.Sets;
+import country.pvp.practice.Messages;
 import country.pvp.practice.duel.DuelInvitable;
 import country.pvp.practice.duel.Request;
-import country.pvp.practice.util.message.Sender;
-import country.pvp.practice.Messages;
-import country.pvp.practice.util.message.Recipient;
 import country.pvp.practice.party.duel.PartyDuelRequest;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.Recipient;
+import country.pvp.practice.util.message.Sender;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +44,7 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest>, Recipient 
 
     public void removePlayer(PlayerSession player, RemoveReason reason) {
         members.remove(player);
+        player.removeFromParty();
         broadcast(reason.message.match("{player}", player.getName()));
     }
 
@@ -85,12 +86,12 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest>, Recipient 
     }
 
     private void broadcast(String message) {
-        Sender.message(this, message);
+        members.forEach(it -> Sender.message(it, message));
     }
 
     @Override
     public void receive(String message) {
-        members.forEach(it -> it.receive(message));
+        leader.receive(message);
     }
 
     @Override
@@ -137,6 +138,11 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest>, Recipient 
     @Override
     public void receiveInvite(BaseComponent[] component) {
         leader.sendComponent(component);
+    }
+
+
+    public boolean isInLobby() {
+        return members.stream().noneMatch(it -> it.isInMatch());
     }
 
     @RequiredArgsConstructor

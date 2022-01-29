@@ -14,15 +14,15 @@ public abstract class Invitation<V extends Invitable> implements Expiring {
     private final String message;
     private final V inviter;
 
-    public void accept() {
-        onAccept();
+    public boolean accept() {
+        return onAccept();
     }
 
     public void decline() {
         onDecline();
     }
 
-    protected abstract void onAccept();
+    protected abstract boolean onAccept();
 
     protected abstract void onDecline();
 

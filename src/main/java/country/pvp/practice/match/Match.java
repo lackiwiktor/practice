@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import country.pvp.practice.Messages;
-import country.pvp.practice.arena.Arena;
+import country.pvp.practice.arena.DuplicatedArena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
@@ -18,8 +18,8 @@ import country.pvp.practice.util.PlayerUtil;
 import country.pvp.practice.util.TaskDispatcher;
 import country.pvp.practice.util.message.Bars;
 import country.pvp.practice.util.message.MessageUtil;
-import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.util.message.Recipient;
+import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.util.message.component.ChatComponentBuilder;
 import country.pvp.practice.util.message.component.ChatHelper;
 import country.pvp.practice.visibility.VisibilityUpdater;
@@ -33,9 +33,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +48,7 @@ public abstract class Match implements Recipient {
     protected final VisibilityUpdater visibilityUpdater;
     protected final LobbyService lobbyService;
     protected final ItemBarService itemBarService;
-    protected final Arena arena;
+    protected final DuplicatedArena arena;
     protected final Ladder ladder;
     protected final boolean ranked;
     protected final boolean duel;
@@ -58,18 +57,26 @@ public abstract class Match implements Recipient {
 
     protected MatchState state = MatchState.STARTING_ROUND;
     protected @Nullable Team winner;
+    protected int roundsLeft;
 
     private final UUID id = UUID.randomUUID();
     private final MatchLogicTask logicTask = new MatchLogicTask(this);
     private final MatchManager matchManager;
     private final InventorySnapshotManager snapshotManager;
-    private final Set<Location> placedBlocks = Sets.newHashSet();
-    private final Set<Item> droppedItems = Sets.newHashSet();
+
 
     private BukkitRunnable countDownRunnable;
-    private long startedOn = System.currentTimeMillis();
+    protected long startedOn = System.currentTimeMillis();
 
-    protected Match(InventorySnapshotManager snapshotManager, MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel) {
+    protected Match(InventorySnapshotManager snapshotManager,
+                    MatchManager matchManager,
+                    VisibilityUpdater visibilityUpdater,
+                    LobbyService lobbyService,
+                    ItemBarService itemBarService,
+                    DuplicatedArena arena,
+                    Ladder ladder,
+                    boolean ranked,
+                    boolean duel) {
         this.snapshotManager = snapshotManager;
         this.matchManager = matchManager;
         this.visibilityUpdater = visibilityUpdater;
@@ -126,6 +133,7 @@ public abstract class Match implements Recipient {
         snapshots.values().forEach(it -> it.setCreatedAt(System.currentTimeMillis()));
         snapshotManager.addAll(snapshots.values());
         sendResultComponent();
+
     }
 
     protected void end() {
@@ -133,14 +141,8 @@ public abstract class Match implements Recipient {
         handleEnd();
         movePlayersToLobby();
         moveSpectatorsToLobby();
-        cleanup();
+        arena.cleanUp();
         finish();
-    }
-
-    protected void moveTeamToLobby(Team team) {
-        for (PlayerSession session : team.getOnlinePlayers()) {
-            lobbyService.moveToLobby(session);
-        }
     }
 
     protected abstract void handleEnd();
@@ -155,7 +157,11 @@ public abstract class Match implements Recipient {
         end();
     }
 
-    protected abstract void movePlayersToLobby();
+    protected void movePlayersToLobby() {
+        for (PlayerSession session : getOnlinePlayers()) {
+            lobbyService.moveToLobby(session);
+        }
+    }
 
     private void moveSpectatorsToLobby() {
         for (PlayerSession spectator : spectators) {
@@ -163,7 +169,7 @@ public abstract class Match implements Recipient {
         }
     }
 
-    public void handlePlayerDeath(PlayerSession deadPlayer) {
+    public void handlePlayerDeath(PlayerSession deadPlayer, List<ItemStack> drops) {
         createInventorySnapshot(deadPlayer);
         deadPlayer.setDead(true);
         broadcastPlayerDeath(deadPlayer);
@@ -172,13 +178,21 @@ public abstract class Match implements Recipient {
         sendDeathPackets(deadPlayer);
         deadPlayer.setVelocity(new Vector());
 
+        //Remove Kit Books
+        drops.removeIf(it -> deadPlayer.getMatchingKit(ladder, it) != null);
+
         if (canEndRound()) {
+            //We don't need items of last dead player
+            drops.clear();
+
             state = MatchState.ENDING_ROUND;
             startedOn = System.currentTimeMillis() - startedOn;
             onRoundEnd();
 
             if (canEndMatch()) {
                 state = MatchState.ENDING_MATCH;
+            } else {
+                TaskDispatcher.runLater(() -> arena.cleanUp(), 100L, TimeUnit.MILLISECONDS);
             }
 
             logicTask.setNextAction(4);
@@ -222,7 +236,7 @@ public abstract class Match implements Recipient {
 
     protected abstract void broadcastPlayerDeath(PlayerSession player);
 
-    protected abstract boolean canEndRound();
+    public abstract boolean canEndRound();
 
     protected void updateVisibility() {
         for (PlayerSession session : getAllOnlinePlayers()) {
@@ -380,25 +394,16 @@ public abstract class Match implements Recipient {
         return team.isAlive(player);
     }
 
-    public void addDroppedItem(Item item) {
-        droppedItems.add(item);
-    }
-
     public void addPlacedBlock(Block block) {
-        placedBlocks.add(block.getLocation());
+        arena.addPlacedBlock(block);
     }
 
     public boolean hasBeenPlacedByPlayer(Block block) {
-        return placedBlocks.contains(block.getLocation());
+        return arena.hasBeenPlacedByPlayer(block);
     }
 
     public void removePlacedBlock(Block block) {
-        placedBlocks.remove(block.getLocation());
-    }
-
-    public void cleanup() {
-        droppedItems.forEach(Entity::remove);
-        placedBlocks.forEach(it -> it.getBlock().setType(Material.AIR));
+        arena.removePlacedBlock(block);
     }
 
     protected abstract @Nullable Team getTeam(PlayerSession player);
@@ -420,5 +425,9 @@ public abstract class Match implements Recipient {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public boolean isInArena(Location location) {
+        return arena.isIn(location);
     }
 }

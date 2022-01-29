@@ -14,9 +14,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
@@ -51,42 +50,43 @@ public class ArenaBlockListener extends PlayerListener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void placeBlock(BlockPlaceEvent event) {
         PlayerSession playerSession = get(event.getPlayer());
-
         if (!playerSession.isInMatch()) return;
 
         Match match = playerSession.getCurrentMatch();
+
+        Block block = event.getBlockPlaced();
+
+        if (!match.isInArena(block.getLocation())) {
+            Sender.messageError(playerSession, "You can't build outside the arena.");
+            event.setCancelled(true);
+            return;
+        }
+
         match.addPlacedBlock(event.getBlockPlaced());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void placeBlock(PlayerDropItemEvent event) {
+    public void bucketEmpty(PlayerBucketEmptyEvent event) {
         PlayerSession playerSession = get(event.getPlayer());
 
         if (!playerSession.isInMatch()) return;
 
         Match match = playerSession.getCurrentMatch();
-        match.addDroppedItem(event.getItemDrop());
+
+        Block block = event.getBlockClicked().getRelative(event.getBlockFace());
+
+        if (!match.isInArena(block.getLocation())) {
+            Sender.messageError(playerSession, "You can't build outside the arena.");
+            event.setCancelled(true);
+            return;
+        }
+
+        match.addPlacedBlock(block);
     }
 
     @EventHandler
-    public void placeBlock(PlayerDeathEvent event) {
-        PlayerSession playerSession = get(event.getEntity());
-
-        if (!playerSession.isInMatch()) return;
-
-        Match match = playerSession.getCurrentMatch();
-        event.getDrops().forEach(it -> match.addDroppedItem(event.getEntity().getWorld().dropItemNaturally(event.getEntity().getLocation(), it)));
-        event.getDrops().clear();
-    }
-
-
-    @EventHandler
-    public void onBlockFrom(BlockFromToEvent event) {
-        matchManager.getAll()
-                .stream()
-                .filter(it -> it.getArena().isIn(event.getBlock().getLocation()))
-                .findFirst()
-                .ifPresent(it -> it.addPlacedBlock(event.getBlock()));
+    public void onBlockFromToEvent(BlockFromToEvent event) {
+        event.setCancelled(true);
     }
 
     @EventHandler

@@ -1,16 +1,17 @@
 package country.pvp.practice.listeners;
 
 import com.google.inject.Inject;
-import country.pvp.practice.util.TaskDispatcher;
+import country.pvp.practice.Messages;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchState;
-import country.pvp.practice.util.message.Sender;
-import country.pvp.practice.Messages;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.TaskDispatcher;
 import country.pvp.practice.util.TimeUtil;
+import country.pvp.practice.util.message.Sender;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,10 +19,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,6 +30,13 @@ public class MatchListener extends PlayerListener {
     @Inject
     public MatchListener(PlayerManager playerManager) {
         super(playerManager);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void itemSpawn(ItemSpawnEvent event) {
+        Entity entity = event.getEntity();
+
+        TaskDispatcher.runLater(() -> entity.remove(), 10L, TimeUnit.SECONDS);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -71,12 +76,9 @@ public class MatchListener extends PlayerListener {
 
         PlayerSession damagerPlayer = get((Player) event.getDamager());
 
-        if (!match.isInMatch(damagerPlayer) || !match.isAlive(damagerPlayer)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (match.isOnSameTeam(damagedPlayer, damagerPlayer)) {
+        if (!match.isInMatch(damagerPlayer)
+                || !match.isAlive(damagerPlayer)
+                || match.isOnSameTeam(damagedPlayer, damagerPlayer)) {
             event.setCancelled(true);
             return;
         }
@@ -90,8 +92,10 @@ public class MatchListener extends PlayerListener {
         event.setDeathMessage(null);
         PlayerSession player = get(event.getEntity());
         if (!player.isInMatch()) return;
+
+        event.setDroppedExp(0);
         Match match = player.getCurrentMatch();
-        match.handlePlayerDeath(player);
+        match.handlePlayerDeath(player, event.getDrops());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -163,13 +167,15 @@ public class MatchListener extends PlayerListener {
     }
 
     @EventHandler
-    public void itemPickup(PlayerPickupItemEvent event) {
+    public void pickupItem(PlayerPickupItemEvent event) {
         PlayerSession player = get(event);
 
         if (player.isInMatch()) {
             Match currentMatch = player.getCurrentMatch();
 
-            if (currentMatch.getState() != MatchState.PLAYING_ROUND || !currentMatch.isAlive(player)) event.setCancelled(true);
+            if (currentMatch.getState() != MatchState.PLAYING_ROUND || !currentMatch.isAlive(player)) {
+                event.setCancelled(true);
+            }
         }
     }
 

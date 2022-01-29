@@ -14,8 +14,8 @@ public class DuplicatedArenaManager {
         arenas.put(arena, duplicatedArenas);
     }
 
-    public void remove(Arena arena) {
-        arenas.remove(arena);
+    public @Nullable Set<DuplicatedArena> remove(Arena arena) {
+        return arenas.remove(arena);
     }
 
     public void addAll(Map<Arena, Set<DuplicatedArena>> copies) {

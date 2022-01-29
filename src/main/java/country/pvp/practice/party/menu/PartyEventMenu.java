@@ -7,11 +7,12 @@ import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.type.MultiTeam;
 import country.pvp.practice.match.team.type.SoloTeam;
-import country.pvp.practice.util.menu.Button;
-import country.pvp.practice.util.menu.Menu;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.party.PartyEvent;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.menu.Button;
+import country.pvp.practice.util.menu.Menu;
+import country.pvp.practice.util.message.Sender;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -62,7 +63,9 @@ public class PartyEventMenu extends Menu {
         public void clicked(Player player, ClickType clickType) {
             if (!clickType.isLeftClick()) return;
 
-
+            if (party.size() < 2) {
+                Sender.messageError(player, "You must have at least 2 players in your party in order to start a party event.");
+            }
             kitChooseMenuProvider.provide((ladder) -> {
                 List<PlayerSession> players = Lists.newArrayList(party.getMembers());
 

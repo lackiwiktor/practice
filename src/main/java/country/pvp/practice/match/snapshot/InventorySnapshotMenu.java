@@ -4,10 +4,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.match.PlayerMatchStatistics;
+import country.pvp.practice.util.TimeUtil;
 import country.pvp.practice.util.menu.Button;
 import country.pvp.practice.util.menu.Menu;
 import country.pvp.practice.util.message.FormatUtil;
-import country.pvp.practice.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -90,7 +90,8 @@ public class InventorySnapshotMenu extends Menu {
         public ItemStack getButtonItem(Player player) {
             return new ItemBuilder(Material.SPECKLED_MELON)
                     .amount((int) FormatUtil.formatHealth(health))
-                    .name(health == 0 ? ChatColor.RED + "Dead" : (ChatColor.GREEN.toString() + FormatUtil.formatHealth(health) + "/10 Health"))
+                    .hideAll()
+                    .name(FormatUtil.formatHealthWithHeart(health))
                     .build();
         }
     }
@@ -104,6 +105,7 @@ public class InventorySnapshotMenu extends Menu {
         public ItemStack getButtonItem(Player player) {
             return new ItemBuilder(Material.COOKED_BEEF)
                     .amount(hunger)
+                    .hideAll()
                     .name(ChatColor.GREEN.toString() + hunger + "/20 Hunger")
                     .build();
         }
@@ -123,6 +125,7 @@ public class InventorySnapshotMenu extends Menu {
             }
 
             return new ItemBuilder(Material.POTION)
+                    .hideAll()
                     .name(ChatColor.GREEN + "Potion Effects")
                     .lore(lore)
                     .build();
@@ -161,6 +164,7 @@ public class InventorySnapshotMenu extends Menu {
         @Override
         public ItemStack getButtonItem(Player player) {
             return new ItemBuilder(Material.LEVER)
+                    .hideAll()
                     .name(ChatColor.GREEN + "View ".concat(snapshot.getName()).concat(" inventory."))
                     .build();
         }
@@ -182,12 +186,13 @@ public class InventorySnapshotMenu extends Menu {
         @Override
         public ItemStack getButtonItem(Player player) {
             List<String> lore = Lists.newArrayList();
-            lore.add("Hits: " + statistics.getHits());
-            lore.add("Longest Combo: " + statistics.getLongestCombo());
-            lore.add("Potion Accuracy: " + statistics.getPotionAccuracy() + "%");
+            lore.add(ChatColor.GRAY + "Hits: " + ChatColor.WHITE + statistics.getHits());
+            lore.add(ChatColor.GRAY + "Longest Combo: " + ChatColor.WHITE + statistics.getLongestCombo());
+            lore.add(ChatColor.GRAY + "Potion Accuracy: " + ChatColor.WHITE + statistics.getPotionAccuracy() + "%");
 
             return new ItemBuilder(Material.PAPER)
                     .name(ChatColor.GREEN.toString().concat("Match Stats"))
+                    .hideAll()
                     .lore(lore)
                     .build();
         }
@@ -205,6 +210,7 @@ public class InventorySnapshotMenu extends Menu {
             return new ItemBuilder(Material.POTION)
                     .amount(healthPotionsCount)
                     .durability(16421)
+                    .hideAll()
                     .name(ChatColor.GREEN.toString().concat(healthPotionsCount + " health potions"))
                     .build();
         }

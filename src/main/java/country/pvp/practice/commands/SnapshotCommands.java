@@ -20,7 +20,7 @@ public class SnapshotCommands {
     private final InventorySnapshotMenuProvider inventorySnapshotMenuProvider;
 
     @Command("viewsnapshot")
-    public void viewInv(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("id") UUID id) {
+    public void viewSnapshot(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("id") UUID id) {
         Optional<InventorySnapshot> snapshotOptional = snapshotManager.get(id);
 
         if (!snapshotOptional.isPresent()) {

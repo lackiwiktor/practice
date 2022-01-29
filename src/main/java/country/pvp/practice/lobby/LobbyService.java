@@ -3,9 +3,9 @@ package country.pvp.practice.lobby;
 import com.google.inject.Inject;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.player.PlayerSession;
-import country.pvp.practice.util.PlayerUtil;
 import country.pvp.practice.player.data.PlayerState;
 import country.pvp.practice.settings.PracticeSettings;
+import country.pvp.practice.util.PlayerUtil;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
@@ -20,6 +20,10 @@ public class LobbyService {
 
     public Location getSpawnLocation() {
         return practiceSettings.getSpawnLocation();
+    }
+
+    public boolean shouldRebound(Location location) {
+        return location.getY() < practiceSettings.getVoidY();
     }
 
     public void moveToLobby(PlayerSession player) {

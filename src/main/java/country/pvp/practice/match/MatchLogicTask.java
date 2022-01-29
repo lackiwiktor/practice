@@ -29,7 +29,7 @@ class MatchLogicTask extends BukkitRunnable {
             if (nextAction == 0) {
                 if (match.canStartRound()) {
                     match.onRoundStart();
-                }
+                } else match.end();
             }
         } else if (match.getState() == MatchState.ENDING_MATCH) {
             if (nextAction == 0) {

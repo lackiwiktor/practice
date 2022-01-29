@@ -5,8 +5,10 @@ import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.util.message.Sender;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class ArenaSelectionListener extends PlayerListener {
 
@@ -18,11 +20,12 @@ public class ArenaSelectionListener extends PlayerListener {
     @EventHandler
     public void blockInteractEvent(PlayerInteractEvent event) {
         PlayerSession session = get(event);
-
         if (!session.isSelecting()) return;
 
-        SessionSelectionData selectionData = session.getStateData();
+        ItemStack item = event.getItem();
+        if (item == null || item.getType() != Material.GOLD_PICKAXE) return;
 
+        SessionSelectionData selectionData = session.getStateData();
         switch (event.getAction()) {
             case LEFT_CLICK_BLOCK:
                 Sender.messageSuccess(session, "Set first corner of selection.");
@@ -37,7 +40,6 @@ public class ArenaSelectionListener extends PlayerListener {
             default:
                 return;
         }
-
         if (selectionData.isReady()) {
             Sender.messageSuccess(session, "You successfully selected area, bind it to a arena using /arena region");
         }

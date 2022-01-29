@@ -4,11 +4,11 @@ import com.google.common.collect.Maps;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchManager;
-import country.pvp.practice.util.menu.Button;
-import country.pvp.practice.util.menu.Menu;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.queue.Queue;
 import country.pvp.practice.queue.QueueManager;
+import country.pvp.practice.util.menu.Button;
+import country.pvp.practice.util.menu.Menu;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -52,7 +52,8 @@ public class QueueMenu extends Menu {
             Ladder ladder = queue.getLadder();
             return new ItemBuilder(ladder.getIcon())
                     .name(ladder.getDisplayName())
-                    .lore("",
+                    .hideAll()
+                    .lore(
                             ChatColor.GRAY + "In Fights: " + ChatColor.WHITE + matchManager.getPlayersInFightCount(ladder, ranked),
                             ChatColor.GRAY + "In Queue: " + ChatColor.WHITE + queue.size())
                     .build();

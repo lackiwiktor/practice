@@ -11,6 +11,7 @@ public class PracticeSettings implements DataObject {
 
     private Location spawnLocation;
     private Location editorLocation;
+    private int voidY;
 
     @Override
     public String getCollection() {
@@ -28,6 +29,7 @@ public class PracticeSettings implements DataObject {
 
         document.put("spawnLocation", LocationAdapter.toJson(spawnLocation));
         document.put("editorLocation", LocationAdapter.toJson(editorLocation));
+        document.put("voidY", voidY);
 
         return document;
     }
@@ -36,5 +38,6 @@ public class PracticeSettings implements DataObject {
     public void applyDocument(Document document) {
         spawnLocation = LocationAdapter.fromJson(document.getString("spawnLocation"));
         editorLocation = LocationAdapter.fromJson(document.getString("editorLocation"));
+        voidY = document.getInteger("voidY");
     }
 }

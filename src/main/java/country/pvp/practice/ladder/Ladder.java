@@ -1,8 +1,8 @@
 package country.pvp.practice.ladder;
 
-import country.pvp.practice.util.data.DataObject;
 import country.pvp.practice.itembar.ItemBuilder;
 import country.pvp.practice.kit.Kit;
+import country.pvp.practice.util.data.DataObject;
 import country.pvp.practice.util.serialization.ItemStackAdapter;
 import lombok.Data;
 import org.bson.Document;
@@ -65,7 +65,10 @@ public class Ladder implements DataObject {
     public @Nullable ItemStack getIcon() {
         if (!isSetup()) return null;
 
-        return new ItemBuilder(icon.clone()).name(displayName).build();
+        return new ItemBuilder(icon.clone())
+                .hideAll()
+                .name(displayName)
+                .build();
     }
 
     public void setInventory(ItemStack... inventory) {
