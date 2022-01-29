@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import country.pvp.practice.Messages;
-import country.pvp.practice.arena.Arena;
+import country.pvp.practice.arena.DuplicatedArena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
@@ -16,6 +16,7 @@ import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.util.message.MessagePattern;
 import country.pvp.practice.visibility.VisibilityUpdater;
+import org.bukkit.ChatColor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,9 +28,18 @@ public class FreeForAllMatch extends Match {
 
     private final Set<Team> teams = Sets.newConcurrentHashSet();
 
-    public FreeForAllMatch(MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, InventorySnapshotManager snapshotManager, Arena arena, Ladder ladder, boolean duel, SoloTeam... teams) {
+    public FreeForAllMatch(MatchManager matchManager,
+                           VisibilityUpdater visibilityUpdater,
+                           LobbyService lobbyService,
+                           ItemBarService itemBarService,
+                           InventorySnapshotManager snapshotManager,
+                           DuplicatedArena arena,
+                           Ladder ladder,
+                           boolean duel,
+                           SoloTeam... teams) {
         super(snapshotManager, matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, false, duel);
         this.teams.addAll(Arrays.stream(teams).collect(Collectors.toList()));
+        Preconditions.checkState(teams.length >= 2, "Invalid team size for FFA match");
     }
 
     @Override
@@ -55,13 +65,6 @@ public class FreeForAllMatch extends Match {
 
     @Override
     protected void handleEnd() {
-    }
-
-    @Override
-    protected void movePlayersToLobby() {
-        for (Team team : teams) {
-            moveTeamToLobby(team);
-        }
     }
 
     @Override
@@ -95,7 +98,7 @@ public class FreeForAllMatch extends Match {
     }
 
     @Override
-    protected boolean canEndRound() {
+    public boolean canEndRound() {
         if (getAliveTeamsCount() <= 1) {
             getAliveTeam().ifPresent(it -> winner = it);
             return true;
@@ -126,7 +129,12 @@ public class FreeForAllMatch extends Match {
 
     @Override
     public List<String> getBoard(PlayerSession player) {
-        return Lists.newArrayList();
+        List<String> lines = Lists.newArrayList();
+
+        lines.add(ChatColor.YELLOW + "Teams: " + ChatColor.WHITE + getAliveTeamsCount() + "/" + teams.size());
+        lines.add(" ");
+
+        return lines;
     }
 
     @Override

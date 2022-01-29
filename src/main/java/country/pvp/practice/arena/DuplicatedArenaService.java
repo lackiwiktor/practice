@@ -3,6 +3,7 @@ package country.pvp.practice.arena;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import country.pvp.practice.util.data.mongo.MongoRepositoryImpl;
 import org.bson.Document;
@@ -23,13 +24,15 @@ public class DuplicatedArenaService extends MongoRepositoryImpl<DuplicatedArena>
 
     public Map<Arena, Set<DuplicatedArena>> loadAll() {
         Map<Arena, Set<DuplicatedArena>> arenas = Maps.newHashMap();
+        MongoCollection<Document> collection = database.getCollection("duplicated_arenas");
 
-        for (Document document : database.getCollection("duplicated_arenas").find()) {
+        for (Document document : collection.find()) {
             String parentName = document.getString("parent");
             Arena parent = arenaManager.get(parentName);
 
             if (parent == null) {
                 System.out.println("Parent of arena not found, skipping loading duplicates.");
+                collection.deleteOne(document);
                 continue;
             }
 

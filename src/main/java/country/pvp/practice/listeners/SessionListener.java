@@ -36,9 +36,9 @@ public class SessionListener extends PlayerListener {
         PlayerSession playerSession = new PlayerSession(event.getUniqueId(), event.getName());
 
         try {
-            playerManager.add(playerSession);
             playerService.load(playerSession);
             playerSession.setLoaded(true);
+            playerManager.add(playerSession);
         } catch (Exception e) {
             e.printStackTrace();
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Error");

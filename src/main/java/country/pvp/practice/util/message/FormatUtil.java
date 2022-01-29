@@ -1,9 +1,23 @@
 package country.pvp.practice.util.message;
 
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.bukkit.ChatColor;
 
 @UtilityClass
 public class FormatUtil {
+
+    public static String formatHealthWithHeart(double health) {
+        String formatted = "";
+
+        if (health == 0) {
+            formatted = ChatColor.RED + "Dead";
+        } else {
+            formatted = ChatColor.GREEN.toString() + FormatUtil.formatHealth(health) + " " + ChatColor.DARK_RED + FormatUtil.getHeartIcon();
+        }
+
+        return formatted;
+    }
 
     public static double formatHealth(double health) {
         double dividedHealth = health / 2;
@@ -23,5 +37,9 @@ public class FormatUtil {
         } else {
             return ((int) dividedHealth);
         }
+    }
+
+    public static String getHeartIcon() {
+        return StringEscapeUtils.unescapeJava("\u2764");
     }
 }

@@ -31,11 +31,22 @@ public class ItemBar {
             case IN_LOBBY:
                 ItemBarItem[] items = new ItemBarItem[9];
 
-                items[0] = Items.UNRANKED.get();
-                items[1] = Items.RANKED.get();
-                items[2] = player.hasRematch() ? Items.REMATCH.get() : null;
-                items[4] = Items.KIT_EDITOR.get();
-                items[5] = Items.CREATE_PARTY.get();
+                if (player.hasParty()) {
+                    items[0] = Items.PARTY_MEMBERS.get();
+
+                    if (player.isPartyLeader()) {
+                        items[1] = Items.PARTY_EVENT.get();
+                    }
+
+                    items[8] = Items.PARTY_LEAVE.get();
+                } else {
+                    items[0] = Items.UNRANKED.get();
+                    items[1] = Items.RANKED.get();
+                    items[2] = player.hasRematch() ? Items.REMATCH.get() : null;
+                    items[4] = Items.CREATE_PARTY.get();
+                }
+
+                items[7] = Items.KIT_EDITOR.get();
 
                 return new ItemBar(items);
             case QUEUING:
@@ -50,19 +61,47 @@ public class ItemBar {
     @RequiredArgsConstructor
     private enum Items {
 
-        UNRANKED(new ItemBarItem(new ItemBuilder(Material.IRON_SWORD).name("&7Unranked").unbreakable().build(),
-                (practicePlayer -> practicePlayer.chat("/unranked")))),
-        RANKED(new ItemBarItem(new ItemBuilder(Material.DIAMOND_SWORD).name("&6Ranked").unbreakable().build(),
-                (practicePlayer -> practicePlayer.chat("/ranked")))),
-        REMATCH(new ItemBarItem(new ItemBuilder(Material.BLAZE_ROD).name("&eRematch").unbreakable().build(),
-                (practicePlayer -> practicePlayer.chat("/duel " + practicePlayer.getRematchPlayer().getName() + " " + practicePlayer.getRematchLadder().getName())))),
-        KIT_EDITOR(new ItemBarItem(new ItemBuilder(Material.ANVIL).name("&eKit Editor").unbreakable().build(),
-                (practicePlayer -> practicePlayer.chat("/kiteditor")))),
-        CREATE_PARTY(new ItemBarItem(new ItemBuilder(Material.NAME_TAG).name("&bCreate Party").build(),
-                (practicePlayer -> practicePlayer.chat("/party create")))),
-        LEAVE_QUEUE(new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("&cLeave Queue").unbreakable().build(),
+        UNRANKED(new ItemBarItem(new ItemBuilder(Material.IRON_SWORD)
+                .name("&7Unranked")
+                .hideAll()
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("unranked")))),
+        RANKED(new ItemBarItem(new ItemBuilder(Material.DIAMOND_SWORD)
+                .name("&6Ranked")
+                .hideAll()
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("ranked")))),
+        REMATCH(new ItemBarItem(new ItemBuilder(Material.BLAZE_POWDER)
+                .name("&eRematch")
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("duel " + practicePlayer.getRematchPlayer().getName() + " " + practicePlayer.getRematchLadder().getName())))),
+        KIT_EDITOR(new ItemBarItem(new ItemBuilder(Material.ANVIL)
+                .name("&eKit Editor")
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("kiteditor")))),
+        CREATE_PARTY(new ItemBarItem(new ItemBuilder(Material.NAME_TAG)
+                .name("&bCreate Party")
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("party create")))),
+        PARTY_EVENT(new ItemBarItem(new ItemBuilder(Material.IRON_AXE)
+                .name("&aParty Event")
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("party event")))),
+        PARTY_MEMBERS(new ItemBarItem(new ItemBuilder(Material.SKULL_ITEM)
+                .name("&aParty Members")
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("party members")))),
+        PARTY_LEAVE(new ItemBarItem(new ItemBuilder(Material.REDSTONE)
+                .name("&cLeave Party")
+                .build(),
+                (practicePlayer -> practicePlayer.runCommand("party leave")))),
+        LEAVE_QUEUE(new ItemBarItem(new ItemBuilder(Material.REDSTONE)
+                .name("&cLeave Queue")
+                .build(),
                 (practicePlayer -> practicePlayer.removeFromQueue(true)))),
-        STOP_SPECTATING(new ItemBarItem(new ItemBuilder(Material.REDSTONE).name("&cStop spectating").unbreakable().build(),
+        STOP_SPECTATING(new ItemBarItem(new ItemBuilder(Material.REDSTONE)
+                .name("&cStop spectating")
+                .build(),
                 (practicePlayer -> practicePlayer.stopSpectating(true))));
 
         private final ItemBarItem item;

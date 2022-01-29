@@ -3,6 +3,7 @@ package country.pvp.practice.itembar;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -151,6 +152,18 @@ public class ItemBuilder {
     for (Enchantment e : is.getEnchantments().keySet()) {
       is.removeEnchantment(e);
     }
+
+    return this;
+  }
+
+  public ItemBuilder hideAll() {
+    ItemMeta meta = is.getItemMeta();
+
+    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+    meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+    meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+
+    is.setItemMeta(meta);
 
     return this;
   }

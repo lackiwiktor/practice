@@ -5,7 +5,6 @@ import country.pvp.practice.util.Region;
 import country.pvp.practice.util.RegionAdapter;
 import country.pvp.practice.util.data.DataObject;
 import country.pvp.practice.util.serialization.ItemStackAdapter;
-import country.pvp.practice.util.serialization.LocationAdapter;
 import lombok.Data;
 import org.bson.Document;
 import org.bukkit.Location;
@@ -28,8 +27,6 @@ public class Arena implements DataObject {
     private ItemStack icon;
     private int gridIndex;
     private boolean occupied;
-    Location spawnLocation1;
-    Location spawnLocation2;
     Region region;
 
     @Override
@@ -49,8 +46,6 @@ public class Arena implements DataObject {
         document.put("schematic", schematic);
         document.put("icon", ItemStackAdapter.toJson(icon));
         document.put("gridIndex", gridIndex);
-        document.put("spawnLocation1", LocationAdapter.toJson(spawnLocation1));
-        document.put("spawnLocation2", LocationAdapter.toJson(spawnLocation2));
         document.put("region", RegionAdapter.toJson(region));
 
         return document;
@@ -61,8 +56,6 @@ public class Arena implements DataObject {
         displayName = document.getString("displayName");
         schematic = document.getString("schematic");
         icon = ItemStackAdapter.fromJson(document.getString("icon"));
-        spawnLocation1 = LocationAdapter.fromJson(document.getString("spawnLocation1"));
-        spawnLocation2 = LocationAdapter.fromJson(document.getString("spawnLocation2"));
         region = RegionAdapter.fromJson(document.getString("region"));
         gridIndex = document.getInteger("gridIndex");
     }
@@ -72,15 +65,11 @@ public class Arena implements DataObject {
     }
 
     public boolean isSetup() {
-        return icon != null && displayName != null && region != null && spawnLocation1 != null && spawnLocation2 != null;
+        return icon != null && displayName != null && region != null;
     }
 
     public @Nullable File getSchematic() {
         return Paths.get(WORLD_EDIT_SCHEMATICS_FOLDER.getAbsolutePath(), name.concat(".schematic")).toFile();
-    }
-
-    public Location getCenter() {
-        return spawnLocation1;
     }
 
     public synchronized void setOccupied(boolean occupied) {

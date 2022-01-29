@@ -22,9 +22,11 @@ public class QueueManager {
     private final MatchProvider matchProvider;
 
     public void initQueue(Ladder ladder) {
-        queues.computeIfAbsent(false, (k) -> Lists.newArrayList()).add(new Queue(itemBarService, arenaManager, matchProvider, ladder, false));
+        queues.computeIfAbsent(false, (k) -> Lists.newArrayList())
+                .add(new Queue(itemBarService, arenaManager, matchProvider, ladder, false));
         if (ladder.isRanked())
-            queues.computeIfAbsent(true, (k) -> Lists.newArrayList()).add(new Queue(itemBarService, arenaManager, matchProvider,  ladder, true));
+            queues.computeIfAbsent(true, (k) -> Lists.newArrayList())
+                    .add(new Queue(itemBarService, arenaManager, matchProvider, ladder, true));
     }
 
     public List<Queue> getQueues(boolean ranked) {

@@ -32,8 +32,9 @@ public class InvitationService {
     }
 
     public void accept(Invitation invitation) {
-        invitation.accept();
-        invitationManager.remove(invitation);
+        if(invitation.accept()) {
+            invitationManager.remove(invitation);
+        }
     }
 
     public void decline(Invitation invitation) {

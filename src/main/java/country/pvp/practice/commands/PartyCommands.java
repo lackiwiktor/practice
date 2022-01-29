@@ -2,13 +2,14 @@ package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.party.PartyManager;
 import country.pvp.practice.party.PartyService;
 import country.pvp.practice.party.menu.PartyEventMenuProvider;
+import country.pvp.practice.party.menu.PartyMembersMenuProvider;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.Sender;
 import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
 import me.vaperion.blade.command.annotation.Optional;
@@ -19,13 +20,15 @@ public class PartyCommands extends PlayerCommands {
     private final PartyService partyService;
     private final PartyManager partyManager;
     private final PartyEventMenuProvider partyEventMenuProvider;
+    private final PartyMembersMenuProvider partyMembersMenuProvider;
 
     @Inject
-    public PartyCommands(PlayerManager playerManager, PartyService partyService, PartyManager partyManager, PartyEventMenuProvider partyEventMenuProvider) {
+    public PartyCommands(PlayerManager playerManager, PartyService partyService, PartyManager partyManager, PartyEventMenuProvider partyEventMenuProvider, PartyMembersMenuProvider partyMembersMenuProvider) {
         super(playerManager);
         this.partyService = partyService;
         this.partyManager = partyManager;
         this.partyEventMenuProvider = partyEventMenuProvider;
+        this.partyMembersMenuProvider = partyMembersMenuProvider;
     }
 
     @Command("party create")
@@ -34,17 +37,30 @@ public class PartyCommands extends PlayerCommands {
         partyService.createParty(leader);
     }
 
+    @Command("party leave")
+    public void leave(@me.vaperion.blade.command.annotation.Sender Player sender) {
+        PlayerSession playerSession = get(sender);
+
+        if (!playerSession.hasParty()) {
+            Sender.messageError(playerSession, "You do not have a party.");
+            return;
+        }
+
+        Party party = playerSession.getParty();
+        partyService.leaveFromParty(party, playerSession);
+    }
+
     @Command("party disband")
     public void disband(@me.vaperion.blade.command.annotation.Sender Player sender) {
         PlayerSession leader = get(sender);
 
-        if (!leader.isInLobby()) {
-            Sender.messageError(leader, "You must be in the lobby in order to disband your party.");
+        if (!leader.hasParty()) {
+            Sender.messageError(leader, "You do not have a party.");
             return;
         }
 
-        if (!leader.hasParty()) {
-            Sender.messageError(leader, "You do not have a party.");
+        if (!leader.isPartyLeader()) {
+            Sender.messageError(leader, "You must be the leader of the party in order to disband it.");
             return;
         }
 
@@ -137,7 +153,29 @@ public class PartyCommands extends PlayerCommands {
             return;
         }
 
+        if (!party.isInLobby()) {
+            Sender.messageError(leader, "You must be in lobby in order to start a party event");
+            return;
+        }
+
         partyEventMenuProvider.provide(party).openMenu(sender);
+    }
+
+    @Command("party members")
+    public void members(@me.vaperion.blade.command.annotation.Sender Player sender) {
+        PlayerSession inviter = get(sender);
+
+        if (!inviter.hasParty()) {
+            Sender.messageError(inviter, "You do not have a party.");
+            return;
+        }
+
+        if (!inviter.isInLobby()) {
+            Sender.messageError(inviter, "You must be in the lobby in order to view party members.");
+            return;
+        }
+
+        partyMembersMenuProvider.provide(inviter.getParty()).openMenu(sender);
     }
 
     @Command("party list")

@@ -6,8 +6,8 @@ import country.pvp.practice.invitation.InvitationService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.match.MatchProvider;
 import country.pvp.practice.match.team.type.SoloTeam;
-import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.Sender;
 
 public class PlayerDuelService extends DuelService<PlayerSession, PlayerDuelRequest> {
 
@@ -26,28 +26,32 @@ public class PlayerDuelService extends DuelService<PlayerSession, PlayerDuelRequ
 
     @Override
     protected boolean canSendDuel(PlayerSession inviter, PlayerSession invitee) {
-        if (!inviter.isInLobby()) {
-            Sender.messageError(inviter, "You must be in lobby in order to duel someone.");
-            return false;
-        }
-
-        if (!invitee.isInLobby()) {
-            Sender.messageError(inviter, "This player is busy right now.");
-            return false;
-        }
-
         if (invitee.hasDuelRequest(inviter)) {
             Sender.messageError(inviter, "You already invited this player for a duel.");
             return false;
         }
 
-        return true;
+        return check(inviter, invitee);
     }
 
     @Override
     protected boolean canAcceptDuel(PlayerSession inviter, PlayerSession invitee) {
+        return check(inviter, invitee);
+    }
+
+    private boolean check(PlayerSession inviter, PlayerSession invitee) {
+        if (inviter.hasParty()) {
+            Sender.messageError(invitee, "Player can't be in a party if you want to duel him.");
+            return false;
+        }
+
+        if (invitee.hasParty()) {
+            Sender.messageError(invitee, "You can't be in a party if you want to duel someone.");
+            return false;
+        }
+
         if (!invitee.isInLobby()) {
-            Sender.messageError(invitee, "You must be in lobby in order to duel someone.");
+            Sender.messageError(invitee, "You must be in lobby if you want to duel someone.");
             return false;
         }
 

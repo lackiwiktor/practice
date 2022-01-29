@@ -70,7 +70,10 @@ public class KitEditorMenu extends Menu {
 
         @Override
         public ItemStack getButtonItem(Player player) {
-            return new ItemBuilder(Material.CHEST).name("&eSave kit &d" + ladder.getName() + " #" + slot).build();
+            return new ItemBuilder(Material.CHEST)
+                    .hideAll()
+                    .name("&eSave kit &d" + ladder.getName() + " #" + slot)
+                    .build();
         }
 
         @Override
@@ -112,7 +115,10 @@ public class KitEditorMenu extends Menu {
 
         @Override
         public ItemStack getButtonItem(Player player) {
-            return new ItemBuilder(Material.BOOK).name("&eLoad kit &d" + ladder.getName() + " #" + slot).build();
+            return new ItemBuilder(Material.BOOK)
+                    .hideAll()
+                    .name("&eLoad kit &d" + ladder.getName() + " #" + slot)
+                    .build();
         }
 
         @Override
@@ -141,7 +147,10 @@ public class KitEditorMenu extends Menu {
 
         @Override
         public ItemStack getButtonItem(Player player) {
-            return new ItemBuilder(Material.REDSTONE).name("&eRemove kit &d" + ladder.getName() + " #" + slot).build();
+            return new ItemBuilder(Material.REDSTONE)
+                    .hideAll()
+                    .name("&eRemove kit &d" + ladder.getName() + " #" + slot)
+                    .build();
         }
 
         @Override

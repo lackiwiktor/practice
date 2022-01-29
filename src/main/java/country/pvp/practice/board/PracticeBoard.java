@@ -48,7 +48,11 @@ public class PracticeBoard extends PlayerListener {
 
     public void update() {
         for (Map.Entry<PlayerSession, FastBoard> entry : this.boards.entrySet()) {
-            updateBoard(entry.getKey(), entry.getValue());
+            try {
+                updateBoard(entry.getKey(), entry.getValue());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

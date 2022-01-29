@@ -32,8 +32,8 @@ public abstract class DuelService<V extends DuelInvitable, D extends DuelRequest
 
         Invitation invitation = new Invitation(message, invitee) {
             @Override
-            protected void onAccept() {
-                acceptInvite(inviter, invitee, ladder);
+            protected boolean onAccept() {
+                return acceptInvite(inviter, invitee, ladder);
             }
 
             @Override
@@ -46,20 +46,24 @@ public abstract class DuelService<V extends DuelInvitable, D extends DuelRequest
         invitationService.invite(invitee, invitation);
     }
 
-    private void acceptInvite0(V inviter, V invitee, Ladder ladder) {
-        if (!canAcceptDuel(inviter, invitee)) return;
+    private boolean acceptInvite0(V inviter, V invitee, Ladder ladder) {
+        boolean canAcceptDuel = canAcceptDuel(inviter, invitee);
+
+        if (!canAcceptDuel) return true;
 
         inviter.clearDuelRequests(invitee);
         invitee.clearDuelRequests(inviter);
 
         handleAccept(inviter, invitee, ladder);
+
+        return canAcceptDuel;
     }
 
-    public void acceptInvite(V invitee, D request) {
-        acceptInvite(request.getInviter(), invitee, request.getLadder());
+    public boolean acceptInvite(V invitee, D request) {
+        return acceptInvite(request.getInviter(), invitee, request.getLadder());
     }
 
-    public void acceptInvite(V inviter, V invitee, Ladder ladder) {
-        acceptInvite0(inviter, invitee, ladder);
+    public boolean acceptInvite(V inviter, V invitee, Ladder ladder) {
+        return acceptInvite0(inviter, invitee, ladder);
     }
 }

@@ -21,6 +21,7 @@ import country.pvp.practice.match.snapshot.InventorySnapshotMenuProvider;
 import country.pvp.practice.party.PartyManager;
 import country.pvp.practice.party.PartyService;
 import country.pvp.practice.party.menu.PartyEventMenuProvider;
+import country.pvp.practice.party.menu.PartyMembersMenuProvider;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.duel.PlayerDuelService;
@@ -67,5 +68,6 @@ public class PracticeModule extends AbstractModule {
         bind(PartyEventMenuProvider.class).asEagerSingleton();
         bind(DuplicatedArenaManager.class).asEagerSingleton();
         bind(DuplicatedArenaService.class).asEagerSingleton();
+        bind(PartyMembersMenuProvider.class).asEagerSingleton();
     }
 }

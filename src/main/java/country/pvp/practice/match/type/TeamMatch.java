@@ -3,12 +3,13 @@ package country.pvp.practice.match.type;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import country.pvp.practice.Messages;
-import country.pvp.practice.arena.Arena;
+import country.pvp.practice.arena.DuplicatedArena;
 import country.pvp.practice.itembar.ItemBarService;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
+import country.pvp.practice.match.MatchState;
 import country.pvp.practice.match.RematchData;
 import country.pvp.practice.match.elo.EloUtil;
 import country.pvp.practice.match.snapshot.InventorySnapshot;
@@ -17,8 +18,11 @@ import country.pvp.practice.match.team.Team;
 import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.player.PlayerService;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.FormatUtil;
 import country.pvp.practice.util.message.MessagePattern;
 import country.pvp.practice.visibility.VisibilityUpdater;
+import org.bukkit.ChatColor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -29,7 +33,22 @@ public class TeamMatch extends Match {
     private final Team teamA;
     private final Team teamB;
 
-    public TeamMatch(MatchManager matchManager, VisibilityUpdater visibilityUpdater, LobbyService lobbyService, ItemBarService itemBarService, Arena arena, Ladder ladder, boolean ranked, boolean duel, InventorySnapshotManager snapshotManager, PlayerService playerService, Team teamA, Team teamB) {
+    private int teamARoundsWon;
+    private int teamBRoundsWon;
+
+    public TeamMatch(MatchManager matchManager,
+                     VisibilityUpdater visibilityUpdater,
+                     LobbyService lobbyService,
+                     ItemBarService itemBarService,
+                     DuplicatedArena arena,
+                     Ladder ladder,
+                     boolean ranked,
+                     boolean duel,
+                     InventorySnapshotManager snapshotManager,
+                     PlayerService playerService,
+                     Team teamA,
+                     Team teamB,
+                     int rounds) {
         super(snapshotManager, matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, ranked, duel);
         this.playerService = playerService;
         this.teamA = teamA;
@@ -44,8 +63,6 @@ public class TeamMatch extends Match {
 
     @Override
     protected void resetTeams() {
-        Preconditions.checkNotNull(arena.getSpawnLocation1());
-        Preconditions.checkNotNull(arena.getSpawnLocation2());
         resetTeam(teamA, arena.getSpawnLocation1());
         resetTeam(teamB, arena.getSpawnLocation2());
 
@@ -83,17 +100,6 @@ public class TeamMatch extends Match {
     }
 
     @Override
-    protected void movePlayersToLobby() {
-        for (PlayerSession session : teamA.getOnlinePlayers()) {
-            lobbyService.moveToLobby(session);
-        }
-
-        for (PlayerSession session : teamB.getOnlinePlayers()) {
-            lobbyService.moveToLobby(session);
-        }
-    }
-
-    @Override
     protected boolean canEndMatch() {
         return true;
     }
@@ -126,21 +132,28 @@ public class TeamMatch extends Match {
     }
 
     @Override
-    protected boolean canEndRound() {
+    public boolean canEndRound() {
         if (teamA.isDead()) {
             winner = teamA;
+            teamARoundsWon++;
             return true;
         } else if (teamB.isDead()) {
             winner = teamB;
+            teamBRoundsWon++;
             return true;
         }
 
         return false;
     }
 
+    public @Nullable Team getTeam(PlayerSession player) {
+        if (teamA.hasPlayer(player)) {
+            return teamA;
+        } else if (teamB.hasPlayer(player)) {
+            return teamB;
+        }
 
-    public Team getTeam(PlayerSession player) {
-        return teamA.hasPlayer(player) ? teamA : teamB;
+        return null;
     }
 
     public Team getOpponent(Team team) {
@@ -206,6 +219,59 @@ public class TeamMatch extends Match {
 
     @Override
     public List<String> getBoard(PlayerSession player) {
-        return Lists.newArrayList();
+        List<String> lines = Lists.newArrayList();
+
+        if (spectators.contains(player)) {
+            Team playerTeam = teamA;
+            Team opponentTeam = teamB;
+
+            String teamName = playerTeam.getName();
+            String teamNameOpponent = opponentTeam.getName();
+
+            if (playerTeam instanceof SoloTeam && opponentTeam instanceof SoloTeam) {
+                SoloTeam soloTeam = (SoloTeam) playerTeam;
+                SoloTeam soloTeamOpponent = (SoloTeam) opponentTeam;
+
+                lines.add(ChatColor.GREEN + teamName + " Ping: " + ChatColor.WHITE + soloTeam.getPing());
+                lines.add(ChatColor.YELLOW + teamNameOpponent + " Ping: " + ChatColor.WHITE + soloTeamOpponent.getPing());
+            } else {
+                lines.add(ChatColor.GREEN + "Team " + teamName + ": " + ChatColor.WHITE + playerTeam.getAlivePlayersCount() + "/" + playerTeam.size());
+                lines.add(ChatColor.YELLOW + "Team " + teamNameOpponent + ": " + ChatColor.WHITE + opponentTeam.getAlivePlayersCount() + "/" + opponentTeam.size());
+            }
+
+            lines.add(" ");
+        } else {
+            Team playerTeam = getTeam(player);
+            Team opponentTeam = getOpponent(playerTeam);
+
+            if (playerTeam instanceof SoloTeam && opponentTeam instanceof SoloTeam) {
+                if (state == MatchState.STARTING_ROUND) {
+                    lines.add(ChatColor.WHITE + "Opponent: " + ChatColor.YELLOW + opponentTeam.getName());
+                    lines.add(" ");
+                }
+
+                SoloTeam soloTeam = (SoloTeam) playerTeam;
+                SoloTeam soloTeamOpponent = (SoloTeam) opponentTeam;
+
+                lines.add(ChatColor.WHITE + "Your Ping: " + ChatColor.YELLOW + soloTeam.getPing());
+                lines.add(ChatColor.WHITE + "Their Ping: " + ChatColor.YELLOW + soloTeamOpponent.getPing());
+                lines.add(" ");
+            } else if (getPlayersCount() > 5) {
+                lines.add(ChatColor.GREEN + "Team: " + ChatColor.WHITE + playerTeam.getAlivePlayersCount() + "/" + playerTeam.size());
+                lines.add(ChatColor.RED + "Opponents: " + ChatColor.WHITE + opponentTeam.getAlivePlayersCount() + "/" + opponentTeam.size());
+                lines.add(" ");
+            } else {
+                lines.add(ChatColor.GREEN + "Team: " + ChatColor.WHITE + playerTeam.getAlivePlayersCount() + "/" + playerTeam.size());
+
+                for (PlayerSession session : playerTeam.getPlayers()) {
+                    lines.add(" " + session.getName() + ChatColor.YELLOW + " " + session.getPing() + ChatColor.WHITE + " ms " + FormatUtil.formatHealthWithHeart(session.getHealth()));
+                }
+
+                lines.add(" ");
+                lines.add(ChatColor.RED + "Opponents: " + ChatColor.WHITE + opponentTeam.getAlivePlayersCount() + "/" + opponentTeam.size());
+            }
+        }
+
+        return lines;
     }
 }

@@ -61,6 +61,10 @@ public class ArenaCommands extends PlayerCommands {
     public void remove(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("arena") Arena arena) {
         arenaManager.remove(arena);
         arenaService.deleteAsync(arena);
+
+        Set<DuplicatedArena> arenas = duplicatedArenaManager.remove(arena);
+        arenas.forEach(it -> duplicatedArenaService.deleteAsync(it));
+
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully removed arena.");
     }
 

@@ -52,6 +52,15 @@ public final class WorldEditUtils {
         );
     }
 
+    public static org.bukkit.Location vectorToLocation(World world, org.bukkit.util.Vector vector) {
+        return new org.bukkit.Location(
+                world,
+                vector.getBlockX(),
+                vector.getBlockY(),
+                vector.getBlockZ()
+        );
+    }
+
     public static EditSession getEditSession(String worldName) {
         BukkitWorld world = new BukkitWorld(Bukkit.getWorld(worldName));
         EditSessionFactory esFactory = WorldEdit.getInstance().getEditSessionFactory();
