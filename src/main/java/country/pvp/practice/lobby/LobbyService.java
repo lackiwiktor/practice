@@ -28,7 +28,7 @@ public class LobbyService {
 
     public void moveToLobby(PlayerSession player) {
         player.setState(PlayerState.IN_LOBBY);
-        PlayerUtil.resetPlayer(player.getPlayer(), false);
+        PlayerUtil.resetPlayer(player.getPlayer());
         player.disableFlying();
         itemBarService.apply(player);
         visibilityUpdater.update(player);

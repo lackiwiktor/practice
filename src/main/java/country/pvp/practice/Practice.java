@@ -8,25 +8,27 @@ import country.pvp.practice.board.PracticeBoard;
 import country.pvp.practice.commands.*;
 import country.pvp.practice.commands.provider.ArenaProvider;
 import country.pvp.practice.commands.provider.LadderProvider;
+import country.pvp.practice.commands.provider.PartyProvider;
 import country.pvp.practice.duel.DuelRequestInvalidateTask;
 import country.pvp.practice.invitation.InvitationInvalidateTask;
 import country.pvp.practice.kit.editor.KitEditorListener;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
-import country.pvp.practice.ladder.LadderService;
+import country.pvp.practice.ladder.LadderRepository;
 import country.pvp.practice.leaderboards.LeaderBoardsFetchTask;
 import country.pvp.practice.listeners.*;
 import country.pvp.practice.match.Match;
 import country.pvp.practice.match.MatchManager;
 import country.pvp.practice.match.PearlCooldownTask;
 import country.pvp.practice.match.snapshot.InventorySnapshotInvalidateTask;
+import country.pvp.practice.party.Party;
 import country.pvp.practice.party.PartyRequestInvalidateTask;
 import country.pvp.practice.player.*;
 import country.pvp.practice.queue.QueueManager;
 import country.pvp.practice.queue.QueueTask;
 import country.pvp.practice.settings.PracticeSettings;
 import country.pvp.practice.settings.PracticeSettingsCommand;
-import country.pvp.practice.settings.PracticeSettingsService;
+import country.pvp.practice.settings.PracticeSettingsRepository;
 import country.pvp.practice.util.TaskDispatcher;
 import country.pvp.practice.util.menu.MenuListener;
 import lombok.RequiredArgsConstructor;
@@ -47,15 +49,15 @@ public class Practice {
 
     private final Injector injector;
     private final PlayerManager playerManager;
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
     private final LadderManager ladderManager;
-    private final LadderService ladderService;
+    private final LadderRepository ladderRepository;
     private final ArenaManager arenaManager;
-    private final ArenaService arenaService;
+    private final ArenaRepository arenaRepository;
     private final QueueManager queueManager;
     private final PracticeSettings practiceSettings;
-    private final PracticeSettingsService practiceSettingsService;
-    private final DuplicatedArenaService duplicatedArenaService;
+    private final PracticeSettingsRepository practiceSettingsRepository;
+    private final DuplicatedArenaRepository duplicatedArenaRepository;
     private final DuplicatedArenaManager duplicatedArenaManager;
     private final MatchManager matchManager;
 
@@ -77,7 +79,7 @@ public class Practice {
 
         schedule(QueueTask.class, 1000L, TimeUnit.MILLISECONDS, true);
         schedule(BoardTask.class, 500L, TimeUnit.MILLISECONDS, true);
-        schedule(PlayerSaveTask.class, 1L, TimeUnit.MINUTES, true);
+        schedule(PlayerSaveTask.class, 10L, TimeUnit.MINUTES, true);
         schedule(PearlCooldownTask.class, 100L, TimeUnit.MILLISECONDS, true);
         schedule(InventorySnapshotInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
         schedule(DuelRequestInvalidateTask.class, 5L, TimeUnit.SECONDS, true);
@@ -86,7 +88,7 @@ public class Practice {
         schedule(LeaderBoardsFetchTask.class, 15L, TimeUnit.SECONDS, true);
 
         if (Bukkit.getWorld("arenas") == null) {
-            Bukkit.createWorld(new WorldCreator("arenas").generateStructures(false).type(WorldType.FLAT)).save();
+            Bukkit.createWorld(new WorldCreator("arenas").generateStructures(false).type(WorldType.FLAT));
         }
 
         loadSettings();
@@ -115,7 +117,7 @@ public class Practice {
         }
 
         for (PlayerSession playerSession : playerManager.getAll()) {
-            playerService.save(playerSession);
+            playerRepository.save(playerSession);
         }
     }
 
@@ -123,7 +125,7 @@ public class Practice {
         for (Player player : Bukkit.getOnlinePlayers()) {
             try {
                 PlayerSession playerSession = new PlayerSession(player);
-                playerService.loadAsync(playerSession);
+                playerRepository.loadAsync(playerSession);
                 playerManager.add(playerSession);
             } catch (Exception e) {
                 player.kickPlayer("Server is restarting...");
@@ -147,6 +149,7 @@ public class Practice {
                 .overrideCommands(true)
                 .bind(Arena.class, injector.getInstance(ArenaProvider.class))
                 .bind(Ladder.class, injector.getInstance(LadderProvider.class))
+                .bind(Party.class, injector.getInstance(PartyProvider.class))
                 .bind(PlayerSession.class, injector.getInstance(PracticePlayerProvider.class))
                 .containerCreator(BukkitCommandContainer.CREATOR)
                 .binding(new BukkitBindings())
@@ -165,18 +168,18 @@ public class Practice {
     }
 
     private void loadLadders() {
-        ladderManager.addAll(ladderService.loadAll());
+        ladderManager.addAll(ladderRepository.loadAll());
     }
 
     private void loadArenas() {
-        arenaManager.addAll(arenaService.loadAll());
+        arenaManager.addAll(arenaRepository.loadAll());
     }
 
     private void loadArenaDuplicates() {
-        duplicatedArenaManager.addAll(duplicatedArenaService.loadAll());
+        duplicatedArenaManager.addAll(duplicatedArenaRepository.loadAll());
     }
 
     private void loadSettings() {
-        practiceSettingsService.load(practiceSettings);
+        practiceSettingsRepository.load(practiceSettings);
     }
 }

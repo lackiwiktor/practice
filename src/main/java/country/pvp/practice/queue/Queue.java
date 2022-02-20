@@ -59,11 +59,9 @@ public class Queue {
 
     public void tick() {
         if (entries.size() < 2) return;
+        Set<SessionQueueData> toRemove = Sets.newHashSet();
 
-        synchronized (entries) {
-            System.out.println(Thread.currentThread().getName());
-            Set<SessionQueueData> toRemove = Sets.newHashSet();
-            for (SessionQueueData entry : entries) {
+        for (SessionQueueData entry : entries) {
                 for (SessionQueueData other : entries) {
                     if (entry.equals(other) || toRemove.contains(entry) || toRemove.contains(other)) continue;
                     if (ranked && !entry.isWithinEloRange(other)) continue;
@@ -76,8 +74,8 @@ public class Queue {
                     break;
                 }
             }
-            entries.removeAll(toRemove);
-        }
+
+        entries.removeAll(toRemove);
     }
 
     public int size() {

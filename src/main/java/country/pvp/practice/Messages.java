@@ -12,6 +12,7 @@ public enum Messages {
 
     PLAYER_JOINED_QUEUE("&eYou have joined the {ranked} {queue} &equeue."),
     PLAYER_DUEL_INVITATION("&ePlayer &f{player} &7(&f{ping} &ems&7)&e sent you a {ladder} &eduel request."),
+
     PLAYER_LEFT_QUEUE("&cYou have left the queue."),
     MATCH_COUNTDOWN("&eMatch will start in &f{time} &eseconds."),
     QUEUE_FOUND_OPPONENT("&eFound opponent: &f{player}"),
@@ -33,7 +34,8 @@ public enum Messages {
     PARTY_PLAYER_JOINED("Player joined the party."),
     PARTY_PLAYER_LEFT("Player {player} has left the party."),
     PARTY_PLAYER_DISCONNECTED("Player {player} has disconnected."),
-    PARTY_PLAYER_WAS_KICKED("Player {player} was kicked from the party.");
+    PARTY_PLAYER_WAS_KICKED("Player {player} was kicked from the party."),
+    PARTY_DUEL_INVITATION("&eParty &f{party}&e sent you a {ladder} &eduel request.");
 
     private final String value;
 

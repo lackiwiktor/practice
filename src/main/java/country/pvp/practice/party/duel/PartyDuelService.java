@@ -21,7 +21,7 @@ public class PartyDuelService extends DuelService<Party, PartyDuelRequest> {
 
     @Override
     protected void handleAccept(Party inviter, Party invitee, Ladder ladder) {
-        matchProvider.provide(ladder, false, true, PartyTeam.of(inviter), PartyTeam.of(invitee));
+        matchProvider.provide(ladder, false, true, PartyTeam.of(inviter), PartyTeam.of(invitee)).init();
     }
 
     @Override

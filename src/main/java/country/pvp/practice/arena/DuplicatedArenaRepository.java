@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class DuplicatedArenaService extends MongoRepositoryImpl<DuplicatedArena> {
+public class DuplicatedArenaRepository extends MongoRepositoryImpl<DuplicatedArena> {
 
     private final ArenaManager arenaManager;
 
     @Inject
-    public DuplicatedArenaService(MongoDatabase database, ArenaManager arenaManager) {
+    public DuplicatedArenaRepository(MongoDatabase database, ArenaManager arenaManager) {
         super(database);
         this.arenaManager = arenaManager;
     }

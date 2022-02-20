@@ -7,14 +7,14 @@ import lombok.RequiredArgsConstructor;
 public class PlayerSaveTask implements Runnable {
 
     private final PlayerManager playerManager;
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
 
     @Override
     public void run() {
         for (PlayerSession player : playerManager.getAll()) {
-            if (!player.isLoaded()) continue;
+            if (!player.isOnline() || !player.isLoaded()) continue;
 
-            playerService.saveAsync(player);
+            playerRepository.save(player);
         }
     }
 }

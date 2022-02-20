@@ -7,10 +7,10 @@ import country.pvp.practice.util.data.mongo.MongoRepositoryImpl;
 
 import java.util.Set;
 
-public class LadderService extends MongoRepositoryImpl<Ladder> {
+public class LadderRepository extends MongoRepositoryImpl<Ladder> {
 
     @Inject
-    public LadderService(MongoDatabase database) {
+    public LadderRepository(MongoDatabase database) {
         super(database);
     }
 

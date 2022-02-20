@@ -6,13 +6,15 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import country.pvp.practice.util.data.DataObject;
 import country.pvp.practice.util.data.Repository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bson.conversions.Bson;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class MongoRepositoryImpl<V extends DataObject> implements Repository<V> {
 
-    protected final MongoDatabase database;
+   @Getter
+   protected final MongoDatabase database;
 
     @Override
     public void save(V entity) {

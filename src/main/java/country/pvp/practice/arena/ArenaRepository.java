@@ -7,10 +7,10 @@ import country.pvp.practice.util.data.mongo.MongoRepositoryImpl;
 
 import java.util.Set;
 
-public class ArenaService extends MongoRepositoryImpl<Arena> {
+public class ArenaRepository extends MongoRepositoryImpl<Arena> {
 
     @Inject
-    public ArenaService(MongoDatabase database) {
+    public ArenaRepository(MongoDatabase database) {
         super(database);
     }
 

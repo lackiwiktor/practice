@@ -3,7 +3,7 @@ package country.pvp.practice.listeners;
 import com.google.inject.Inject;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerRepository;
 import country.pvp.practice.player.PlayerSession;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,12 +18,12 @@ import java.util.Optional;
 
 public class SessionListener extends PlayerListener {
 
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
 
     @Inject
-    public SessionListener(PlayerManager playerManager, PlayerService playerService) {
+    public SessionListener(PlayerManager playerManager, PlayerRepository playerRepository) {
         super(playerManager);
-        this.playerService = playerService;
+        this.playerRepository = playerRepository;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -36,7 +36,7 @@ public class SessionListener extends PlayerListener {
         PlayerSession playerSession = new PlayerSession(event.getUniqueId(), event.getName());
 
         try {
-            playerService.load(playerSession);
+            playerRepository.load(playerSession);
             playerSession.setLoaded(true);
             playerManager.add(playerSession);
         } catch (Exception e) {
@@ -58,6 +58,6 @@ public class SessionListener extends PlayerListener {
         event.setQuitMessage(null);
         Player player = event.getPlayer();
         Optional.ofNullable(playerManager.remove(player))
-                .ifPresent(playerService::saveAsync);
+                .ifPresent(playerRepository::saveAsync);
     }
 }
