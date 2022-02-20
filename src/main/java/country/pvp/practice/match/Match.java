@@ -58,15 +58,14 @@ public abstract class Match implements Recipient {
     protected MatchState state = MatchState.STARTING_ROUND;
     protected @Nullable Team winner;
     protected int roundsLeft;
+    protected long startedOn = System.currentTimeMillis();
 
     private final UUID id = UUID.randomUUID();
     private final MatchLogicTask logicTask = new MatchLogicTask(this);
     private final MatchManager matchManager;
     private final InventorySnapshotManager snapshotManager;
 
-
     private BukkitRunnable countDownRunnable;
-    protected long startedOn = System.currentTimeMillis();
 
     protected Match(InventorySnapshotManager snapshotManager,
                     MatchManager matchManager,
@@ -96,6 +95,8 @@ public abstract class Match implements Recipient {
     }
 
     private void start() {
+        arena.getChunks()
+                .forEach(it -> it.getChunk().load());
         prepareTeams();
         resetTeams();
         onRoundStart();
@@ -406,7 +407,7 @@ public abstract class Match implements Recipient {
         arena.removePlacedBlock(block);
     }
 
-    protected abstract @Nullable Team getTeam(PlayerSession player);
+    public abstract @Nullable Team getTeam(PlayerSession player);
 
     protected abstract Team[] getLosers();
 

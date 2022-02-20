@@ -12,7 +12,7 @@ import country.pvp.practice.match.team.Team;
 import country.pvp.practice.match.team.type.SoloTeam;
 import country.pvp.practice.match.type.FreeForAllMatch;
 import country.pvp.practice.match.type.TeamMatch;
-import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerRepository;
 import country.pvp.practice.util.message.Sender;
 import country.pvp.practice.visibility.VisibilityUpdater;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class MatchProvider {
     private final ItemBarService itemBarService;
     private final DuplicatedArenaManager arenaManager;
     private final InventorySnapshotManager snapshotManager;
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
 
     public @Nullable TeamMatch provide(Ladder ladder, boolean ranked, boolean duel, Team teamA, Team teamB) {
         DuplicatedArena arena = arenaManager.getRandom();
@@ -50,10 +50,9 @@ public class MatchProvider {
                 ranked,
                 duel,
                 snapshotManager,
-                playerService,
+                playerRepository,
                 teamA,
-                teamB,
-                3);
+                teamB);
     }
 
     public @Nullable FreeForAllMatch provide(Ladder ladder, SoloTeam... teams) {

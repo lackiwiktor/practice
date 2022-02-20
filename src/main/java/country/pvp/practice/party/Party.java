@@ -52,6 +52,10 @@ public class Party implements DuelInvitable<Party, PartyDuelRequest>, Recipient 
         return members.contains(player);
     }
 
+    public boolean hasPlayer(String name) {
+        return members.stream().anyMatch(it -> it.getName().equalsIgnoreCase(name));
+    }
+
     public void invite(PlayerSession invitee) {
         requests.add(new PartyInviteRequest(invitee));
     }

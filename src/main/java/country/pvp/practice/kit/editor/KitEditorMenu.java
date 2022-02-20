@@ -6,7 +6,7 @@ import country.pvp.practice.kit.NamedKit;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.util.menu.Button;
 import country.pvp.practice.util.menu.Menu;
-import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerRepository;
 import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KitEditorMenu extends Menu {
 
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
 
     private final PlayerSession playerSession;
     private final Ladder ladder;
@@ -34,7 +34,7 @@ public class KitEditorMenu extends Menu {
         Map<Integer, Button> buttons = Maps.newHashMap();
 
         for (int i = 0; i < 7; i++) {
-            buttons.put(i + 1, new SaveKitButton(playerService, playerSession, ladder, i));
+            buttons.put(i + 1, new SaveKitButton(playerRepository, playerSession, ladder, i));
 
             if (playerSession.getKit(ladder, i) != null) {
                 buttons.put(i + 10, new LoadKitButton(playerSession, ladder, i));
@@ -53,15 +53,15 @@ public class KitEditorMenu extends Menu {
 
     private static class SaveKitButton extends Button {
 
-        private final PlayerService playerService;
+        private final PlayerRepository playerRepository;
 
         private final PlayerSession playerSession;
         private final Ladder ladder;
         private final int index;
         private final int slot;
 
-        public SaveKitButton(PlayerService playerService, PlayerSession playerSession, Ladder ladder, int index) {
-            this.playerService = playerService;
+        public SaveKitButton(PlayerRepository playerRepository, PlayerSession playerSession, Ladder ladder, int index) {
+            this.playerRepository = playerRepository;
             this.playerSession = playerSession;
             this.ladder = ladder;
             this.index = index;
@@ -91,7 +91,7 @@ public class KitEditorMenu extends Menu {
                 newKit.setArmor(player.getInventory().getArmorContents());
                 newKit.setInventory(player.getInventory().getContents());
 
-                playerService.saveAsync(playerSession);
+                playerRepository.saveAsync(playerSession);
                 return true;
             }
 

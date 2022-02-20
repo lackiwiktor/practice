@@ -5,7 +5,7 @@ import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.lobby.LobbyService;
 import country.pvp.practice.player.PlayerListener;
 import country.pvp.practice.player.PlayerManager;
-import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerRepository;
 import country.pvp.practice.player.PlayerSession;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -14,13 +14,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class KitEditorListener extends PlayerListener {
 
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
     private final LobbyService lobbyService;
 
     @Inject
-    public KitEditorListener(PlayerManager playerManager, PlayerService playerService, LobbyService lobbyService) {
+    public KitEditorListener(PlayerManager playerManager, PlayerRepository playerRepository, LobbyService lobbyService) {
         super(playerManager);
-        this.playerService = playerService;
+        this.playerRepository = playerRepository;
         this.lobbyService = lobbyService;
     }
 
@@ -39,7 +39,7 @@ public class KitEditorListener extends PlayerListener {
                 new KitEditorChest(ladder).openMenu(event.getPlayer());
                 break;
             case ANVIL:
-                new KitEditorMenu(playerService, playerSession, ladder).openMenu(event.getPlayer());
+                new KitEditorMenu(playerRepository, playerSession, ladder).openMenu(event.getPlayer());
                 break;
             case WOODEN_DOOR:
             case WOOD_DOOR:

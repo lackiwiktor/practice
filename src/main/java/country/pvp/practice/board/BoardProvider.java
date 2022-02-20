@@ -36,7 +36,7 @@ public class BoardProvider {
                 lines.add(ChatColor.WHITE + "Playing: " + ChatColor.YELLOW + matchManager.getPlayersInFightCount());
                 lines.add("");
                 lines.add(ChatColor.GRAY + "Kit Editor:");
-                lines.add(ChatColor.WHITE + "  " + editingData.getLadder().getDisplayName());
+                lines.add(ChatColor.WHITE + "  " + MessageUtil.color(editingData.getLadder().getDisplayName()));
                 lines.add("");
                 break;
             case QUEUING:

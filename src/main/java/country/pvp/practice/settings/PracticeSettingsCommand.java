@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
 public class PracticeSettingsCommand {
 
     private final PracticeSettings practiceSettings;
-    private final PracticeSettingsService practiceSettingsService;
+    private final PracticeSettingsRepository practiceSettingsRepository;
 
     @Command(value = "setspawn", description = "Sets the spawn location")
     @Permission("practice.admin")
     public void setSpawn(@me.vaperion.blade.command.annotation.Sender Player sender) {
         practiceSettings.setSpawnLocation(sender.getLocation());
-        practiceSettingsService.saveAsync(practiceSettings);
+        practiceSettingsRepository.saveAsync(practiceSettings);
         Sender.messageSuccess(sender, "Successfully set the spawn location.");
     }
 
@@ -25,7 +25,7 @@ public class PracticeSettingsCommand {
     @Permission("practice.admin")
     public void setEditor(@me.vaperion.blade.command.annotation.Sender Player sender) {
         practiceSettings.setEditorLocation(sender.getLocation());
-        practiceSettingsService.saveAsync(practiceSettings);
+        practiceSettingsRepository.saveAsync(practiceSettings);
         Sender.messageSuccess(sender, "Successfully set the editor location.");
     }
 }

@@ -1,14 +1,18 @@
 package country.pvp.practice.commands;
 
 import com.google.inject.Inject;
+import country.pvp.practice.Messages;
+import country.pvp.practice.kit.editor.KitChooseMenuProvider;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.party.Party;
 import country.pvp.practice.party.PartyManager;
 import country.pvp.practice.party.PartyService;
+import country.pvp.practice.party.duel.PartyDuelService;
 import country.pvp.practice.party.menu.PartyEventMenuProvider;
 import country.pvp.practice.party.menu.PartyMembersMenuProvider;
 import country.pvp.practice.player.PlayerManager;
 import country.pvp.practice.player.PlayerSession;
+import country.pvp.practice.util.message.MessagePattern;
 import country.pvp.practice.util.message.Sender;
 import me.vaperion.blade.command.annotation.Command;
 import me.vaperion.blade.command.annotation.Name;
@@ -19,16 +23,20 @@ public class PartyCommands extends PlayerCommands {
 
     private final PartyService partyService;
     private final PartyManager partyManager;
+    private final PartyDuelService partyDuelService;
     private final PartyEventMenuProvider partyEventMenuProvider;
     private final PartyMembersMenuProvider partyMembersMenuProvider;
+    private final KitChooseMenuProvider kitChooseMenuProvider;
 
     @Inject
-    public PartyCommands(PlayerManager playerManager, PartyService partyService, PartyManager partyManager, PartyEventMenuProvider partyEventMenuProvider, PartyMembersMenuProvider partyMembersMenuProvider) {
+    public PartyCommands(PlayerManager playerManager, PartyService partyService, PartyManager partyManager, PartyDuelService partyDuelService, PartyEventMenuProvider partyEventMenuProvider, PartyMembersMenuProvider partyMembersMenuProvider, KitChooseMenuProvider kitChooseMenuProvider) {
         super(playerManager);
         this.partyService = partyService;
         this.partyManager = partyManager;
+        this.partyDuelService = partyDuelService;
         this.partyEventMenuProvider = partyEventMenuProvider;
         this.partyMembersMenuProvider = partyMembersMenuProvider;
+        this.kitChooseMenuProvider = kitChooseMenuProvider;
     }
 
     @Command("party create")
@@ -186,8 +194,31 @@ public class PartyCommands extends PlayerCommands {
     }
 
     @Command("party duel")
-    public void duel(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("party") Party party, @Optional @Name("ladder") Ladder ladder) {
+    public void duel(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("party") Party invitee, @Optional @Name("ladder") Ladder ladder) {
+        PlayerSession leader = get(sender);
+        if (!leader.hasParty()) {
+            Sender.messageError(leader, "You do not have a party.");
+            return;
+        }
 
+        if (!leader.isPartyLeader()) {
+            Sender.messageError(leader, "You must be a leader of the party to start party event.");
+            return;
+        }
+
+        Party inviter = leader.getParty();
+
+        if (ladder != null) {
+            partyDuelService.invite(inviter, invitee, ladder, Messages.PARTY_DUEL_INVITATION.match(
+                    new MessagePattern("{party}", inviter.getName()),
+                    new MessagePattern("{ladder}", ladder.getDisplayName())));
+        } else {
+            kitChooseMenuProvider
+                    .provide((l) -> partyDuelService.invite(inviter, invitee, l, Messages.PARTY_DUEL_INVITATION.match(
+                            new MessagePattern("{party}", inviter.getName()),
+                            new MessagePattern("{ladder}", l.getDisplayName()))))
+                    .openMenu(sender);
+        }
     }
 
     private String getShortPartyInfo(Party party) {

@@ -6,7 +6,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import country.pvp.practice.ladder.Ladder;
-import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerRepository;
 import country.pvp.practice.player.PlayerSession;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 public class LeaderBoardsService {
 
     private final Map<Ladder, List<PlayerSession>> cachedTopPlayers = Maps.newConcurrentMap();
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
 
     public List<PlayerSession> getLeaderBoardPlayers(Ladder ladder) {
         return cachedTopPlayers.getOrDefault(ladder, Collections.emptyList());
@@ -26,10 +26,10 @@ public class LeaderBoardsService {
 
     void fetchTopPlayers(Ladder ladder) {
         final String fieldName = "statistics.".concat(ladder.getName());
-        List<PlayerSession> sessions = playerService.get(Filters.exists(fieldName), Sorts.descending(fieldName), 5);
+        List<PlayerSession> sessions = playerRepository.get(Filters.exists(fieldName), Sorts.descending(fieldName), 5);
 
         if (!sessions.isEmpty()) //work-around
-            playerService.createIndex(sessions.get(0), Indexes.descending(fieldName));
+            playerRepository.createIndex(sessions.get(0), Indexes.descending(fieldName));
         
         cachedTopPlayers.put(ladder, sessions);
     }

@@ -41,7 +41,7 @@ public class MatchCommands extends PlayerCommands {
         matchProvider.provide(ladder, SoloTeam.of(p1), SoloTeam.of(p2), SoloTeam.of(p3)).init();
     }
 
-    @Command("spectate")
+    @Command(value = {"spectate", "spec"})
     public void specate(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("player") PlayerSession player) {
         PlayerSession playerSession = get(sender);
 
@@ -78,7 +78,7 @@ public class MatchCommands extends PlayerCommands {
                     .provide((l) -> playerDuelService.invite(inviter, invitee, l, Messages.PLAYER_DUEL_INVITATION.match(
                             new MessagePattern("{player}", inviter.getName()),
                             new MessagePattern("{ping}", inviter.getPing()),
-                            new MessagePattern("{ladder}", ladder.getDisplayName()))))
+                            new MessagePattern("{ladder}", l.getDisplayName()))))
                     .openMenu(sender);
         }
     }

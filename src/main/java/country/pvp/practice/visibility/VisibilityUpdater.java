@@ -20,6 +20,7 @@ public class VisibilityUpdater {
     public void update(PlayerSession player, boolean flicker) {
         if (flicker) {
             for (PlayerSession other : playerManager.getAll()) {
+                if (!other.isOnline()) continue;
                 update(player, other, Visibility.HIDDEN);
                 update(other, player, Visibility.HIDDEN);
             }
@@ -27,7 +28,7 @@ public class VisibilityUpdater {
 
         Runnable runnable = () -> {
             for (PlayerSession other : playerManager.getAll()) {
-                if (!other.isOnline() || player.equals(other)) continue;
+                if (!other.isOnline()) continue;
 
                 update(player, other);
                 update(other, player);

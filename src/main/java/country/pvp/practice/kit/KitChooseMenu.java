@@ -1,9 +1,9 @@
 package country.pvp.practice.kit;
 
 import com.google.common.collect.Maps;
-import country.pvp.practice.util.data.Callback;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
+import country.pvp.practice.util.data.Callback;
 import country.pvp.practice.util.menu.Button;
 import country.pvp.practice.util.menu.Menu;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +49,7 @@ public class KitChooseMenu extends Menu {
         public void clicked(Player player, ClickType clickType) {
             if (clickType.isLeftClick()) {
                 callback.call(ladder);
+                player.closeInventory();
             }
         }
     }

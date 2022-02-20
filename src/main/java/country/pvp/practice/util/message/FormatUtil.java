@@ -13,10 +13,20 @@ public class FormatUtil {
         if (health == 0) {
             formatted = ChatColor.RED + "Dead";
         } else {
-            formatted = ChatColor.GREEN.toString() + FormatUtil.formatHealth(health) + " " + ChatColor.DARK_RED + FormatUtil.getHeartIcon();
+            formatted = FormatUtil.formatHealth(health) + " " + ChatColor.DARK_RED + FormatUtil.getHeartIcon();
         }
 
         return formatted;
+    }
+
+    public static String cutString(String text, int maxLength) {
+        if (text.length() < maxLength) {
+            return text;
+        }
+
+        int charsLeft = (text.length() - maxLength) + 3;
+
+        return text.substring(0, charsLeft) + "...";
     }
 
     public static double formatHealth(double health) {

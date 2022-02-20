@@ -27,18 +27,18 @@ import java.util.Set;
 public class ArenaCommands extends PlayerCommands {
 
     private final ArenaManager arenaManager;
-    private final ArenaService arenaService;
-    private final DuplicatedArenaService duplicatedArenaService;
+    private final ArenaRepository arenaRepository;
+    private final DuplicatedArenaRepository duplicatedArenaRepository;
     private final DuplicatedArenaManager duplicatedArenaManager;
 
     public static final File WORLD_EDIT_SCHEMATICS_FOLDER = new File(JavaPlugin.getPlugin(PracticePlugin.class).getDataFolder(), "schematics");
 
     @Inject
-    public ArenaCommands(PlayerManager playerManager, ArenaManager arenaManager, ArenaService arenaService, DuplicatedArenaService duplicatedArenaService, DuplicatedArenaManager duplicatedArenaManager) {
+    public ArenaCommands(PlayerManager playerManager, ArenaManager arenaManager, ArenaRepository arenaRepository, DuplicatedArenaRepository duplicatedArenaRepository, DuplicatedArenaManager duplicatedArenaManager) {
         super(playerManager);
         this.arenaManager = arenaManager;
-        this.arenaService = arenaService;
-        this.duplicatedArenaService = duplicatedArenaService;
+        this.arenaRepository = arenaRepository;
+        this.duplicatedArenaRepository = duplicatedArenaRepository;
         this.duplicatedArenaManager = duplicatedArenaManager;
     }
 
@@ -52,7 +52,7 @@ public class ArenaCommands extends PlayerCommands {
 
         Arena arena = new Arena(name);
         arenaManager.add(arena);
-        arenaService.saveAsync(arena);
+        arenaRepository.saveAsync(arena);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully created new arena.");
     }
 
@@ -60,10 +60,10 @@ public class ArenaCommands extends PlayerCommands {
     @Permission("practice.admin")
     public void remove(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("arena") Arena arena) {
         arenaManager.remove(arena);
-        arenaService.deleteAsync(arena);
+        arenaRepository.deleteAsync(arena);
 
         Set<DuplicatedArena> arenas = duplicatedArenaManager.remove(arena);
-        arenas.forEach(it -> duplicatedArenaService.deleteAsync(it));
+        arenas.forEach(it -> duplicatedArenaRepository.deleteAsync(it));
 
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully removed arena.");
     }
@@ -72,7 +72,7 @@ public class ArenaCommands extends PlayerCommands {
     @Permission("practice.admin")
     public void displayName(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("arena") Arena arena, @Name("displayName") String name) {
         arena.setDisplayName(name);
-        arenaService.saveAsync(arena);
+        arenaRepository.saveAsync(arena);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's display name.");
     }
 
@@ -87,7 +87,7 @@ public class ArenaCommands extends PlayerCommands {
         }
 
         arena.setIcon(itemInHand.clone());
-        arenaService.saveAsync(arena);
+        arenaRepository.saveAsync(arena);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set arena's icon.");
     }
 
@@ -102,7 +102,7 @@ public class ArenaCommands extends PlayerCommands {
     @Command("arena gridindex")
     public void gridIndex(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("arena") Arena arena, @Name("index") int index) {
         arena.setGridIndex(index);
-        arenaService.saveAsync(arena);
+        arenaRepository.saveAsync(arena);
         Sender.messageSuccess(sender, "Successfully set grid index.");
     }
 
@@ -124,7 +124,7 @@ public class ArenaCommands extends PlayerCommands {
 
         Region region = Region.from(selectionData.getSelection());
         arena.setRegion(region);
-        arenaService.saveAsync(arena);
+        arenaRepository.saveAsync(arena);
 
 
         File file = new File(WORLD_EDIT_SCHEMATICS_FOLDER, arena.getName() + ".schematic");
@@ -148,7 +148,7 @@ public class ArenaCommands extends PlayerCommands {
         try {
             Set<DuplicatedArena> arenas = ArenaGenerator.generate(arena, amount);
             duplicatedArenaManager.add(arena, arenas);
-            arenas.forEach(it -> duplicatedArenaService.saveAsync(it));
+            arenas.forEach(it -> duplicatedArenaRepository.saveAsync(it));
             System.out.println("Success, I guess???");
         } catch (Exception e) {
             e.printStackTrace();

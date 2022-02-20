@@ -3,7 +3,7 @@ package country.pvp.practice.commands;
 import com.google.inject.Inject;
 import country.pvp.practice.ladder.Ladder;
 import country.pvp.practice.ladder.LadderManager;
-import country.pvp.practice.ladder.LadderService;
+import country.pvp.practice.ladder.LadderRepository;
 import country.pvp.practice.util.message.Sender;
 import lombok.RequiredArgsConstructor;
 import me.vaperion.blade.command.annotation.Command;
@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 public class LadderCommands {
 
     private final LadderManager ladderManager;
-    private final LadderService ladderService;
+    private final LadderRepository ladderRepository;
 
     @Command("ladder create")
     @Permission("practice.admin")
@@ -29,7 +29,7 @@ public class LadderCommands {
 
         Ladder ladder = new Ladder(name);
         ladderManager.add(ladder);
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully created new ladder.");
     }
 
@@ -37,7 +37,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void remove(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder) {
         ladderManager.remove(ladder);
-        ladderService.deleteAsync(ladder);
+        ladderRepository.deleteAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully removed ladder.");
     }
 
@@ -45,7 +45,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void displayName(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder, @Name("displayName") String name) {
         ladder.setDisplayName(name);
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's display name.");
     }
 
@@ -60,7 +60,7 @@ public class LadderCommands {
         }
 
         ladder.setIcon(itemInHand.clone());
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's icon.");
     }
 
@@ -68,7 +68,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void ranked(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder, @Name("ranked") boolean ranked) {
         ladder.setRanked(ranked);
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's ranked status.");
     }
 
@@ -76,7 +76,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void inventory(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setInventory(sender.getInventory().getContents());
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's inventory.");
     }
 
@@ -84,7 +84,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void armor(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setArmor(sender.getInventory().getArmorContents());
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's armor.");
     }
 
@@ -92,7 +92,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void editorItems(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder) {
         ladder.setEditorItems(sender.getInventory().getContents());
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's editor items.");
     }
 
@@ -100,7 +100,7 @@ public class LadderCommands {
     @Permission("practice.admin")
     public void build(@me.vaperion.blade.command.annotation.Sender Player sender, @Name("ladder") Ladder ladder, @Name("build") boolean build) {
         ladder.setBuild(build);
-        ladderService.saveAsync(ladder);
+        ladderRepository.saveAsync(ladder);
         Sender.messageSuccess(sender, ChatColor.GREEN + "Successfully set ladder's build.");
     }
 }

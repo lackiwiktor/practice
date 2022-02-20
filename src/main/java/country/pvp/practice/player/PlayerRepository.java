@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerService extends MongoRepositoryImpl<PlayerSession> {
+public class PlayerRepository extends MongoRepositoryImpl<PlayerSession> {
 
     @Inject
-    public PlayerService(MongoDatabase database) {
+    public PlayerRepository(MongoDatabase database) {
         super(database);
     }
 

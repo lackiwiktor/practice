@@ -176,7 +176,7 @@ public class PlayerSession implements DataObject, DuelInvitable<PlayerSession, P
 
     public boolean isPartyLeader() {
         Preconditions.checkNotNull(party, "party");
-        return party.getLeader().equals(this);
+        return party.isLeader(this);
     }
 
     public void addToParty(Party party) {

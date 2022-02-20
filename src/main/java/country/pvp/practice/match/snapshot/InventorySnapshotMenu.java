@@ -91,7 +91,7 @@ public class InventorySnapshotMenu extends Menu {
             return new ItemBuilder(Material.SPECKLED_MELON)
                     .amount((int) FormatUtil.formatHealth(health))
                     .hideAll()
-                    .name(FormatUtil.formatHealthWithHeart(health))
+                    .name(ChatColor.GREEN + FormatUtil.formatHealthWithHeart(health))
                     .build();
         }
     }

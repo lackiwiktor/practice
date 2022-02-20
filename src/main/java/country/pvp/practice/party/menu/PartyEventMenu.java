@@ -65,7 +65,9 @@ public class PartyEventMenu extends Menu {
 
             if (party.size() < 2) {
                 Sender.messageError(player, "You must have at least 2 players in your party in order to start a party event.");
+                return;
             }
+
             kitChooseMenuProvider.provide((ladder) -> {
                 List<PlayerSession> players = Lists.newArrayList(party.getMembers());
 

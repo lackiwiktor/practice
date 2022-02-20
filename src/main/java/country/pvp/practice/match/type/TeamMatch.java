@@ -16,11 +16,12 @@ import country.pvp.practice.match.snapshot.InventorySnapshot;
 import country.pvp.practice.match.snapshot.InventorySnapshotManager;
 import country.pvp.practice.match.team.Team;
 import country.pvp.practice.match.team.type.SoloTeam;
-import country.pvp.practice.player.PlayerService;
+import country.pvp.practice.player.PlayerRepository;
 import country.pvp.practice.player.PlayerSession;
 import country.pvp.practice.util.message.FormatUtil;
 import country.pvp.practice.util.message.MessagePattern;
 import country.pvp.practice.visibility.VisibilityUpdater;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,12 +30,11 @@ import java.util.List;
 
 public class TeamMatch extends Match {
 
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
+    @Getter
     private final Team teamA;
+    @Getter
     private final Team teamB;
-
-    private int teamARoundsWon;
-    private int teamBRoundsWon;
 
     public TeamMatch(MatchManager matchManager,
                      VisibilityUpdater visibilityUpdater,
@@ -45,12 +45,11 @@ public class TeamMatch extends Match {
                      boolean ranked,
                      boolean duel,
                      InventorySnapshotManager snapshotManager,
-                     PlayerService playerService,
+                     PlayerRepository playerRepository,
                      Team teamA,
-                     Team teamB,
-                     int rounds) {
+                     Team teamB) {
         super(snapshotManager, matchManager, visibilityUpdater, lobbyService, itemBarService, arena, ladder, ranked, duel);
-        this.playerService = playerService;
+        this.playerRepository = playerRepository;
         this.teamA = teamA;
         this.teamB = teamB;
     }
@@ -87,8 +86,8 @@ public class TeamMatch extends Match {
                 loserTeam.setElo(ladder, loserNewRating);
                 winnerTeam.setElo(ladder, winnerNewRating);
 
-                playerService.saveAsync(winnerTeam.getPlayerSession());
-                playerService.saveAsync(loserTeam.getPlayerSession());
+                playerRepository.saveAsync(winnerTeam.getPlayerSession());
+                playerRepository.saveAsync(loserTeam.getPlayerSession());
             }
 
             PlayerSession playerSession = winnerTeam.getPlayerSession();
@@ -135,11 +134,9 @@ public class TeamMatch extends Match {
     public boolean canEndRound() {
         if (teamA.isDead()) {
             winner = teamA;
-            teamARoundsWon++;
             return true;
         } else if (teamB.isDead()) {
             winner = teamB;
-            teamBRoundsWon++;
             return true;
         }
 
@@ -195,12 +192,12 @@ public class TeamMatch extends Match {
 
     @Override
     protected void createInventorySnapshots() {
-        for (PlayerSession session : teamA.getOnlinePlayers()) {
-            if (teamA.isAlive(session)) createInventorySnapshot(session);
+        for (PlayerSession session : teamA.getAlivePlayers()) {
+            createInventorySnapshot(session);
         }
 
-        for (PlayerSession session : teamB.getOnlinePlayers()) {
-            if (teamB.isAlive(session)) createInventorySnapshot(session);
+        for (PlayerSession session : teamB.getAlivePlayers()) {
+            createInventorySnapshot(session);
         }
     }
 
@@ -232,11 +229,11 @@ public class TeamMatch extends Match {
                 SoloTeam soloTeam = (SoloTeam) playerTeam;
                 SoloTeam soloTeamOpponent = (SoloTeam) opponentTeam;
 
-                lines.add(ChatColor.GREEN + teamName + " Ping: " + ChatColor.WHITE + soloTeam.getPing());
-                lines.add(ChatColor.YELLOW + teamNameOpponent + " Ping: " + ChatColor.WHITE + soloTeamOpponent.getPing());
+                lines.add(ChatColor.GREEN + teamName + ChatColor.WHITE + " Ping: " + ChatColor.WHITE + soloTeam.getPing());
+                lines.add(ChatColor.BLUE + teamNameOpponent + ChatColor.WHITE + " Ping: " + ChatColor.WHITE + soloTeamOpponent.getPing());
             } else {
                 lines.add(ChatColor.GREEN + "Team " + teamName + ": " + ChatColor.WHITE + playerTeam.getAlivePlayersCount() + "/" + playerTeam.size());
-                lines.add(ChatColor.YELLOW + "Team " + teamNameOpponent + ": " + ChatColor.WHITE + opponentTeam.getAlivePlayersCount() + "/" + opponentTeam.size());
+                lines.add(ChatColor.BLUE + "Team " + teamNameOpponent + ": " + ChatColor.WHITE + opponentTeam.getAlivePlayersCount() + "/" + opponentTeam.size());
             }
 
             lines.add(" ");
@@ -264,7 +261,12 @@ public class TeamMatch extends Match {
                 lines.add(ChatColor.GREEN + "Team: " + ChatColor.WHITE + playerTeam.getAlivePlayersCount() + "/" + playerTeam.size());
 
                 for (PlayerSession session : playerTeam.getPlayers()) {
-                    lines.add(" " + session.getName() + ChatColor.YELLOW + " " + session.getPing() + ChatColor.WHITE + " ms " + FormatUtil.formatHealthWithHeart(session.getHealth()));
+                    boolean isOnline = session.isOnline();
+                    String line = " "
+                            + ((!isOnline || !isAlive(session)) ? (ChatColor.STRIKETHROUGH + ChatColor.GRAY.toString()) : "")
+                            + ChatColor.DARK_GREEN + session.getName()
+                            + (isOnline && isAlive(session) ? (ChatColor.WHITE + " " + FormatUtil.formatHealthWithHeart(session.getHealth())) : "");
+                    lines.add(line);
                 }
 
                 lines.add(" ");
