@@ -1,4 +1,4 @@
 name: Practice
-main: country.pvp.practice.PracticePlugin
+main: me.ponktacology.practice.Practice
 version: 1.0
 author: ponktacology

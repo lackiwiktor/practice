@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>country.pvp</groupId>
-    <artifactId>pvpcountry-practice</artifactId>
+    <groupId>me.ponktacology</groupId>
+    <artifactId>practice</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>practice</name>
@@ -13,6 +13,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <build>
@@ -41,6 +42,10 @@
                                 <relocation>
                                     <pattern>com.google.common</pattern>
                                     <shadedPattern>shaded.com.google.common</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>me.vaperion.blade</pattern>
+                                    <shadedPattern>shaded.me.vaperion.blade</shadedPattern>
                                 </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
@@ -100,9 +105,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.vaperion</groupId>
-            <artifactId>blade</artifactId>
-            <version>1.2.10</version>
+            <groupId>com.github.vaperion.blade</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -124,22 +129,29 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>5.0.1</version>
+            <groupId>com.sk89q</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <version>6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.gesundkrank.jskills</groupId>
+            <artifactId>jskills</artifactId>
+            <version>1.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.github.spigot</groupId>
             <artifactId>1.8.8</artifactId>
             <version>1.8.8</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/libs/spigot.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>WorldEdit</artifactId>
-            <version>6.1</version>
-            <scope>provided</scope>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>4.11.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
